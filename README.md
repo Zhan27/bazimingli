@@ -39,13 +39,15 @@
 直接双击打开 `命理排盘.html` 即可（也可用任意静态服务器）。
 
 ### GitHub Pages（3 步）
-1. 本仓库 Fork / Clone 后，`deploy/` 目录已是同步好的可部署副本（`index.html` + `assets/`）
-2. 仓库 **Settings → Pages → Source** 选择 `main` 分支，目录选 `/deploy`
+1. 本仓库 Fork / Clone 后，`docs/` 目录已是同步好的可部署副本（`index.html` + `assets/`）
+2. 仓库 **Settings → Pages → Source** 选择 `Deploy from a branch`，Branch 选 `main`，目录选 **`/docs`**，Save
 3. 访问 `https://<你的用户名>.github.io/<仓库名>/`
+
+> 注：GitHub Pages 分支部署模式仅支持根目录（root）或 `/docs`，故部署副本放在 `docs/`。
 
 ### 更新内容后重新同步
 ```bash
-bash sync_deploy.sh   # 把最新的 命理排盘.html 同步到 deploy/index.html
+bash sync_deploy.sh   # 把最新的 命理排盘.html 同步到 docs/index.html
 ```
 
 ## 📁 目录结构
@@ -53,8 +55,8 @@ bash sync_deploy.sh   # 把最新的 命理排盘.html 同步到 deploy/index.ht
 ```
 ├── 命理排盘.html      # 主文件（全部功能，单文件自包含）
 ├── assets/            # 背景与太极图素材
-├── deploy/            # 部署副本（GitHub Pages 入口）
-├── sync_deploy.sh     # 源文件 → deploy 同步脚本
+├── docs/              # 部署副本（GitHub Pages 入口，/docs 模式）
+├── sync_deploy.sh     # 源文件 → docs 同步脚本
 └── .gitignore
 ```
 
