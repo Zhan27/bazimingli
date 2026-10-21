@@ -15,7 +15,7 @@
 
 ![工作台实际截图](verification/screenshots/workbench-desktop.png)
 
-设计参考与许可证核对见 [前端参考说明](docs/UI-REFERENCES.md)。当前版本下载见 [Releases](https://github.com/Zhan27/bazimingli/releases/latest)。本轮已完成的开发与暂停范围见 [进度说明](PROGRESS-21-96.md)。
+设计参考与许可证核对见 [前端参考说明](docs/UI-REFERENCES.md)。当前版本下载见 [Releases](https://github.com/Zhan27/bazimingli/releases/latest)。后续已恢复分段开发，完成与待做范围见 [进度说明](PROGRESS-21-96.md)。5.19.1默认会话保存API Key，页面底部可阅读离线隐私说明；可选中转服务的限制与部署方式见 [Worker说明](worker/README.md)。
 
 ### 5.17：计算规则与可追溯结果
 - 明确选择子初23:00或子正00:00换日；原钟表时刻、UTC偏移、手动夏令时修正、东八区时刻和真太阳时分项显示。默认仍为东八区，不自动查询历史时区。

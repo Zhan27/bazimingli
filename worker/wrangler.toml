@@ -6,11 +6,17 @@ compatibility_date = "2025-01-01"
 [vars]
 # 上游 OpenAI 兼容地址（不带 /chat/completions）
 UPSTREAM_BASE = "https://api.deepseek.com/v1"
-# 每个 IP 每日请求上限，0 = 不限
+# 每个访问码和每个IP的isolate内每日额度；无效或0回退80（非全局限流）
 DAILY_LIMIT = "80"
-# 允许的模型白名单，逗号分隔；留空 = 不限制
+# 精确允许的网页Origin，逗号分隔；默认只允许本项目Pages站点。
+# 自建站点请替换；本地file页面仅在明确接受风险时另加null。不是身份验证的替代品。
+ALLOWED_ORIGINS = "https://zhan27.github.io"
+# 允许的模型白名单，逗号分隔；空值回退deepseek-chat
 ALLOWED_MODELS = "deepseek-chat"
-# 单次响应 token 上限（防止被刷），0 = 不限制
+# UTF-8请求体字节上限（含分块请求）及上游总时长（含流式响应）
+MAX_BODY_BYTES = "131072"
+UPSTREAM_TIMEOUT_MS = "120000"
+# 单次响应token上限；无效或0回退8192
 MAX_TOKENS_CAP = "8192"
 
 [observability]

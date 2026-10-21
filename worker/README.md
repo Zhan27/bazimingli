@@ -53,9 +53,22 @@ wrangler tail
 | 变量 | 说明 | 默认 |
 |---|---|---|
 | `UPSTREAM_BASE` | 上游地址，不带 `/chat/completions` | `https://api.deepseek.com/v1` |
-| `DAILY_LIMIT` | 每 IP 每日请求上限，`0`=不限 | `80` |
+| `DAILY_LIMIT` | 每访问码及每IP的isolate内每日额度；0/无效值回退80 | `80` |
+| `ALLOWED_ORIGINS` | 精确Origin白名单，逗号分隔；缺省拒绝带Origin的浏览器请求 | `https://zhan27.github.io` |
 | `ALLOWED_MODELS` | 模型白名单，逗号分隔 | `deepseek-chat` |
+| `MAX_BODY_BYTES` | UTF-8请求体字节上限（含分块读取），最大1 MiB | `131072` |
+| `UPSTREAM_TIMEOUT_MS` | 上游请求及流式响应总时长，最大300秒 | `120000` |
 | `MAX_TOKENS_CAP` | 单次 max_tokens 硬上限 | `8192` |
+
+### 5.19.1边界与兼容性
+
+先修改 `ALLOWED_ORIGINS` 为实际网页的Origin（协议、主机、端口，不含路径）。默认允许本项目Pages域名；本地file页面可能发送 `Origin: null`，默认拒绝。只有明确接受其较宽来源范围才加入字面值 `null`，也可使用本地HTTP站点并允许其精确Origin。无Origin的命令行客户端仍需访问码；CORS不能替代身份验证。
+
+请求必须是JSON；最多40条system/user/assistant字符串消息，超限明确拒绝，不静默截断聊天记录。未配置模型回退deepseek-chat，`/v1/models`只返回白名单。max_tokens必须是正整数并受上限约束；总响应还有4 MiB上限。上游地址只允许HTTPS，不跟随重定向。错误返回固定提示和类型，不回显上游响应正文或原始异常；所有响应禁用缓存。总时长限制覆盖流式传输，客户端取消会向上游传递取消信号，不自动付费重试。
+
+每日额度是**单个Worker isolate内尽力限制**：访问码跨IP共享桶，同时限制IP；每日UTC零点过期，最多4096桶，满后拒绝新增。部署、多实例和重启仍可能重置或分散计数。严格全局额度需要Cloudflare平台限流或Durable Objects；不能把内存计数当成全局账单上限。模型列表与无效请求也计入额度。
+
+本仓库修改不等于已部署服务更新；需要维护者按配置重新部署。`npm test`中的Worker测试使用虚构访问码和模拟上游，不发送收费模型请求。
 
 ---
 
@@ -80,7 +93,7 @@ API Key  = <你设的 ACCESS_CODES 里的任意一个>
 |---|---|---|
 | GET | `/health` | 健康检查，免鉴权 |
 | POST | `/v1/chat/completions` | 通用代理，OpenAI 兼容，`stream:true` 透传 |
-| GET | `/v1/models` | 转发上游模型列表 |
+| GET | `/v1/models` | 鉴权后只列出配置允许的模型，不访问上游 |
 | POST | `/v1/divine` | **服务端注入 Prompt**：只收命盘事实与知识库片段 |
 
 `/v1/divine` 请求体：

@@ -9282,7 +9282,7 @@ function freezeRules(value){
   Object.values(value).forEach(v=>{if(v&&typeof v==='object'&&!Object.isFrozen(v))freezeRules(v);});
   return Object.freeze(value);
 }
-const RULE_VERSION='5.19.0';
+const RULE_VERSION='5.19.1';
 const STRENGTH_RULES=freezeRules({id:'legacy-strength-v1',
   month:{same:3,resource:2.5,output:-1.5,officer:-2.5,wealth:-1.5},
   root:{same:[1.5,0.5,0.25],resource:[1,0.3,0.15],dayBonus:0.8,monthBonus:0.3},

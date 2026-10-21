@@ -36,7 +36,7 @@ test('strength command, root, and momentum components have independent hand-coun
 test('five immutable school configurations share pillars but apply explicit use-god strategies',()=>{
   const results=e.json(`RULE_PROFILES.map(p=>{const z=zhCompute(parseCivilDate('2024-01-04'),0,1,'北京',{schoolId:p.id});return {id:z.profile.id,version:z.ruleVersion,pillars:z.pillars,score:z.strengthScore,yong:z.yongShen,reason:z.useGod.reason,prompt:aiBuildSchool(p.id).role};})`);
   assert.equal(new Set(results.map(r=>r.reason)).size>=4,true);
-  results.forEach((r,i)=>{assert.equal(r.id,i);assert.equal(r.version,'5.19.0');assert.deepEqual(r.pillars,results[0].pillars);assert.equal(r.score,results[0].score);assert.ok(r.prompt.includes('5.19.0'));});
+  results.forEach((r,i)=>{assert.equal(r.id,i);assert.equal(r.version,'5.19.1');assert.deepEqual(r.pillars,results[0].pillars);assert.equal(r.score,results[0].score);assert.ok(r.prompt.includes('5.19.1'));});
   assert.equal(e.run('Object.isFrozen(RULE_PROFILES[0])&&Object.isFrozen(STRENGTH_RULES.root.same)'),true);
   assert.throws(()=>e.run('getRuleProfile(5)'));
   // Mutating a returned prompt must not modify the source rules for later calls.

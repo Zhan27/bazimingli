@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.19.1 — 2026-10-21
+- Resumed unfinished roadmap after frontend delivery. Default new API keys to tab-session storage, migrate unmarked legacy settings, preserve explicit persistence choices and retain keys in page memory if storage is unavailable.
+- Added offline privacy disclosure and accurate AI relay/provider data-transfer and browser-session restoration information.
+- Hardened optional Worker source with exact origin/model allowlists, bounded UTF-8 bodies/messages/tokens, HTTPS/no redirects, cancellable total upstream timeout, bounded streaming responses and sanitized uncached errors.
+- Added bounded isolate-local code/IP quotas and documented their distributed-limit boundary. Existing deployed Workers were not redeployed.
+- Added nine Node and one browser regression tests using synthetic data/mocked providers; no paid model requests.
+
 ## 5.19.0 — 2026-10-21
 - Redesigned the frontend as a jade-and-paper study workbench with persistent module navigation, side-by-side desktop entry/chart and stacked mobile layout.
 - Brought four pillars before dense narrative sections; added learning/professional views and collapsible time assumptions/settings without changing chart calculation.
