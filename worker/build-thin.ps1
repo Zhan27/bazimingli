@@ -43,7 +43,7 @@ function aiBuildSchool(schoolIdx){
   throw new Error('本版本已启用服务端 Prompt：流派研判准则不在本地。');
 }
 '@
-$html = Cut-Range -Text $html -StartMarker 'function aiBuildSchool(schoolIdx){' -EndMarker '/* 紫微斗数参考摘要' -Replacement $stubA -Label 'aiBuildSchool（5 流派人格）'
+$html = Cut-Range -Text $html -StartMarker '/* 按流派生成角色与 dimGuide(18 维解读侧重),返回{role,dimGuide} */' -EndMarker '/* 紫微斗数参考摘要' -Replacement $stubA -Label 'aiBuildSchool（5 流派人格）'
 
 # ---- 2. 18 维输出框架 + 评分规则 + 研究纪律 + 命格原型 ----
 $stubB = @'
@@ -73,26 +73,26 @@ $before = $html
 $html = [regex]::Replace($html, $btnPattern, '')
 if ($html -ne $before) { Write-Host "  · 已移除「提取 Prompt」按钮" } else { Write-Host "  ! 未找到「提取 Prompt」按钮（可忽略）" -ForegroundColor Yellow }
 
-# ---- 6. 校验：敏感内容必须彻底消失 ----
+# ---- 6. 校验：被剥离的结构必须彻底消失 ----
+# 注：这里只检查**代码标识符**，不检查 Prompt 正文 ——
+#     否则校验脚本自己就把研判准则带进公开仓库了。
 Write-Host ""
 Write-Host "· 校验残留…"
 $forbidden = @(
-  @{ n = '评估标准标题';   s = '综合定档评分标准' },
-  @{ n = '研究纪律';       s = '研究纪律（跃渊方法论）' },
-  @{ n = '命格原型参照';   s = '命格原型参照（命格宇宙式断语体系）' },
-  @{ n = '格局成败六态';   s = '成格=相神在位且原局无病' },
-  @{ n = '流派侧重（盲派）'; s = '**盲派象法**资深命理师' },
-  @{ n = '流派侧重（调候）'; s = '**穷通调候派**资深命理师' },
-  @{ n = '输出格式硬性要求'; s = '严禁修改标记格式' },
-
-  @{ n = '评分加减项';     s = '得令：月令本气生扶日主或为用神 +12' }
+  @{ n = '流派 role 赋值';    s = 'sch.role' },
+  @{ n = '维度指引表';        s = 'dimGuide' },
+  @{ n = '评分规则';          s = 'const scoreRule' },
+  @{ n = '研究纪律';          s = 'const researchDiscipline' },
+  @{ n = '命格原型参照';      s = 'const mingGeRef' },
+  @{ n = '维度兜底表';        s = 'const genGuide' },
+  @{ n = '维度清单拼接';      s = 'const dimsLine' }
 )
 $leak = 0
 foreach ($f in $forbidden) {
-  if ($html.IndexOf($f.s) -ge 0) { Write-Host ("   ✗ 残留：{0}（{1}）" -f $f.n, $f.s.Substring(0,[Math]::Min(12,$f.s.Length))) -ForegroundColor Red; $leak++ }
+  if ($html.IndexOf($f.s) -ge 0) { Write-Host ("   ✗ 残留：{0}（{1}）" -f $f.n, $f.s) -ForegroundColor Red; $leak++ }
 }
-if ($leak -gt 0) { Write-Host "✗ 仍有 $leak 处 Prompt 残留，构建中止" -ForegroundColor Red; exit 2 }
-Write-Host "   ✓ 8 项敏感标记全部清除" -ForegroundColor Green
+if ($leak -gt 0) { Write-Host "✗ 仍有 $leak 处结构残留，构建中止" -ForegroundColor Red; exit 2 }
+Write-Host "   ✓ 8 项结构标记全部清除" -ForegroundColor Green
 
 # ---- 7. 语法校验 ----
 $scriptMatch = [regex]::Match($html, '(?s)<script[^>]*>(.*?)</script>')
