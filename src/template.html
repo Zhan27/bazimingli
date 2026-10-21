@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="description" content="玄机命理排盘：八字四柱、紫微斗数、奇门遁甲、六爻卜筮在线排盘工具，支持 AI 深度解读与多流派分析。">
+<meta name="keywords" content="八字排盘,紫微斗数,奇门遁甲,六爻,合婚,真太阳时,命理排盘,AI命理解读">
+<meta name="author" content="Zhan27">
+<meta name="theme-color" content="#ece6d8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14120e" media="(prefers-color-scheme: dark)">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="玄机命理排盘">
+<meta property="og:title" content="玄机命理排盘 · 八字紫微奇门六爻">
+<meta property="og:description" content="八字四柱、紫微斗数、奇门遁甲、六爻、合婚一体机。纯本地计算，数据不上传；可接任意 OpenAI 兼容大模型做 18 维深度解读。">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="玄机命理排盘 · 八字紫微奇门六爻">
+<meta name="twitter:description" content="八字四柱、紫微斗数、奇门遁甲、六爻、合婚一体机。纯本地计算，数据不上传。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%AF%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%AF%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<title>玄机命理排盘 · 八字紫微奇门六爻</title>
+<style>
+:root{
+  --bg:#ece6d8;--bg2:#f3efe4;--card:#ffffff;--card2:#faf8f3;--line:#e0d9c8;
+  --gold:#b08a3e;--gold2:#8a6d2f;--red:#9e2b25;--red2:#7a201c;--jade:#4a7a4a;
+  --ink:#26221c;--ink2:#6b6457;--ink3:#9a9280;--blue:#3a5a6a;--purple:#6a5a8a;
+  --pink:#a85a7a;--teal:#3a7a72;--green:#3a7a4a;--orange:#c87a2d;
+  --yang:#9e2b25;--yin:#2f6da8;
+  --c-mu:#2e8b57;--c-huo:#c0392b;--c-tu:#b8860b;--c-jin:#8a8d93;--c-shui:#2f6da8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased;min-height:100vh;transition:background .35s,color .35s}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse at top,rgba(176,138,62,.05),transparent 55%),radial-gradient(ellipse at bottom,rgba(158,43,37,.03),transparent 55%);pointer-events:none;z-index:0}
+body::after{content:"";position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.028'/%3E%3C/svg%3E");pointer-events:none;z-index:0;mix-blend-mode:multiply}
+/* ============ 主题: 玄墨青(暗色) ============ */
+body[data-theme="xuanmo"]{
+  --bg:#14120e;--bg2:#191610;--card:#211d15;--card2:#272218;--line:#3a3327;
+  --gold:#c9a45c;--gold2:#a8863f;--red:#c2544c;--red2:#a83f37;--jade:#6fa86f;
+  --ink:#e8e2d4;--ink2:#a89e8a;--ink3:#7c7360;--blue:#5a86a0;--purple:#8a7aaa;
+  --pink:#b8789a;--teal:#5a9a92;--green:#5a9a6a;--orange:#d8904a;
+  --yang:#c2544c;--yin:#5a86b8;
+}
+body[data-theme="xuanmo"] .pillar-card.self{background:#2b251a}
+body[data-theme="xuanmo"] .sec-nav{background:rgba(39,34,24,.92)}
+body[data-theme="xuanmo"] .tab{color:var(--ink);border-color:#3a3327}
+body[data-theme="xuanmo"] .tab:hover{border-color:var(--gold);color:var(--gold)}
+body[data-theme="xuanmo"] .tab.active{background:var(--gold);color:#1a1712;border-color:var(--gold);box-shadow:0 2px 8px rgba(0,0,0,.4)}
+body[data-theme="xuanmo"] .sec-nav-btn{color:var(--ink)}
+body[data-theme="xuanmo"] .sec-nav-btn:hover{color:var(--gold);background:rgba(201,164,92,.12)}
+body[data-theme="xuanmo"] .sec-nav-btn.active{background:var(--gold);color:#1a1712;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+body[data-theme="xuanmo"] .btn-primary{background:var(--gold);color:#1a1712}
+body[data-theme="xuanmo"] .btn-primary:hover{background:var(--gold2)}
+/* ============ 主题: 青绿山水(黛青) ============ */
+body[data-theme="qinglv"]{
+  --bg:#dfe9e4;--bg2:#edf3ef;--card:#f9fcf9;--card2:#f0f6f2;--line:#c6d6cd;
+  --gold:#7d8f4f;--gold2:#64753c;--red:#9e4a3a;--red2:#7a3528;--jade:#2e6e5c;
+  --ink:#22302c;--ink2:#5a6e68;--ink3:#8a9c96;--blue:#3a6a7a;--purple:#6a7a8a;
+  --pink:#a86a7a;--teal:#2e7a6e;--green:#3a7a5a;--orange:#b07a3a;
+  --yang:#9e4a3a;--yin:#3a6a9a;
+}
+body[data-theme="qinglv"] .pillar-card.self{background:#f2f8f4}
+/* 主题切换按钮 */
+header{position:relative}
+.theme-dots{position:absolute;top:14px;right:168px;display:flex;gap:6px;z-index:60}
+.theme-dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);cursor:pointer;transition:transform .2s,border-color .2s;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.theme-dot:hover{transform:scale(1.18)}
+.theme-dot.active{border-color:var(--gold);box-shadow:0 0 0 2px rgba(176,138,62,.35)}
+@media(max-width:640px){.theme-dots{right:8px;top:56px}.theme-dot{width:17px;height:17px}}
+.wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 14px 60px}
+header{padding:22px 0 16px;text-align:center;border-bottom:1px solid var(--line);margin-bottom:20px}
+header h1{font-family:"Noto Serif SC","Songti SC",serif;font-size:1.7rem;color:var(--ink);letter-spacing:.25em;font-weight:700}
+header h1 em{font-style:normal;color:var(--gold)}
+header .sub{font-size:.78rem;color:var(--ink3);margin-top:6px;letter-spacing:.2em}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:18px}
+.tab{padding:8px 18px;border:1px solid var(--line);background:var(--card);color:var(--ink2);border-radius:9px;cursor:pointer;font-size:.88rem;transition:all .2s;font-family:inherit}
+.tab:hover{border-color:var(--gold);color:var(--ink)}
+.tab.active{background:var(--ink);color:#f6f3ee;border-color:var(--ink);box-shadow:0 2px 8px rgba(38,34,28,.15);font-weight:600}
+.panel{display:none}
+.panel.active{display:block;animation:fade .3s}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.form-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-bottom:16px;box-shadow:0 6px 24px rgba(0,0,0,.04)}
+.form-card h2{font-family:"Noto Serif SC","Songti SC",serif;font-size:1rem;color:var(--ink);letter-spacing:.15em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.form-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:6px}
+.field{display:flex;flex-direction:column;gap:5px}
+/* v5.5 出生地选择器(省市两级小卡片) */
+.pp-btn{border:1px solid var(--line);background:var(--card2);color:var(--gold);border-radius:8px;padding:2px 8px;font-size:.8rem;cursor:pointer;white-space:nowrap;line-height:1.6}
+.pp-btn:hover{border-color:var(--gold2);color:var(--gold2)}
+.pp-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;max-width:660px;width:92%;max-height:72vh;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+.pp-row{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}
+.pp-chip{border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:999px;padding:4px 12px;font-size:.78rem;cursor:pointer;transition:.15s}
+.pp-chip:hover{border-color:var(--gold2);color:var(--gold);transform:translateY(-1px)}
+.field label{font-size:.75rem;color:var(--ink3);letter-spacing:.05em}
+.field input,.field select{background:var(--card2);border:1px solid var(--line);color:var(--ink);padding:9px 12px;border-radius:10px;font-size:.9rem;font-family:inherit;min-width:110px}
+.field input:focus,.field select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(176,138,62,.12)}
+.btn{padding:10px 24px;border:none;border-radius:10px;cursor:pointer;font-size:.92rem;font-family:inherit;transition:all .2s}
+.btn:active{transform:scale(.97)}
+.btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.btn-primary{background:var(--ink);color:#f6f3ee;font-weight:600}
+.btn-primary:hover{background:var(--gold);box-shadow:0 4px 14px rgba(176,138,62,.3)}
+.btn-ghost{background:var(--card);color:var(--ink2);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-1px)}
+.result{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:16px;box-shadow:0 6px 24px rgba(0,0,0,.04)}
+/* 问真式分段导航 */
+.sec-nav{position:sticky;top:8px;z-index:50;display:flex;gap:4px;justify-content:center;margin:0 0 16px;padding:5px;background:rgba(250,248,243,.92);border:1px solid var(--line);border-radius:13px;backdrop-filter:blur(10px);box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.sec-nav-btn{flex:1;max-width:150px;padding:8px 10px;border:none;border-radius:9px;background:transparent;color:var(--ink2);font-size:.84rem;font-family:inherit;cursor:pointer;letter-spacing:.18em;transition:all .25s}
+.sec-nav-btn:hover{color:var(--gold);background:rgba(176,138,62,.09)}
+.sec-nav-btn.active{background:var(--ink);color:#f6f3ee;font-weight:600;box-shadow:0 2px 8px rgba(38,34,28,.18)}
+.sec-nav-btn:active{transform:scale(.97)}
+.sec-page{animation:fade .3s}
+.result-title{font-family:"Noto Serif SC","Songti SC",serif;color:var(--ink);font-size:1.15rem;margin-bottom:14px;text-align:center;letter-spacing:.2em;font-weight:700}
+.info-bar{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;font-size:.84rem;color:var(--ink2);margin-bottom:14px;padding:11px 14px;background:var(--card2);border-radius:12px;border:1px solid var(--line)}
+.info-bar b{color:var(--gold);font-weight:600}
+.tip{font-size:.76rem;color:var(--ink3);text-align:center;margin-top:10px;line-height:1.6}
+/* 罗盘式四柱 */
+.pillar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.pillar-card{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:20px 10px 16px;text-align:center;transition:transform .3s cubic-bezier(.16,1,.3,1),border-color .3s,box-shadow .3s}
+.pillar-card:hover{transform:translateY(-3px);border-color:var(--gold2);box-shadow:0 10px 24px rgba(176,138,62,.1)}
+.pillar-card.self{border-color:var(--gold);box-shadow:0 4px 16px rgba(176,138,62,.12);background:#fff}
+.pillar-card .p-tag{font-size:10px;letter-spacing:.3em;color:var(--ink3);margin-bottom:14px}
+.pillar-card .p-gz{font-family:"Noto Serif SC","Songti SC",serif;font-size:36px;font-weight:700;letter-spacing:.08em;line-height:1.1}
+.pillar-card .p-gz .z{color:var(--gold)}
+.pillar-card .p-ts{font-size:11px;color:var(--ink2);margin-top:10px}
+.pillar-card.self .p-ts{color:var(--gold);font-weight:600}
+.pillar-card .p-detail{font-size:10px;color:var(--ink3);margin-top:8px;line-height:1.7;border-top:1px solid var(--line);padding-top:8px}
+.pillar-card .p-wx{font-size:10px;color:var(--ink2);margin-top:4px}
+.pillar-card .p-wx i{font-style:normal;color:var(--gold)}
+@media(max-width:640px){.pillar-grid{grid-template-columns:repeat(2,1fr)}.pillar-card .p-gz{font-size:28px}}
+/* 八字四柱表 */
+.gz{font-size:1.4rem;font-weight:700;letter-spacing:.04em}
+.wu-xing{font-size:.72rem;margin-top:2px;padding:1px 6px;border-radius:8px;display:inline-block}
+.ten-god{font-size:.76rem;color:var(--ink2)}
+.ten-god.self{color:var(--gold);font-weight:600}
+/* 术语即点即译: 可点击术语 */
+.tterm{cursor:pointer;border-bottom:1px dashed var(--gold2);transition:color .18s,background .18s}
+.tterm:hover{color:var(--gold);background:rgba(176,138,62,.1);border-radius:3px}
+.tterm[data-term="长生"],.tterm[data-term="沐浴"],.tterm[data-term="冠带"],.tterm[data-term="临官"],.tterm[data-term="帝旺"]{font-weight:600}
+.dy-table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:6px;font-variant-numeric:tabular-nums}
+.dy-table th{background:var(--card2);color:var(--gold);padding:5px;border:1px solid var(--line);font-size:.76rem;letter-spacing:.06em;font-weight:600;white-space:nowrap}
+.dy-table td{border:1px solid var(--line);padding:5px 3px;text-align:center;font-size:.82rem}
+.dy-table td.age-active{background:rgba(176,138,62,.12)}
+.section-block{margin-top:18px;padding:20px 22px;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,.03)}
+.section-block h3{font-family:"Noto Serif SC","Songti SC",serif;color:var(--ink);font-size:.95rem;letter-spacing:.12em;font-weight:700;margin-bottom:14px;text-wrap:balance}
+.tag-list{display:flex;flex-wrap:wrap;gap:6px}
+.tag{padding:4px 12px;border-radius:14px;font-size:.76rem;background:var(--card2);border:1px solid var(--line);color:var(--ink2)}
+.tag.mu{border-color:var(--c-mu);color:var(--c-mu);background:rgba(46,139,87,.07)}
+.tag.huo{border-color:var(--c-huo);color:var(--c-huo);background:rgba(192,57,43,.06)}
+.tag.tu{border-color:var(--c-tu);color:var(--c-tu);background:rgba(184,134,11,.07)}
+.tag.jin{border-color:var(--c-jin);color:var(--c-jin);background:rgba(138,141,147,.08)}
+.tag.shui{border-color:var(--c-shui);color:var(--c-shui);background:rgba(47,109,168,.06)}
+.nayin{color:var(--purple);font-size:.82rem}
+.desc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.desc-item{background:var(--card2);border:1px solid var(--line);padding:11px 12px;border-radius:12px;font-size:.8rem;transition:border-color .25s,transform .25s}
+.desc-item:hover{border-color:var(--gold2);transform:translateY(-1px)}
+.desc-item .k{color:var(--ink3);font-size:.74rem}
+.desc-item .v{color:var(--ink);margin-top:2px;font-weight:500}
+/* 18维瀑布流(紧凑布局,按内容自然高度) */
+.dim-waterfall{column-count:3;column-gap:12px}
+.dim-waterfall .desc-item{break-inside:avoid;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s ease,border-color .3s ease}
+.dim-waterfall .desc-item:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.08);border-color:var(--gold)}
+@media(max-width:1100px){.dim-waterfall{column-count:2}}
+@media(max-width:640px){.dim-waterfall{column-count:1}}
+/* 紫微 */
+.zw-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--gold);border-radius:8px;overflow:hidden;margin:8px 0}
+.zw-cell{border:1px solid var(--line);padding:8px 4px;min-height:90px;font-size:.72rem;position:relative;background:var(--bg2)}
+.zw-cell .palace-name{color:var(--gold);font-weight:600;font-size:.78rem;border-bottom:1px solid var(--line);padding-bottom:2px;margin-bottom:4px}
+.zw-cell .stem-branch{color:var(--ink3);font-size:.68rem}
+.zw-cell .stars{margin-top:4px;line-height:1.6}
+.zw-cell .star{display:block;font-size:.7rem}
+.zw-cell .star.main{color:var(--red);font-weight:600}
+.zw-cell .star.minor{color:var(--ink)}
+.zw-cell .star.assist{color:var(--jade)}
+.zw-cell .star.sha{color:var(--purple)}
+.zw-cell .star.za{color:var(--ink2);font-size:.6rem;display:inline;margin-right:2px}
+.zw-cell .star.za+.star.za::before{content:'·';color:var(--ink3);margin-right:2px}
+.zw-cell .star .bright{color:var(--gold2);font-size:.56rem;margin-left:1px}
+.zw-cell .cs12{display:block;color:var(--blue);font-size:.62rem;margin-top:2px}
+.zw-cell .da-lim{color:var(--ink3);font-size:.6rem;margin-left:4px}
+.zw-cell.is-ming{box-shadow:inset 0 0 0 1px var(--gold)}
+.zw-cell .body{color:var(--gold)}
+/* 奇门 */
+.qm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:2px solid var(--gold);border-radius:8px;overflow:hidden;margin:8px auto;max-width:480px}
+.qm-cell{border:1px solid var(--line);padding:8px;min-height:132px;font-size:.72rem;background:var(--bg2);position:relative}
+.qm-cell .gong-num{position:absolute;top:2px;right:4px;color:var(--ink3);font-size:.66rem}
+.qm-cell .gong-name{color:var(--gold);font-weight:600;font-size:.76rem;margin-bottom:3px}
+.qm-cell .row{display:flex;justify-content:space-between;font-size:.68rem;color:var(--ink2);line-height:1.6}
+.qm-cell .row b{color:var(--ink)}
+.qm-cell.center{background:var(--card2)}
+.qm-cell.fu-cell{background:linear-gradient(135deg,rgba(176,138,62,.07),rgba(176,138,62,.02))}
+.qm-cell .xk{color:var(--orange);font-size:.58rem;margin-left:3px;font-weight:600}
+.ly-table tr.dong-row td{background:rgba(158,43,37,.06)}
+/* 六爻 */
+.ly-table{width:100%;border-collapse:collapse;font-size:.84rem;margin:8px 0;max-width:520px;margin-left:auto;margin-right:auto}
+.ly-table td{border:1px solid var(--line);padding:6px 8px;vertical-align:middle}
+.ly-table .yao-pos{width:50px;text-align:center;color:var(--gold);font-weight:600;background:var(--card2)}
+.ly-table .yao-symbol{width:80px;text-align:center;font-size:1.6rem;letter-spacing:2px}
+.ly-table .yao-info{font-size:.8rem}
+.ly-table .yao-info .gz{font-size:.95rem;color:var(--ink)}
+.ly-table .yao-info .qin{color:var(--ink2)}
+.ly-table .yao-info .shen{color:var(--ink3)}
+.note{font-size:.76rem;color:var(--ink3);background:var(--bg2);padding:8px 10px;border-radius:6px;margin-top:8px;line-height:1.6;border-left:3px solid var(--gold2)}
+.empty-hint{text-align:center;color:var(--ink3);padding:40px 0;font-size:.9rem}
+/* 排盘记录 */
+.rec-list{display:flex;flex-direction:column;gap:8px}
+.rec-item{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .2s}
+.rec-item:hover{border-color:var(--gold2);background:var(--card)}
+.rec-item .rec-main{flex:1;min-width:200px}
+.rec-item .rec-name{color:var(--gold);font-weight:600;font-size:.9rem}
+.rec-item .rec-meta{font-size:.76rem;color:var(--ink3);margin-top:2px}
+.rec-item .rec-bazi{font-size:.85rem;color:var(--ink);letter-spacing:.05em;margin-top:2px}
+.rec-item .rec-bazi b{color:var(--gold)}
+.rec-del{padding:4px 10px;border:1px solid var(--line);background:transparent;color:var(--ink3);border-radius:5px;cursor:pointer;font-size:.74rem;font-family:inherit;transition:all .2s}
+.rec-del:hover{border-color:var(--red);color:var(--red)}
+.rec-empty{text-align:center;color:var(--ink3);padding:16px 0;font-size:.82rem}
+.rec-tools{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+.rec-clear{padding:5px 14px;border:1px solid var(--line);background:var(--card2);color:var(--ink2);border-radius:5px;cursor:pointer;font-size:.76rem;font-family:inherit}
+.rec-clear:hover{border-color:var(--red);color:var(--red)}
+@media(max-width:640px){
+  header h1{font-size:1.25rem}
+  .tab{padding:6px 12px;font-size:.82rem}
+  .field input,.field select{min-width:0;width:100%;font-size:.85rem}
+  .field{flex:1 1 calc(50% - 6px)}
+  .form-card{padding:16px 14px}
+  .section-block{padding:16px 14px}
+  .result{padding:14px 12px}
+  .gz{font-size:1.1rem}
+  .zw-grid{grid-template-columns:repeat(3,1fr)}
+  .zw-cell{min-height:80px;font-size:.66rem}
+  .desc-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media print{
+  body{background:#fff;color:#000}body::before{display:none}
+  .tabs,.form-card,.btn{display:none}.wrap{max-width:100%}
+  .panel{display:block!important}.result{break-inside:avoid}
+}
+/* 轻量动效(方案C UI体系) */
+.section-block,.desc-item,.tag,.note,.rec-item,.chat-quick span,.btn{transition:transform .3s cubic-bezier(0.16,1,0.3,1),box-shadow .3s ease,border-color .3s ease,color .3s ease}
+.section-block:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.06);border-color:var(--gold)}
+.desc-item:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.tag:hover{transform:scale(1.04);border-color:var(--gold);color:var(--gold);cursor:pointer}
+.rec-item:hover{border-color:var(--gold)}
+.chat-quick span:hover{border-color:var(--jade);color:var(--jade)}
+/* 排盘轻提示(极简) */
+.cast-loading{position:fixed;inset:0;background:rgba(243,239,228,.75);z-index:888;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .25s ease}
+.cast-loading.show{opacity:1;pointer-events:auto}
+.cast-loading .label{color:var(--gold);font-size:.92rem;letter-spacing:.4em}
+.cast-loading .sub{color:var(--ink3);font-size:.72rem;letter-spacing:.15em}
+/* 结果区块逐段显现 */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1)}
+.reveal.in{opacity:1;transform:translateY(0)}
+/* 能量条增长 */
+.wxbar-bar{width:0!important;transition:width 1s cubic-bezier(.16,1,.3,1)}
+.wxbar-bar.in{width:var(--pct)!important}
+/* 数字滚动 */
+.roll-num{display:inline-block;font-variant-numeric:tabular-nums}
+/* Tab切换转场 */
+.panel{transition:opacity .25s ease}
+
+/* ============ v2 可访问性 & UX 优化（2026-08-28） ============ */
+/* 1) 跳过导航链接（键盘/读屏用户直达主内容） */
+.skip-link{position:absolute;left:-9999px;top:0;z-index:1000;background:var(--gold);color:#fff;padding:8px 16px;border-radius:0 0 8px 0;font-size:.85rem;text-decoration:none}
+.skip-link:focus{left:0;outline:3px solid var(--gold2);outline-offset:-2px}
+/* 2) 全局键盘焦点环（tab/主题点/历史记录/过三关条目等可点元素） */
+.tab:focus-visible,.theme-dot:focus-visible,.sec-nav-btn:focus-visible,.rec-item:focus-visible,.gsg-item:focus-visible,[onclick]:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.theme-dot:focus-visible{border-color:var(--gold2)}
+/* 3) 减少动效（WCAG 2.3.3）：关闭动画/平滑滚动/入场过渡 */
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .reveal{opacity:1;transform:none}
+  .wxbar-bar{width:var(--pct)!important}
+}
+/* 4) 返回顶部按钮 */
+#back-top{position:fixed;right:18px;bottom:22px;z-index:900;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink2);font-size:1.05rem;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.14);opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .25s,transform .25s,visibility .25s;font-family:inherit}
+#back-top.show{opacity:1;visibility:visible;transform:none}
+#back-top:hover{color:var(--gold);border-color:var(--gold)}
+@media (prefers-reduced-motion: reduce){#back-top{transition:none}}
+/* 5) 对比度修正（WCAG AA：小字号正文 ≥4.5:1） */
+.field label,header .sub{color:var(--ink2)}
+/* 6) 滚动容器布局稳定（防重绘） */
+.sec-nav{contain:layout paint}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">跳到主内容</a>
+<div class="wrap" id="main-content" role="main">
+<header>
+<h1>玄机命理排盘</h1>
+<div class="sub">八字四柱 · 紫微斗数 · 奇门遁甲 · 六爻卜筮</div>
+<div class="theme-dots" role="group" aria-label="主题切换">
+  <span class="theme-dot active" data-theme="zhiyun" role="button" tabindex="0" onclick="setTheme('zhiyun')" style="background:#f3efe4" title="米白纸韵" aria-label="切换到米白纸韵主题"></span>
+  <span class="theme-dot" data-theme="xuanmo" role="button" tabindex="0" onclick="setTheme('xuanmo')" style="background:#1a1712" title="玄墨青(暗色)" aria-label="切换到玄墨青暗色主题"></span>
+  <span class="theme-dot" data-theme="qinglv" role="button" tabindex="0" onclick="setTheme('qinglv')" style="background:#dfe9e4" title="青绿山水" aria-label="切换到青绿山水主题"></span>
+</div>
+<button class="btn btn-ghost" onclick="aiOpenSettings()" style="position:absolute;top:14px;right:14px;font-size:.75rem;padding:6px 13px;border-color:var(--jade);color:var(--jade)">🤖 AI 深度解读设置</button>
+</header>
+
+<!-- AI 设置弹窗 -->
+<div id="ai-modal" role="dialog" aria-modal="true" aria-label="AI 深度解读设置" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(3px)">
+<div style="background:var(--card);border:1px solid var(--gold2);border-radius:14px;padding:22px;width:min(460px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.25)">
+<h3 style="margin:0 0 4px;color:var(--gold);font-size:1.05rem">🤖 AI 深度解读设置</h3>
+<div style="font-size:.74rem;color:var(--ink3);margin-bottom:12px;line-height:1.7">接入大模型 API（OpenAI 兼容协议），排盘后一键生成<b>综合典籍 + AI 深度思考</b>的多维解读。<br>Key 仅在<b>本机</b>生效，请求直接发往您填写的 API 地址，不经过任何第三方服务器。<b>填入后不会回显</b>，仅显示尾号。</div>
+<div id="ai-key-state" style="font-size:.72rem;color:var(--ink3);margin-bottom:10px;padding:6px 10px;background:var(--bg2);border:1px solid var(--line);border-radius:8px">当前未配置 Key</div>
+<div class="field" style="margin-bottom:10px"><label>API 地址 (BaseURL)</label><input id="ai-base" placeholder="https://api.deepseek.com/v1" style="width:100%"></div>
+<div class="field" style="margin-bottom:10px"><label>API Key</label><input id="ai-key" type="password" placeholder="sk-..." autocomplete="off" spellcheck="false" style="width:100%"></div>
+<div class="field" style="margin-bottom:10px"><label>模型名</label><input id="ai-model" placeholder="deepseek-chat" style="width:100%"></div>
+<div class="field" style="margin-bottom:10px"><label>输出长度上限 (max_tokens)</label><input id="ai-maxtok" type="number" min="0" max="65536" step="256" placeholder="8000" style="width:100%">
+<div style="font-size:.7rem;color:var(--ink3);margin-top:4px;line-height:1.6">18 维全量输出约需 6000+ tokens；默认 8000。若接口报 400/参数超限，改小或留 0 表示不指定（用服务端默认，可能被截断导致【18】缺失）。</div></div>
+<label style="display:flex;align-items:flex-start;gap:8px;font-size:.75rem;color:var(--ink2);margin:12px 0 4px;cursor:pointer;line-height:1.6">
+  <input id="ai-divine" type="checkbox" style="margin-top:3px;flex:0 0 auto">
+  <span><b>🎭 使用服务端 Prompt</b>（需已部署中转服务的 <code>/v1/divine</code>）<br><span style="color:var(--ink3);font-size:.7rem">开启后 18 维研判准则由服务端注入，浏览器只发命盘事实与知识库片段</span></span>
+</label>
+<label style="display:flex;align-items:flex-start;gap:8px;font-size:.75rem;color:var(--ink2);margin:12px 0 4px;cursor:pointer;line-height:1.6">
+  <input id="ai-session-only" type="checkbox" style="margin-top:3px;flex:0 0 auto">
+  <span><b>仅本次会话使用</b>（不写入磁盘，关闭浏览器/标签页即失效）<br><span style="color:var(--ink3);font-size:.7rem">共用电脑、录屏演示、网吧/公司设备请勾选</span></span>
+</label>
+<div style="display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:16px;flex-wrap:wrap">
+<button class="btn btn-ghost" onclick="aiClearKey()" style="font-size:.78rem;border-color:var(--red);color:var(--red)">🗑 清除 Key</button>
+<button class="btn btn-ghost" onclick="aiTestConn()" style="font-size:.78rem">测试连接</button>
+<button class="btn btn-ghost" onclick="document.getElementById('ai-modal').style.display='none'" style="font-size:.78rem">取消</button>
+<button class="btn btn-primary" onclick="aiSaveSettings()" style="font-size:.78rem">保存</button>
+</div>
+<div id="ai-test-msg" style="font-size:.74rem;margin-top:10px;min-height:1.2em;color:var(--ink3)"></div>
+</div>
+</div>
+
+<!-- AI Prompt 提取/回填弹窗 -->
+<div id="ai-prompt-modal" role="dialog" aria-modal="true" aria-label="提取 Prompt" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(3px)">
+<div style="background:var(--card);border:1px solid var(--jade);border-radius:14px;padding:22px;width:min(620px,94vw);box-shadow:0 20px 60px rgba(0,0,0,.25);max-height:88vh;overflow-y:auto">
+<h3 style="margin:0 0 4px;color:var(--jade);font-size:1.05rem">📋 提取 Prompt · 无 API Key 也能 AI 深度解读</h3>
+<div style="font-size:.74rem;color:var(--ink3);margin-bottom:12px;line-height:1.7">把下方 Prompt 复制到<b>任意 AI 对话</b>（WorkBuddy / DeepSeek / ChatGPT 等）中发送，AI 会按【1】~【18】逐维深度解读；再把回复<b>粘贴回下方输入框回填</b>，18 张卡片即被 AI 内容点亮。</div>
+<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+<button class="btn btn-primary" onclick="aiCopyPrompt()" style="font-size:.78rem">📋 复制 Prompt</button>
+<button class="btn btn-ghost" onclick="document.getElementById('ai-prompt-modal').style.display='none'" style="font-size:.78rem">关闭</button>
+<span id="ai-prompt-msg" style="font-size:.72rem;color:var(--ink3)"></span>
+</div>
+<textarea id="ai-prompt-text" readonly style="width:100%;height:180px;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:.74rem;line-height:1.6;color:var(--ink);font-family:inherit;box-sizing:border-box;resize:vertical"></textarea>
+<div style="margin:12px 0 6px;font-size:.8rem;color:var(--gold)">📥 粘贴 AI 回复（含【1】~【18】标记）→ 一键回填</div>
+<textarea id="ai-reply-text" placeholder="把 AI 的完整回复粘贴到这里…" style="width:100%;height:120px;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:.78rem;line-height:1.7;color:var(--ink);font-family:inherit;box-sizing:border-box;resize:vertical"></textarea>
+<div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="btn btn-primary" onclick="aiApplyReply()" style="font-size:.78rem;border-color:var(--gold);background:var(--gold);color:#fff">🔁 回填 18 维卡片</button></div>
+</div>
+</div>
+
+
+<div class="tabs">
+<div class="tab active" data-tab="zonghe">综合排盘</div>
+<div class="tab" data-tab="bazi">八字排盘</div>
+<div class="tab" data-tab="ziwei">紫微斗数</div>
+<div class="tab" data-tab="qimen">奇门遁甲</div>
+<div class="tab" data-tab="liuyao">六爻卜筮</div>
+<div class="tab" data-tab="hehun">合婚配对</div>
+</div>
+
+<!-- 综合排盘 -->
+<div class="panel active" id="panel-zonghe">
+<div class="form-card">
+<h2>综合排盘 · 五术同参 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">传统命理文化 × AI 多维解读</span></h2>
+<div class="form-row">
+<div class="field"><label>姓名/昵称</label><input maxlength="100" id="zh-name" placeholder="选填"></div>
+<div class="field"><label>性别</label><select id="zh-gender"><option value="1">男</option><option value="0">女</option><option value="2">不提供</option></select></div>
+<div class="field"><label>历法输入</label><select id="zh-cal" onchange="zhToggleCal()"><option value="0">公历</option><option value="1">农历</option></select></div>
+<div class="field" id="zh-solar-field"><label>公历日期</label><input type="date" id="zh-solar" min="1900-01-31" max="2099-12-31" onchange="zhSyncFromSolar()"></div>
+<div class="field" id="zh-lunar-field" style="display:none"><label>农历年</label><select id="zh-ly" onchange="zhOnLunarChange(this.id)"></select></div>
+<div class="field" id="zh-lm-field" style="display:none"><label>农历月</label><select id="zh-lm" onchange="zhOnLunarChange(this.id)"></select></div>
+<div class="field" id="zh-ld-field" style="display:none"><label>农历日</label><select id="zh-ld" onchange="zhOnLunarChange(this.id)"></select></div>
+<div class="field" id="zh-ll-field" style="display:none"><label>闰月</label><select id="zh-ll" onchange="zhOnLunarChange(this.id)"><option value="0">否</option><option value="1">是</option></select></div>
+<div class="field"><label>出生时辰</label><select id="zh-hour"></select></div>
+<div class="field"><label for="zh-utc-offset">出生钟表的UTC标准时偏移</label><select id="zh-utc-offset" data-utc-offset></select></div>
+<div class="field"><label for="zh-dst">当时是否使用夏令时</label><select id="zh-dst"><option value="0">无／已换为标准时</option><option value="60">钟表比标准时快1小时</option></select></div>
+<div class="field"><label for="zh-wx-mode">五行展示口径</label><select id="zh-wx-mode" data-wx-mode></select></div>
+<div class="field"><label for="zh-time">具体出生时分（选填）</label><input type="time" id="zh-time" step="60"></div>
+<div class="field"><label for="zh-day-boundary">日柱换日规则</label><select id="zh-day-boundary"><option value="zi-chu">子初23:00换日</option><option value="zi-zheng">子正00:00换日</option></select></div>
+<div class="field"><label>仅知时辰的估算分钟</label><select id="zh-minute"><option value="0">00</option><option value="15">15</option><option value="30" selected>30</option><option value="45">45</option></select></div>
+<div class="field"><label>出生地点</label><div style="display:flex;gap:4px;align-items:center"><input maxlength="200" list="city-options" id="zh-place" placeholder="选填·用于真太阳时校正" style="width:130px"><button type="button" class="pp-btn" onclick="zhOpenPicker('zh-place')" title="点选省/市">📍 选</button></div></div>
+<div class="field"><label>真太阳时</label><select id="zh-true-sun"><option value="1">开启</option><option value="0" selected>关闭</option></select></div>
+<div class="field"><label>时辰准确性</label><select id="zh-unknow-hour"><option value="0" selected>确定</option><option value="1">不确定</option></select></div>
+<div class="field"><label>命理流派</label><select id="zh-school2">
+  <option value="0" selected>综合多流派</option>
+  <option value="1">旺衰平衡派</option>
+  <option value="2">盲派象法</option>
+  <option value="3">子平格局派</option>
+  <option value="4">穷通调候派</option>
+</select></div>
+<div class="field" style="align-self:flex-end;padding-bottom:4px"><label style="display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap" title="排盘后先断前事验证时辰，确认无误再看整体；不确定时辰时强烈建议开启"><input type="checkbox" id="zh-check-past" checked onchange="zhCast()" style="width:auto;accent-color:var(--orange)"> 过三关·断前事（验时辰）</label></div>
+<div class="field" style="align-self:flex-end;padding-bottom:4px"><label style="display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap"><input type="checkbox" id="zh-zw-ref" checked onchange="zhCast()" style="width:auto;accent-color:var(--gold)"> 参考紫微斗数</label></div>
+<button class="btn btn-primary" onclick="zhCast()">综合排盘</button>
+<button class="btn btn-ghost" onclick="zhNow()">此刻</button>
+</div>
+<div class="tip">输入公历或农历任一日，系统自动互转。以同一出生时刻为基准，同步排出<b>八字、紫微斗数、奇门遁甲、六爻</b>四盘并汇总解读。日期范围1900-01-31至2099-12-31；钟表时间按所选UTC偏移及手动夏令时修正转换为东八区，未自动推断历史时区。具体时分优先于时辰选择；未填时按时辰中点估算。真太阳时采用GeoNames WGS84城市点位及近似均时差（可填如87.6°），临近边界请核对；时辰不确定时展示全天候选盘及稳定/变化字段，不生成默认确定盘。</div>
+</div>
+<!-- 排盘记录(第二排:表单正下方,方便查找) -->
+<div class="result" id="zh-records-wrap" style="display:none">
+<div class="result-title">排盘记录 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">（点击记录可重新排盘）</span></div>
+<div id="zh-records"></div>
+</div>
+<div id="zh-result" aria-live="polite"></div>
+</div>
+
+<!-- 八字 -->
+<div class="panel" id="panel-bazi">
+<div class="form-card">
+<h2>八字排盘</h2>
+<div class="form-row">
+<div class="field"><label>姓名</label><input maxlength="100" id="bz-name" placeholder="选填"></div>
+<div class="field"><label>性别</label><select id="bz-gender"><option value="1">男</option><option value="0">女</option></select></div>
+<div class="field"><label>公历日期</label><input type="date" id="bz-date" min="1900-01-31" max="2099-12-31"></div>
+<div class="field"><label>出生时辰</label><select id="bz-hour"></select></div>
+<div class="field"><label for="bz-utc-offset">出生钟表的UTC标准时偏移</label><select id="bz-utc-offset" data-utc-offset></select></div>
+<div class="field"><label for="bz-dst">当时是否使用夏令时</label><select id="bz-dst"><option value="0">无／已换为标准时</option><option value="60">钟表比标准时快1小时</option></select></div>
+<div class="field"><label for="bz-wx-mode">五行展示口径</label><select id="bz-wx-mode" data-wx-mode></select></div>
+<div class="field"><label for="bz-time">具体时分（选填）</label><input type="time" id="bz-time" step="60"></div>
+<div class="field"><label>子时换日</label><select id="bz-school"><option value="0" selected>子初23:00换日</option><option value="1">子正00:00换日</option></select></div>
+<div class="field"><label>命理流派</label><select id="bz-school2">
+  <option value="0" selected>综合多流派</option>
+  <option value="1">旺衰平衡派</option>
+  <option value="2">盲派象法</option>
+  <option value="3">子平格局派</option>
+  <option value="4">穷通调候派</option>
+</select></div>
+<button class="btn btn-primary" onclick="bzCast()">排 盘</button>
+<button class="btn btn-ghost" onclick="bzNow()">此刻</button>
+</div>
+<div class="tip">输入公历出生时间即可排出四柱八字、十神、大运流年、神煞纳音。月柱以节气为准（非农历初一），日柱按所选23:00或00:00规则换日；请填具体时分区分早子时与晚子时。仅知时辰按中点估算，交节/换日边界待核对。</div>
+</div>
+<div class="result" id="bz-records-wrap" style="display:none">
+<div class="result-title">排盘历史 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">（点击记录可重新排盘）</span></div>
+<div id="bz-records"></div>
+</div>
+<div id="bz-result" aria-live="polite"></div>
+</div>
+
+<!-- 紫微 -->
+<div class="panel" id="panel-ziwei">
+<div class="form-card">
+<h2>紫微斗数</h2>
+<div class="form-row">
+<div class="field"><label>性别</label><select id="zw-gender"><option value="1">男</option><option value="0">女</option></select></div>
+<div class="field"><label>公历日期</label><input type="date" id="zw-date" min="1900-01-31" max="2099-12-31"></div>
+<div class="field"><label>出生时辰</label><select id="zw-hour"></select></div>
+<div class="field"><label>风格</label><select id="zw-style"><option value="0" selected>三合派（完整安星）</option><option value="1">三合精简</option></select></div>
+<button class="btn btn-primary" onclick="zwCast()">排 盘</button>
+</div>
+<div class="tip">基于出生农历年月时定命身宫，依五行局安紫微主星，排十二宫与南北斗星曜。</div>
+</div>
+<div class="result" id="zw-records-wrap" style="display:none">
+<div class="result-title">排盘历史 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">（点击记录可重新排盘）</span></div>
+<div id="zw-records"></div>
+</div>
+<div id="zw-result" aria-live="polite"></div>
+</div>
+
+<!-- 奇门 -->
+<div class="panel" id="panel-qimen">
+<div class="form-card">
+<h2>奇门遁甲</h2>
+<div class="form-row">
+<div class="field"><label>排盘方式</label><select id="qm-mode"><option value="0">此时此刻</option><option value="1">指定时间</option></select></div>
+<div class="field"><label>日期</label><input type="date" id="qm-date" min="1900-01-31" max="2099-12-31"></div>
+<div class="field"><label>时间(精确到分)</label><input type="time" id="qm-time" step="60" title="可精确到分钟，自动换算时辰（含晚子时23:00）"></div>
+<div class="field"><label>时辰</label><select id="qm-hour"></select></div>
+<div class="field"><label>定局法</label><select id="qm-school"><option value="1" selected>拆补法（推荐）</option><option value="0">置闰法</option></select></div>
+<button class="btn btn-primary" onclick="qmCast()">排 盘</button>
+<button class="btn btn-ghost" onclick="qmNow()">此刻</button>
+</div>
+<div class="tip">时家奇门转盘排盘：依节气与日干支定阴阳遁局数（默认拆补法），排天盘干、九星、地盘三奇六仪、八门、八神于九宫之中。时间精确到分钟自动换算时辰（含晚子时），标注旬首与旬空。</div>
+</div>
+<div class="result" id="qm-records-wrap" style="display:none">
+<div class="result-title">排盘历史 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">（点击记录可重新排盘）</span></div>
+<div id="qm-records"></div>
+</div>
+<div id="qm-result" aria-live="polite"></div>
+</div>
+
+<!-- 六爻 -->
+<div class="panel" id="panel-liuyao">
+<div class="form-card">
+<h2>六爻卜筮</h2>
+<div class="form-row">
+<div class="field"><label>起卦方式</label><select id="ly-mode" onchange="lyModeChange()"><option value="0">时间起卦</option><option value="1">三数起卦</option><option value="2">铜钱摇卦</option></select></div>
+<div class="field"><label>日期</label><input type="date" id="ly-date" min="1900-01-31" max="2099-12-31"></div>
+<div class="field"><label>时辰</label><select id="ly-hour"></select></div>
+<div class="field"><label>三数(空格隔开)</label><input id="ly-num" placeholder="如 3 8 6" style="min-width:130px"></div>
+<div class="field" id="ly-yao-wrap" style="display:none;align-items:center;gap:6px"><button type="button" class="btn btn-ghost" onclick="lyYaoOne()">摇一爻</button><button type="button" class="btn btn-ghost" onclick="lyYaoAuto()">自动摇完</button><span id="ly-yao-status" style="font-size:.74rem;color:var(--ink3)"></span></div>
+<button class="btn btn-primary" onclick="lyCast()">起 卦</button>
+</div>
+<div class="tip">时间起卦取年月日时数;三数起卦以前两数得上下卦、第三数取动爻;铜钱摇卦每爻摇一次（三枚硬币，3背=老阳○动、2背=少阳、1背=少阴、0背=老阴×动），从初爻到上爻共六次。安世应、纳甲、六亲（依八宫卦宫五行）、六神，标旬空月破。</div>
+</div>
+<div class="result" id="ly-records-wrap" style="display:none">
+<div class="result-title">排盘历史 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">（点击记录可重新排盘）</span></div>
+<div id="ly-records"></div>
+</div>
+<div id="ly-result" aria-live="polite"></div>
+</div>
+
+<!-- 合婚配对 -->
+<div class="panel" id="panel-hehun">
+<div class="form-card">
+<h2>合婚配对 · 双盘互参 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">年支定基调 · 日主论关系 · 夫妻宫看亲疏 · 用神看互补</span></h2>
+<div style="display:flex;flex-direction:column;gap:12px">
+  <div style="border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--card2)">
+    <div style="font-size:.8rem;font-weight:700;color:var(--gold);margin-bottom:8px">🀄 甲方</div>
+    <div class="form-row" style="margin-bottom:0">
+      <div class="field"><label>姓名/称呼</label><input maxlength="100" id="hh1-name" placeholder="选填" style="min-width:90px"></div>
+      <div class="field"><label>性别</label><select id="hh1-gender"><option value="1">男</option><option value="0">女</option></select></div>
+      <div class="field"><label>公历日期</label><input type="date" id="hh1-date" min="1900-01-31" max="2099-12-31"></div>
+      <div class="field"><label>时辰</label><select id="hh1-hour"></select></div>
+<div class="field"><label for="hh1-time">具体时分（选填）</label><input type="time" id="hh1-time" step="60"></div>
+      <div class="field"><label>出生地</label><div style="display:flex;gap:4px;align-items:center"><input maxlength="200" list="city-options" id="hh1-place" placeholder="选填,如:广州" style="min-width:80px"><button type="button" class="pp-btn" onclick="zhOpenPicker('hh1-place')" title="点选省/市">📍 选</button></div></div>
+    </div>
+  </div>
+  <div style="border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--card2)">
+    <div style="font-size:.8rem;font-weight:700;color:var(--jade);margin-bottom:8px">♬ 乙方</div>
+    <div class="form-row" style="margin-bottom:0">
+      <div class="field"><label>姓名/称呼</label><input maxlength="100" id="hh2-name" placeholder="选填" style="min-width:90px"></div>
+      <div class="field"><label>性别</label><select id="hh2-gender"><option value="0">女</option><option value="1">男</option></select></div>
+      <div class="field"><label>公历日期</label><input type="date" id="hh2-date" min="1900-01-31" max="2099-12-31"></div>
+      <div class="field"><label>时辰</label><select id="hh2-hour"></select></div>
+<div class="field"><label for="hh2-time">具体时分（选填）</label><input type="time" id="hh2-time" step="60"></div>
+      <div class="field"><label>出生地</label><div style="display:flex;gap:4px;align-items:center"><input maxlength="200" list="city-options" id="hh2-place" placeholder="选填,如:哈尔滨" style="min-width:80px"><button type="button" class="pp-btn" onclick="zhOpenPicker('hh2-place')" title="点选省/市">📍 选</button></div></div>
+    </div>
+  </div>
+</div>
+<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+  <button class="btn btn-primary" onclick="hhCast()">💍 合盘计算</button>
+  <button class="btn btn-ghost" onclick="hhSwap()">⇄ 交换甲乙</button>
+</div>
+<div class="tip">合婚为传统民俗参考：年支看两族根基基调、日主十神论相处关系、日支（夫妻宫）看日常亲疏、用神互补看能量增益。结果仅为倾向参考，感情经营在人。</div>
+</div>
+<div class="result" id="hh-result" aria-live="polite"></div>
+<div class="result" id="hh-ai-wrap" style="display:none">
+<div class="result-title">🤖 AI 合婚深度解读
+  <button class="btn btn-ghost" id="hh-ai-btn" onclick="hhAiDeep()" style="font-size:.72rem;padding:4px 12px">🤖 AI 深度合婚分析</button>
+  <button class="btn btn-ghost" onclick="hhExtractPrompt()" style="font-size:.72rem;padding:4px 12px;border-color:var(--gold);color:var(--gold)">📋 提取 Prompt（无 Key 用）</button>
+  <button class="btn btn-ghost" onclick="hhApplyReply()" style="font-size:.72rem;padding:4px 12px;border-color:var(--jade);color:var(--jade)">📥 粘贴回填</button>
+</div>
+<div id="hh-prompt-box" style="display:none;margin:8px 0;background:var(--bg2);border:1px solid var(--gold2);border-radius:10px;padding:12px">
+  <div style="font-size:.76rem;color:var(--ink2);line-height:1.7;margin-bottom:6px">把下方 Prompt 复制到<b>任意 AI 对话</b>（DeepSeek/豆包/ChatGPT…），AI 回复后再粘贴回下方并点「✅ 回填解读」。</div>
+  <textarea id="hh-prompt-text" readonly style="width:100%;height:150px;background:var(--card2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px;font-size:.72rem;font-family:inherit;box-sizing:border-box"></textarea>
+  <div style="display:flex;gap:8px;margin:8px 0;flex-wrap:wrap"><button class="btn btn-primary" onclick="hhCopyPrompt()" style="font-size:.72rem;padding:5px 14px">📋 复制 Prompt</button><span id="hh-prompt-msg" style="font-size:.7rem;color:var(--ink3);align-self:center"></span></div>
+  <div style="font-size:.76rem;color:var(--gold);margin-bottom:4px">📥 粘贴 AI 回复到此处 → 回填</div>
+  <textarea id="hh-reply-text" placeholder="把 AI 的完整回复粘贴到这里…" style="width:100%;height:110px;background:var(--card2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px;font-size:.74rem;font-family:inherit;box-sizing:border-box"></textarea>
+  <div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="btn btn-primary" onclick="hhApplyReply()" style="font-size:.72rem;padding:5px 14px">✅ 回填解读</button></div>
+</div>
+<div id="hh-ai-box" style="font-size:.82rem;line-height:1.8;color:var(--ink)"></div>
+<!-- v5.11 AI 合婚深度解读·五段卡片(流式/粘贴回填后点亮, 同综合解读模式) -->
+<div id="hh-ai-cards" style="display:none;margin-top:12px;border:1px solid var(--jade);border-radius:12px;padding:12px 14px;background:var(--card)">
+  <div style="font-size:.8rem;color:var(--jade);font-weight:700;margin-bottom:8px">🤖 AI 合婚深度解读 <span style="font-size:.66rem;color:var(--ink3);font-weight:400">（五段卡片 · AI 生成后点亮，正文保留在上方）</span></div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div class="hh-dim" id="hh-dim-0" style="border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:var(--card2)"><div style="display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--teal);font-weight:700">💬 相处模式<span class="hh-dim-badge" style="display:none;margin-left:auto;font-size:.56rem;background:var(--jade);color:#fff;padding:1px 6px;border-radius:8px;white-space:nowrap">AI深度</span></div><div class="hh-dim-body" style="font-size:.76rem;color:var(--ink);line-height:1.8;margin-top:3px;text-align:justify"></div></div>
+    <div class="hh-dim" id="hh-dim-1" style="border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:var(--card2)"><div style="display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--pink);font-weight:700">💗 感情浓度<span class="hh-dim-badge" style="display:none;margin-left:auto;font-size:.56rem;background:var(--jade);color:#fff;padding:1px 6px;border-radius:8px;white-space:nowrap">AI深度</span></div><div class="hh-dim-body" style="font-size:.76rem;color:var(--ink);line-height:1.8;margin-top:3px;text-align:justify"></div></div>
+    <div class="hh-dim" id="hh-dim-2" style="border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:var(--card2)"><div style="display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--orange);font-weight:700">⚠️ 潜在矛盾点<span class="hh-dim-badge" style="display:none;margin-left:auto;font-size:.56rem;background:var(--jade);color:#fff;padding:1px 6px;border-radius:8px;white-space:nowrap">AI深度</span></div><div class="hh-dim-body" style="font-size:.76rem;color:var(--ink);line-height:1.8;margin-top:3px;text-align:justify"></div></div>
+    <div class="hh-dim" id="hh-dim-3" style="border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:var(--card2)"><div style="display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--blue);font-weight:700">📋 经营建议<span class="hh-dim-badge" style="display:none;margin-left:auto;font-size:.56rem;background:var(--jade);color:#fff;padding:1px 6px;border-radius:8px;white-space:nowrap">AI深度</span></div><div class="hh-dim-body" style="font-size:.76rem;color:var(--ink);line-height:1.8;margin-top:3px;text-align:justify"></div></div>
+    <div class="hh-dim" id="hh-dim-4" style="border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:var(--card2)"><div style="display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--gold);font-weight:700">🎯 综合断<span class="hh-dim-badge" style="display:none;margin-left:auto;font-size:.56rem;background:var(--jade);color:#fff;padding:1px 6px;border-radius:8px;white-space:nowrap">AI深度</span></div><div class="hh-dim-body" style="font-size:.76rem;color:var(--ink);line-height:1.8;margin-top:3px;text-align:justify"></div></div>
+  </div>
+</div>
+</div>
+</div>
+
+</div>
+
+<!-- 免责与设置 -->
+<div class="section-block" style="margin-top:20px;border:1px solid var(--line)">
+<details>
+<summary style="cursor:pointer;color:var(--ink2);font-size:.85rem;font-weight:600;padding:6px 2px">📜 免责与设置 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">（传统命理文化 · 仅供娱乐参考）</span></summary>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;padding:8px 0">
+<div style="background:var(--bg2);border-radius:8px;padding:10px 12px;font-size:.75rem;color:var(--ink2);line-height:1.7"><b style="color:var(--gold)">📖 总免责声明</b><br>本网页为传统命理文化体验工具，所有排盘、解读、报告内容均基于命理文化传统，<b>仅供娱乐与自我探索参考</b>，不构成任何形式的预测承诺、行为指导或决策依据。</div>
+<div style="background:var(--bg2);border-radius:8px;padding:10px 12px;font-size:.75rem;color:var(--ink2);line-height:1.7"><b style="color:var(--gold)">🏥 健康免责</b><br>健康相关内容仅作传统文化养生参考，<b>不构成医疗诊断或治疗建议</b>。身体不适请及时就医，遵医嘱。</div>
+<div style="background:var(--bg2);border-radius:8px;padding:10px 12px;font-size:.75rem;color:var(--ink2);line-height:1.7"><b style="color:var(--gold)">💰 财富免责</b><br>财富相关内容仅作命理倾向分析，<b>不构成投资建议</b>。投资理财请理性评估风险，量力而行。</div>
+<div style="background:var(--bg2);border-radius:8px;padding:10px 12px;font-size:.75rem;color:var(--ink2);line-height:1.7"><b style="color:var(--gold)">💞 婚姻免责</b><br>婚姻相关内容仅作传统文化参考，<b>不构成婚恋决策建议</b>，不制造焦虑或偏见。感情经营重在现实沟通与相互理解。</div>
+<div style="background:var(--bg2);border-radius:8px;padding:10px 12px;font-size:.75rem;color:var(--ink2);line-height:1.7"><b style="color:var(--gold)">🕐 时辰不准提示</b><br>若出生时辰不确定，时柱、子女宫、晚运及盲派应期断语的确定性会降低，相关内容<b>仅供参考</b>。</div>
+<div style="background:var(--bg2);border-radius:8px;padding:10px 12px;font-size:.75rem;color:var(--ink2);line-height:1.7"><b style="color:var(--gold)">🧒 未成年人提示</b><br>本工具面向成年用户。未成年人请在监护人陪同下使用，命理内容不应用于学业规划以外的决策。</div>
+<div style="background:var(--bg2);border-radius:8px;padding:10px 12px;font-size:.75rem;color:var(--ink2);line-height:1.7"><b style="color:var(--gold)">🔒 隐私保护</b><br>排盘数据仅保存在<b>本机浏览器</b>（localStorage），不上传任何服务器。可随时点击「清空全部记录」删除出生数据。</div>
+</div>
+</details>
+</div>
+
+<datalist id="city-options"></datalist>
+<!-- APP_SCRIPTS -->
+<button id="back-top" type="button" aria-label="返回顶部">↑</button>
+<!-- v5.5 出生地选择器面板 -->
+<div id="place-picker" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);align-items:center;justify-content:center;z-index:999" onclick="if(event.target===this)closePlacePicker()">
+  <div class="pp-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><b style="font-size:.92rem">📍 选择出生地</b><button type="button" class="pp-btn" onclick="closePlacePicker()" title="关闭">✕</button></div>
+    <div style="font-size:.7rem;color:var(--ink3);margin-bottom:4px">省 / 直辖市 / 自治区</div>
+    <div id="pp-prov" class="pp-row"></div>
+    <div style="font-size:.7rem;color:var(--ink3);margin:12px 0 4px">城市 / 区县</div>
+    <div id="pp-city" class="pp-row"></div><p style="font-size:.7rem">城市点位：<a href="https://www.geonames.org/" target="_blank" rel="noopener">GeoNames</a> · WGS84 · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>；点位近似，不代表精确出生地址。</p>
+  </div>
+</div>
+</body>
+</html>

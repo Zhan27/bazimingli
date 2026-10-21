@@ -1,0 +1,82 @@
+
+> bazimingli@5.17.0 verify
+> npm run check && npm test && npm run test:e2e
+
+
+> bazimingli@5.17.0 check
+> node scripts/build.mjs --check
+
+已校验单文件与 docs/index.html，SHA256 b3158af3c4b4289acc418b44fed9d6c4b976571dfb37dcc57df725a5bafa2250
+
+> bazimingli@5.17.0 test
+> node --test tests/*.test.cjs
+
+✔ 18 dimensions parse standard, Markdown, numbered and fullwidth heading variants (1.8081ms)
+✔ missing, reordered, duplicate, incomplete streaming headings and supplementary sections (0.4562ms)
+✔ long replies retain content without truncation; oversized replies fail clearly (2.42ms)
+✔ AI HTML rendering keeps script, SVG, handlers, entities and markdown links inert (0.4739ms)
+✔ release check detects stale artifacts; secret/syntax failures do not overwrite output (554.8044ms)
+✔ all 100 ten-god mappings agree with the independent published lookup table (2.7774ms)
+✔ three wuxing count conventions give hand-counted totals without changing core facts (17.1243ms)
+✔ strength command, root, and momentum components have independent hand-counted cases (0.4581ms)
+✔ five immutable school configurations share pillars but apply explicit use-god strategies (3.0179ms)
+✔ fixed UTC offsets, manual DST, fractional offsets and midnight/year crossing preserve one instant (0.8219ms)
+✔ NOAA solar-time components agree with independent Astronomy Engine hour-angle reference (19.7154ms)
+✔ city database uses sourced WGS84 stable IDs, exact aliases and explicit ambiguity (13.8359ms)
+✔ unknown hour partitions all day, early/late Zi, exact Jie, solar crossing and unsupported edges (25.1688ms)
+✔ HKO solar/lunar benchmarks and labeled legacy epoch in both directions (37.7744ms)
+✔ seeded random Gregorian/lunar round trips, including endpoints (2002 cases) (6059.2453ms)
+✔ every lunar month start/end and leap boundary for all 200 supported lunar years (7887.972ms)
+✔ invalid lunar dates/leap months and out-of-range solar dates are rejected (21.3834ms)
+✔ sexagenary cycles wrap in both directions; all 60 pairs invert (13.0812ms)
+✔ all 24 solar terms for all supported years: before/at/after, year/month invariants (984.7743ms)
+✔ 2026 major solar terms agree with HKO minute-resolution independent data within 60 seconds (0.6567ms)
+✔ four pillars fixed benchmark plus early/late Zi and exact Jie instant (1.0637ms)
+✔ NOAA equation of time, longitude sign, hour/day crossing and civil Jie separation (2.7764ms)
+✔ January DaYun uses previous December Jie and continuous fractional-day interval (1.0197ms)
+✔ backup uses ml_records; round trip restores all five categories and excludes secrets (2.6289ms)
+✔ v4 mingli_records backups migrate, both keys merge without duplicate IDs (0.3749ms)
+✔ local legacy key migrates once and cannot resurrect after clearing (0.2404ms)
+✔ malformed imports fail before any storage mutation (1.2264ms)
+✔ storage quota failure rolls back preceding category writes (0.4283ms)
+✔ every frozen v5.16 baseline recalculates unchanged and emits an inspectable report (184.8805ms)
+✔ five strength states retain all classification thresholds (0.9703ms)
+✔ chart, summary and AI prompt retain exact five-state labels (34.2844ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 31
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15328.2553
+
+> bazimingli@5.17.0 test:e2e
+> playwright test
+
+[WebServer] (node:32260) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 17 tests using 1 worker
+
+(node:2180) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 tests\e2e\app.spec.cjs:2:1 › single HTML starts and all chart modules calculate without script errors (2.0s)
+  ok  2 tests\e2e\app.spec.cjs:15:1 › backup download, clear, v5 import, reload and exact input restoration (2.8s)
+  ok  3 tests\e2e\app.spec.cjs:39:1 › user names, places, legacy records and AI HTML cannot create executable elements (2.4s)
+  ok  4 tests\e2e\app.spec.cjs:56:1 › invalid imported data and unsupported dates show errors without changing history (1.1s)
+  ok  5 tests\e2e\app.spec.cjs:67:1 › exact time drives Jie transition and both Zi rules through real form controls (3.2s)
+  ok  6 tests\e2e\app.spec.cjs:75:1 › all five computed states match UI, prompts, summaries and actual PNG canvas text (1.5s)
+  ok  7 tests\e2e\app.spec.cjs:95:1 › real cards accept all 18 Markdown dimensions and incremental streaming prefixes (1.3s)
+  ok  8 tests\e2e\app.spec.cjs:101:1 › release opens directly as a local file with network disabled (921ms)
+  ok  9 tests\e2e\app.spec.cjs:107:1 › Beijing form inputs remain identical in UTC, Shanghai, New York and Sydney browsers (4.4s)
+  ok 10 tests\e2e\app.spec.cjs:123:1 › lunar leap month controls refresh actual day counts and synchronize Gregorian date (1.9s)
+  ok 11 tests\e2e\app.spec.cjs:134:1 › unknown time shows candidates, disables exact input and never fabricates a default chart (3.0s)
+  ok 12 tests\e2e\calculation.spec.cjs:3:1 › offset and DST controls convert the input, restore history, and retain the same instant (2.9s)
+  ok 13 tests\e2e\calculation.spec.cjs:14:1 › standard city picker selects an attributed coordinate instead of substring matching (1.8s)
+  ok 14 tests\e2e\calculation.spec.cjs:23:1 › Bazi hour-only history retains the original clock hour after timezone conversion (2.6s)
+  ok 15 tests\e2e\calculation.spec.cjs:37:1 › all five school selections drive the displayed rule, calculation and serialized prompt (3.9s)
+  ok 16 tests\e2e\calculation.spec.cjs:48:1 › wuxing display changes convention without changing pillars or the scoring model (2.1s)
+  ok 17 tests\e2e\calculation.spec.cjs:57:1 › unknown-time history reloads as candidates, and both Zi conventions change only their defined facts (3.4s)
+
+  17 passed (42.9s)

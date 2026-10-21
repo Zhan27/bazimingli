@@ -1,0 +1,20 @@
+[
+  {"solar":"1900-01-31","lunar":[1900,1,1,false],"source":"Original epoch, lunar-javascript agreement (not independent HKO data)"},
+  {"solar":"2020-01-24","lunar":[2019,12,30,false],"source":"HKO T2020e.txt"},
+  {"solar":"2020-01-25","lunar":[2020,1,1,false],"source":"HKO T2020e.txt"},
+  {"solar":"2020-02-29","lunar":[2020,2,7,false],"source":"HKO T2020e.txt"},
+  {"solar":"2020-05-22","lunar":[2020,4,30,false],"source":"HKO T2020e.txt"},
+  {"solar":"2020-05-23","lunar":[2020,4,1,true],"source":"HKO T2020e.txt"},
+  {"solar":"2020-06-20","lunar":[2020,4,29,true],"source":"HKO T2020e.txt"},
+  {"solar":"2020-06-21","lunar":[2020,5,1,false],"source":"HKO T2020e.txt"},
+  {"solar":"2023-01-21","lunar":[2022,12,30,false],"source":"HKO T2023e.txt"},
+  {"solar":"2023-01-22","lunar":[2023,1,1,false],"source":"HKO T2023e.txt"},
+  {"solar":"2023-03-21","lunar":[2023,2,30,false],"source":"HKO T2023e.txt"},
+  {"solar":"2023-03-22","lunar":[2023,2,1,true],"source":"HKO T2023e.txt"},
+  {"solar":"2023-04-19","lunar":[2023,2,29,true],"source":"HKO T2023e.txt"},
+  {"solar":"2023-04-20","lunar":[2023,3,1,false],"source":"HKO T2023e.txt"},
+  {"solar":"2024-02-09","lunar":[2023,12,30,false],"source":"HKO T2024e.txt"},
+  {"solar":"2024-02-10","lunar":[2024,1,1,false],"source":"HKO T2024e.txt"},
+  {"solar":"2033-12-21","lunar":[2033,11,30,false],"source":"HKO T2033e.txt"},
+  {"solar":"2033-12-22","lunar":[2033,11,1,true],"source":"HKO T2033e.txt"}
+]

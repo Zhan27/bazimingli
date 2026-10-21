@@ -1,0 +1,1182 @@
+{
+  "version": "v5.16",
+  "source": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
+  "cases": [
+    {
+      "id": "legacy-01",
+      "input": {
+        "date": "2024-02-10",
+        "time": "12:00",
+        "gender": 1,
+        "place": "",
+        "options": {
+          "preciseTime": true
+        }
+      },
+      "expected": {
+        "pillars": [
+          [
+            0,
+            4
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            0,
+            4
+          ],
+          [
+            6,
+            6
+          ]
+        ],
+        "lunar": {
+          "year": 2024,
+          "month": 1,
+          "day": 1,
+          "isLeap": false
+        },
+        "term": 2,
+        "dayun": {
+          "startAge": 8,
+          "startYears": 7,
+          "startMonths": 11,
+          "forward": true,
+          "days": 23.932465277777776,
+          "list": [
+            [
+              3,
+              3,
+              8
+            ],
+            [
+              4,
+              4,
+              18
+            ],
+            [
+              5,
+              5,
+              28
+            ],
+            [
+              6,
+              6,
+              38
+            ],
+            [
+              7,
+              7,
+              48
+            ],
+            [
+              8,
+              8,
+              58
+            ],
+            [
+              9,
+              9,
+              68
+            ],
+            [
+              0,
+              10,
+              78
+            ]
+          ]
+        },
+        "wxCount": [
+          3,
+          2,
+          2,
+          1,
+          0
+        ],
+        "strengthScore": 8.7,
+        "strengthType": "中和",
+        "yongShen": 4
+      }
+    },
+    {
+      "id": "legacy-02",
+      "input": {
+        "date": "2024-02-10",
+        "time": "00:30",
+        "gender": 1,
+        "place": "",
+        "options": {
+          "preciseTime": true
+        }
+      },
+      "expected": {
+        "pillars": [
+          [
+            0,
+            4
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            0,
+            4
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "lunar": {
+          "year": 2024,
+          "month": 1,
+          "day": 1,
+          "isLeap": false
+        },
+        "term": 2,
+        "dayun": {
+          "startAge": 8,
+          "startYears": 8,
+          "startMonths": 1,
+          "forward": true,
+          "days": 24.411631944444444,
+          "list": [
+            [
+              3,
+              3,
+              8
+            ],
+            [
+              4,
+              4,
+              18
+            ],
+            [
+              5,
+              5,
+              28
+            ],
+            [
+              6,
+              6,
+              38
+            ],
+            [
+              7,
+              7,
+              48
+            ],
+            [
+              8,
+              8,
+              58
+            ],
+            [
+              9,
+              9,
+              68
+            ],
+            [
+              0,
+              10,
+              78
+            ]
+          ]
+        },
+        "wxCount": [
+          4,
+          1,
+          2,
+          0,
+          1
+        ],
+        "strengthScore": 10.7,
+        "strengthType": "身强",
+        "yongShen": 2
+      }
+    },
+    {
+      "id": "legacy-03",
+      "input": {
+        "date": "2024-02-10",
+        "time": "23:30",
+        "gender": 1,
+        "place": "",
+        "options": {
+          "preciseTime": true
+        }
+      },
+      "expected": {
+        "pillars": [
+          [
+            0,
+            4
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            2,
+            0
+          ]
+        ],
+        "lunar": {
+          "year": 2024,
+          "month": 1,
+          "day": 1,
+          "isLeap": false
+        },
+        "term": 2,
+        "dayun": {
+          "startAge": 8,
+          "startYears": 7,
+          "startMonths": 9,
+          "forward": true,
+          "days": 23.453298611111112,
+          "list": [
+            [
+              3,
+              3,
+              8
+            ],
+            [
+              4,
+              4,
+              18
+            ],
+            [
+              5,
+              5,
+              28
+            ],
+            [
+              6,
+              6,
+              38
+            ],
+            [
+              7,
+              7,
+              48
+            ],
+            [
+              8,
+              8,
+              58
+            ],
+            [
+              9,
+              9,
+              68
+            ],
+            [
+              0,
+              10,
+              78
+            ]
+          ]
+        },
+        "wxCount": [
+          3,
+          3,
+          1,
+          0,
+          1
+        ],
+        "strengthScore": 7.45,
+        "strengthType": "中和",
+        "yongShen": 4
+      }
+    },
+    {
+      "id": "legacy-04",
+      "input": {
+        "date": "2026-02-04",
+        "time": "04:02",
+        "gender": 1,
+        "place": "",
+        "options": {
+          "preciseTime": true
+        }
+      },
+      "expected": {
+        "pillars": [
+          [
+            1,
+            5
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        "lunar": {
+          "year": 2025,
+          "month": 12,
+          "day": 17,
+          "isLeap": false
+        },
+        "term": 1,
+        "dayun": {
+          "startAge": 10,
+          "startYears": 9,
+          "startMonths": 9,
+          "forward": false,
+          "days": 29.485300925925927,
+          "list": [
+            [
+              4,
+              0,
+              10
+            ],
+            [
+              3,
+              11,
+              20
+            ],
+            [
+              2,
+              10,
+              30
+            ],
+            [
+              1,
+              9,
+              40
+            ],
+            [
+              0,
+              8,
+              50
+            ],
+            [
+              9,
+              7,
+              60
+            ],
+            [
+              8,
+              6,
+              70
+            ],
+            [
+              7,
+              5,
+              80
+            ]
+          ]
+        },
+        "wxCount": [
+          2,
+          2,
+          3,
+          1,
+          0
+        ],
+        "strengthScore": 8.85,
+        "strengthType": "中和",
+        "yongShen": 1
+      }
+    },
+    {
+      "id": "legacy-05",
+      "input": {
+        "date": "2026-02-04",
+        "time": "04:03",
+        "gender": 1,
+        "place": "",
+        "options": {
+          "preciseTime": true
+        }
+      },
+      "expected": {
+        "pillars": [
+          [
+            2,
+            6
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        "lunar": {
+          "year": 2025,
+          "month": 12,
+          "day": 17,
+          "isLeap": false
+        },
+        "term": 2,
+        "dayun": {
+          "startAge": 10,
+          "startYears": 9,
+          "startMonths": 10,
+          "forward": true,
+          "days": 29.747222222222224,
+          "list": [
+            [
+              7,
+              3,
+              10
+            ],
+            [
+              8,
+              4,
+              20
+            ],
+            [
+              9,
+              5,
+              30
+            ],
+            [
+              0,
+              6,
+              40
+            ],
+            [
+              1,
+              7,
+              50
+            ],
+            [
+              2,
+              8,
+              60
+            ],
+            [
+              3,
+              9,
+              70
+            ],
+            [
+              4,
+              10,
+              80
+            ]
+          ]
+        },
+        "wxCount": [
+          2,
+          3,
+          1,
+          2,
+          0
+        ],
+        "strengthScore": 2.7,
+        "strengthType": "身弱",
+        "yongShen": 1
+      }
+    },
+    {
+      "id": "legacy-06",
+      "input": {
+        "date": "2023-03-22",
+        "time": "06:00",
+        "gender": 1,
+        "place": "",
+        "options": {
+          "preciseTime": true
+        }
+      },
+      "expected": {
+        "pillars": [
+          [
+            9,
+            3
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            3,
+            3
+          ]
+        ],
+        "lunar": {
+          "year": 2023,
+          "month": 2,
+          "day": 1,
+          "isLeap": true
+        },
+        "term": 5,
+        "dayun": {
+          "startAge": 5,
+          "startYears": 5,
+          "startMonths": 4,
+          "forward": false,
+          "days": 16.058171296296297,
+          "list": [
+            [
+              0,
+              2,
+              5
+            ],
+            [
+              9,
+              1,
+              15
+            ],
+            [
+              8,
+              0,
+              25
+            ],
+            [
+              7,
+              11,
+              35
+            ],
+            [
+              6,
+              10,
+              45
+            ],
+            [
+              5,
+              9,
+              55
+            ],
+            [
+              4,
+              8,
+              65
+            ],
+            [
+              3,
+              7,
+              75
+            ]
+          ]
+        },
+        "wxCount": [
+          5,
+          1,
+          1,
+          0,
+          1
+        ],
+        "strengthScore": -2,
+        "strengthType": "从弱",
+        "yongShen": 0
+      }
+    },
+    {
+      "id": "legacy-07",
+      "input": {
+        "date": "2033-12-22",
+        "time": "08:00",
+        "gender": 1,
+        "place": "",
+        "options": {
+          "preciseTime": true
+        }
+      },
+      "expected": {
+        "pillars": [
+          [
+            9,
+            1
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            3,
+            7
+          ],
+          [
+            0,
+            4
+          ]
+        ],
+        "lunar": {
+          "year": 2033,
+          "month": 11,
+          "day": 1,
+          "isLeap": true
+        },
+        "term": 23,
+        "dayun": {
+          "startAge": 5,
+          "startYears": 5,
+          "startMonths": 0,
+          "forward": false,
+          "days": 15.17712962962963,
+          "list": [
+            [
+              9,
+              11,
+              5
+            ],
+            [
+              8,
+              10,
+              15
+            ],
+            [
+              7,
+              9,
+              25
+            ],
+            [
+              6,
+              8,
+              35
+            ],
+            [
+              5,
+              7,
+              45
+            ],
+            [
+              4,
+              6,
+              55
+            ],
+            [
+              3,
+              5,
+              65
+            ],
+            [
+              2,
+              4,
+              75
+            ]
+          ]
+        },
+        "wxCount": [
+          2,
+          1,
+          3,
+          0,
+          2
+        ],
+        "strengthScore": 2.05,
+        "strengthType": "身弱",
+        "yongShen": 0
+      }
+    },
+    {
+      "id": "legacy-08",
+      "input": {
+        "date": "1900-01-31",
+        "time": "12:00",
+        "gender": 1,
+        "place": "",
+        "options": {
+          "preciseTime": true
+        }
+      },
+      "expected": {
+        "pillars": [
+          [
+            5,
+            11
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            0,
+            4
+          ],
+          [
+            6,
+            6
+          ]
+        ],
+        "lunar": {
+          "year": 1900,
+          "month": 1,
+          "day": 1,
+          "isLeap": false
+        },
+        "term": 1,
+        "dayun": {
+          "startAge": 8,
+          "startYears": 8,
+          "startMonths": 5,
+          "forward": false,
+          "days": 25.413923611111112,
+          "list": [
+            [
+              2,
+              0,
+              8
+            ],
+            [
+              1,
+              11,
+              18
+            ],
+            [
+              0,
+              10,
+              28
+            ],
+            [
+              9,
+              9,
+              38
+            ],
+            [
+              8,
+              8,
+              48
+            ],
+            [
+              7,
+              7,
+              58
+            ],
+            [
+              6,
+              6,
+              68
+            ],
+            [
+              5,
+              5,
+              78
+            ]
+          ]
+        },
+        "wxCount": [
+          1,
+          2,
+          3,
+          1,
+          1
+        ],
+        "strengthScore": 2.85,
+        "strengthType": "身弱",
+        "yongShen": 4
+      }
+    },
+    {
+      "id": "legacy-09",
+      "input": {
+        "date": "2099-12-31",
+        "time": "12:00",
+        "gender": 1,
+        "place": "",
+        "options": {
+          "preciseTime": true
+        }
+      },
+      "expected": {
+        "pillars": [
+          [
+            5,
+            7
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            8,
+            2
+          ],
+          [
+            2,
+            6
+          ]
+        ],
+        "lunar": {
+          "year": 2099,
+          "month": 11,
+          "day": 20,
+          "isLeap": false
+        },
+        "term": 23,
+        "dayun": {
+          "startAge": 8,
+          "startYears": 8,
+          "startMonths": 1,
+          "forward": false,
+          "days": 24.33107638888889,
+          "list": [
+            [
+              1,
+              11,
+              8
+            ],
+            [
+              0,
+              10,
+              18
+            ],
+            [
+              9,
+              9,
+              28
+            ],
+            [
+              8,
+              8,
+              38
+            ],
+            [
+              7,
+              7,
+              48
+            ],
+            [
+              6,
+              6,
+              58
+            ],
+            [
+              5,
+              5,
+              68
+            ],
+            [
+              4,
+              4,
+              78
+            ]
+          ]
+        },
+        "wxCount": [
+          1,
+          3,
+          2,
+          0,
+          2
+        ],
+        "strengthScore": 4.8,
+        "strengthType": "身弱",
+        "yongShen": 3
+      }
+    },
+    {
+      "id": "legacy-10",
+      "input": {
+        "date": "1907-07-19",
+        "time": "08:00",
+        "gender": 1,
+        "place": "",
+        "options": {
+          "preciseTime": true
+        }
+      },
+      "expected": {
+        "pillars": [
+          [
+            3,
+            7
+          ],
+          [
+            3,
+            7
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            4,
+            4
+          ]
+        ],
+        "lunar": {
+          "year": 1907,
+          "month": 6,
+          "day": 10,
+          "isLeap": false
+        },
+        "term": 12,
+        "dayun": {
+          "startAge": 4,
+          "startYears": 3,
+          "startMonths": 6,
+          "forward": false,
+          "days": 10.66724537037037,
+          "list": [
+            [
+              2,
+              6,
+              4
+            ],
+            [
+              1,
+              5,
+              14
+            ],
+            [
+              0,
+              4,
+              24
+            ],
+            [
+              9,
+              3,
+              34
+            ],
+            [
+              8,
+              2,
+              44
+            ],
+            [
+              7,
+              1,
+              54
+            ],
+            [
+              6,
+              0,
+              64
+            ],
+            [
+              5,
+              11,
+              74
+            ]
+          ]
+        },
+        "wxCount": [
+          0,
+          3,
+          5,
+          0,
+          0
+        ],
+        "strengthScore": 14.8,
+        "strengthType": "身极强",
+        "yongShen": 4
+      }
+    },
+    {
+      "id": "legacy-11",
+      "input": {
+        "date": "2024-01-01",
+        "time": "08:00",
+        "gender": 1,
+        "place": "",
+        "options": {
+          "preciseTime": true
+        }
+      },
+      "expected": {
+        "pillars": [
+          [
+            9,
+            3
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            4,
+            4
+          ]
+        ],
+        "lunar": {
+          "year": 2023,
+          "month": 11,
+          "day": 20,
+          "isLeap": false
+        },
+        "term": 23,
+        "dayun": {
+          "startAge": 8,
+          "startYears": 8,
+          "startMonths": 2,
+          "forward": false,
+          "days": 24.602141203703702,
+          "list": [
+            [
+              9,
+              11,
+              8
+            ],
+            [
+              8,
+              10,
+              18
+            ],
+            [
+              7,
+              9,
+              28
+            ],
+            [
+              6,
+              8,
+              38
+            ],
+            [
+              5,
+              7,
+              48
+            ],
+            [
+              4,
+              6,
+              58
+            ],
+            [
+              3,
+              5,
+              68
+            ],
+            [
+              2,
+              4,
+              78
+            ]
+          ]
+        },
+        "wxCount": [
+          3,
+          0,
+          2,
+          0,
+          3
+        ],
+        "strengthScore": 9.75,
+        "strengthType": "中和",
+        "yongShen": 1
+      }
+    },
+    {
+      "id": "legacy-12",
+      "input": {
+        "date": "2024-01-04",
+        "time": "00:00",
+        "gender": 1,
+        "place": "",
+        "options": {
+          "preciseTime": true
+        }
+      },
+      "expected": {
+        "pillars": [
+          [
+            9,
+            3
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            6,
+            0
+          ]
+        ],
+        "lunar": {
+          "year": 2023,
+          "month": 11,
+          "day": 23,
+          "isLeap": false
+        },
+        "term": 23,
+        "dayun": {
+          "startAge": 9,
+          "startYears": 9,
+          "startMonths": 1,
+          "forward": false,
+          "days": 27.26880787037037,
+          "list": [
+            [
+              9,
+              11,
+              9
+            ],
+            [
+              8,
+              10,
+              19
+            ],
+            [
+              7,
+              9,
+              29
+            ],
+            [
+              6,
+              8,
+              39
+            ],
+            [
+              5,
+              7,
+              49
+            ],
+            [
+              4,
+              6,
+              59
+            ],
+            [
+              3,
+              5,
+              69
+            ],
+            [
+              2,
+              4,
+              79
+            ]
+          ]
+        },
+        "wxCount": [
+          3,
+          1,
+          0,
+          1,
+          3
+        ],
+        "strengthScore": 1.3,
+        "strengthType": "从弱",
+        "yongShen": 4
+      }
+    }
+  ]
+}

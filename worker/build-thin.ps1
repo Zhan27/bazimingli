@@ -43,7 +43,9 @@ function aiBuildSchool(schoolIdx){
   throw new Error('本版本已启用服务端 Prompt：流派研判准则不在本地。');
 }
 '@
-$html = Cut-Range -Text $html -StartMarker '/* 按流派生成角色与 dimGuide(18 维解读侧重),返回{role,dimGuide} */' -EndMarker '/* 紫微斗数参考摘要' -Replacement $stubA -Label 'aiBuildSchool（5 流派人格）'
+$html = Cut-Range -Text $html -StartMarker '/* Source: data/school-prompts.json */' -EndMarker '/* Source: src/bazi/data.js */' -Replacement '' -Label '流派 Prompt 数据'
+$html = Cut-Range -Text $html -StartMarker 'function aiBuildSchool(id){' -EndMarker 'function dayBoundaryLabel(rule){' -Replacement $stubA -Label 'aiBuildSchool（5 流派人格）'
+$html = Cut-Range -Text $html -StartMarker '/* 按流派生成角色与 dimGuide(18 维解读侧重),返回{role,dimGuide} */' -EndMarker '/* 紫微斗数参考摘要' -Replacement '' -Label '旧版流派标记'
 
 # ---- 2. 18 维输出框架 + 评分规则 + 研究纪律 + 命格原型 ----
 $stubB = @'
