@@ -1,0 +1,17 @@
+name = "xuanji-mingli-proxy"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+# 非机密变量写这里；机密（API_KEY / ACCESS_CODES / SYSTEM_PROMPT）用 wrangler secret put
+[vars]
+# 上游 OpenAI 兼容地址（不带 /chat/completions）
+UPSTREAM_BASE = "https://api.deepseek.com/v1"
+# 每个 IP 每日请求上限，0 = 不限
+DAILY_LIMIT = "80"
+# 允许的模型白名单，逗号分隔；留空 = 不限制
+ALLOWED_MODELS = "deepseek-chat"
+# 单次响应 token 上限（防止被刷），0 = 不限制
+MAX_TOKENS_CAP = "8192"
+
+[observability]
+enabled = true

@@ -4,7 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="description" content="玄机命理排盘：八字四柱、紫微斗数、奇门遁甲、六爻卜筮在线排盘工具，支持 AI 深度解读与多流派分析。">
+<meta name="keywords" content="八字排盘,紫微斗数,奇门遁甲,六爻,合婚,真太阳时,命理排盘,AI命理解读">
+<meta name="author" content="Zhan27">
+<meta name="theme-color" content="#ece6d8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14120e" media="(prefers-color-scheme: dark)">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="玄机命理排盘">
+<meta property="og:title" content="玄机命理排盘 · 八字紫微奇门六爻">
+<meta property="og:description" content="八字四柱、紫微斗数、奇门遁甲、六爻、合婚一体机。纯本地计算，数据不上传；可接任意 OpenAI 兼容大模型做 18 维深度解读。">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="玄机命理排盘 · 八字紫微奇门六爻">
+<meta name="twitter:description" content="八字四柱、紫微斗数、奇门遁甲、六爻、合婚一体机。纯本地计算，数据不上传。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%AF%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%AF%EF%B8%8F%3C/text%3E%3C/svg%3E">
 <title>玄机命理排盘 · 八字紫微奇门六爻</title>
 <style>
 :root{
@@ -286,11 +300,19 @@ header .sub{font-size:.78rem;color:var(--ink3);margin-top:6px;letter-spacing:.2e
 <div id="ai-modal" role="dialog" aria-modal="true" aria-label="AI 深度解读设置" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(3px)">
 <div style="background:var(--card);border:1px solid var(--gold2);border-radius:14px;padding:22px;width:min(460px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.25)">
 <h3 style="margin:0 0 4px;color:var(--gold);font-size:1.05rem">🤖 AI 深度解读设置</h3>
-<div style="font-size:.74rem;color:var(--ink3);margin-bottom:14px;line-height:1.7">接入大模型 API（OpenAI 兼容协议），排盘后一键生成<b>综合典籍 + AI 深度思考</b>的多维解读。<br>Key 仅保存在<b>本机浏览器</b>（localStorage），请求直接发往您填写的 API 地址，不会上传任何服务器。</div>
+<div style="font-size:.74rem;color:var(--ink3);margin-bottom:12px;line-height:1.7">接入大模型 API（OpenAI 兼容协议），排盘后一键生成<b>综合典籍 + AI 深度思考</b>的多维解读。<br>Key 仅在<b>本机</b>生效，请求直接发往您填写的 API 地址，不经过任何第三方服务器。<b>填入后不会回显</b>，仅显示尾号。</div>
+<div id="ai-key-state" style="font-size:.72rem;color:var(--ink3);margin-bottom:10px;padding:6px 10px;background:var(--bg2);border:1px solid var(--line);border-radius:8px">当前未配置 Key</div>
 <div class="field" style="margin-bottom:10px"><label>API 地址 (BaseURL)</label><input id="ai-base" placeholder="https://api.deepseek.com/v1" style="width:100%"></div>
-<div class="field" style="margin-bottom:10px"><label>API Key</label><input id="ai-key" type="password" placeholder="sk-..." style="width:100%"></div>
+<div class="field" style="margin-bottom:10px"><label>API Key</label><input id="ai-key" type="password" placeholder="sk-..." autocomplete="off" spellcheck="false" style="width:100%"></div>
 <div class="field" style="margin-bottom:10px"><label>模型名</label><input id="ai-model" placeholder="deepseek-chat" style="width:100%"></div>
-<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+<div class="field" style="margin-bottom:10px"><label>输出长度上限 (max_tokens)</label><input id="ai-maxtok" type="number" min="0" max="65536" step="256" placeholder="8000" style="width:100%">
+<div style="font-size:.7rem;color:var(--ink3);margin-top:4px;line-height:1.6">18 维全量输出约需 6000+ tokens；默认 8000。若接口报 400/参数超限，改小或留 0 表示不指定（用服务端默认，可能被截断导致【18】缺失）。</div></div>
+<label style="display:flex;align-items:flex-start;gap:8px;font-size:.75rem;color:var(--ink2);margin:12px 0 4px;cursor:pointer;line-height:1.6">
+  <input id="ai-session-only" type="checkbox" style="margin-top:3px;flex:0 0 auto">
+  <span><b>仅本次会话使用</b>（不写入磁盘，关闭浏览器/标签页即失效）<br><span style="color:var(--ink3);font-size:.7rem">共用电脑、录屏演示、网吧/公司设备请勾选</span></span>
+</label>
+<div style="display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:16px;flex-wrap:wrap">
+<button class="btn btn-ghost" onclick="aiClearKey()" style="font-size:.78rem;border-color:var(--red);color:var(--red)">🗑 清除 Key</button>
 <button class="btn btn-ghost" onclick="aiTestConn()" style="font-size:.78rem">测试连接</button>
 <button class="btn btn-ghost" onclick="document.getElementById('ai-modal').style.display='none'" style="font-size:.78rem">取消</button>
 <button class="btn btn-primary" onclick="aiSaveSettings()" style="font-size:.78rem">保存</button>
@@ -4280,39 +4302,182 @@ function zhLiuNianTimeline(zh){
 }
 
 /* ======================== AI 深度解读（接入大模型 API） ======================== */
-const AI_DEF={base:'https://api.deepseek.com/v1',key:'',model:'deepseek-chat'};
-function aiGetConfig(){try{return Object.assign({},AI_DEF,JSON.parse(localStorage.getItem('mingli_ai_cfg')||'null'));}catch(e){return Object.assign({},AI_DEF);}}
-function aiSaveConfig(c){localStorage.setItem('mingli_ai_cfg',JSON.stringify(c));}
+const AI_DEF={base:'https://api.deepseek.com/v1',key:'',model:'deepseek-chat',maxTok:8000,sessionOnly:false};
+const AI_NS='mingli_ai_cfg';
+/* —— Key 存储：默认 localStorage；sessionOnly=true 时写 sessionStorage（关浏览器即失效）—— */
+function aiMaskKey(k){ if(!k) return ''; return k.length<=10 ? '••••••' : k.slice(0,5)+'••••'+k.slice(-4); }
+function aiGetConfig(){
+  let raw=null;
+  try{ raw=sessionStorage.getItem(AI_NS); }catch(e){}
+  if(!raw){ try{ raw=localStorage.getItem(AI_NS); }catch(e){} }
+  try{ return Object.assign({},AI_DEF,JSON.parse(raw||'null')||{}); }catch(e){ return Object.assign({},AI_DEF); }
+}
+function aiSaveConfig(c){
+  const payload=JSON.stringify(c);
+  try{
+    if(c.sessionOnly){ sessionStorage.setItem(AI_NS,payload); localStorage.removeItem(AI_NS); }
+    else { localStorage.setItem(AI_NS,payload); sessionStorage.removeItem(AI_NS); }
+  }catch(e){
+    // 隐私模式/配额满：退化为仅内存
+    try{ sessionStorage.setItem(AI_NS,payload); }catch(e2){}
+  }
+}
+function aiClearStoredKey(){
+  try{ localStorage.removeItem(AI_NS); }catch(e){}
+  try{ sessionStorage.removeItem(AI_NS); }catch(e){}
+}
+/* —— 统一请求入口：把 BaseURL 归一化，避免用户多填/少填 /v1 —— */
+function aiEndpoint(c){
+  let base=String(c.base||AI_DEF.base).trim().replace(/\/+$/,'');
+  if(/\/chat\/completions$/.test(base)) return base;      // 用户直接填了完整路径
+  return base+'/chat/completions';
+}
+function aiHeaders(c){
+  const h={'Content-Type':'application/json'};
+  const k=String(c.key||'').trim();
+  if(k) h['Authorization']='Bearer '+k;
+  return h;
+}
+/* —— 超时包装：非流式请求 —— */
+function aiFetch(url,opts,timeoutMs){
+  const ctrl=new AbortController();
+  const ms=timeoutMs||60000;
+  const timer=setTimeout(()=>{ try{ctrl.abort();}catch(e){} },ms);
+  return fetch(url,Object.assign({},opts,{signal:ctrl.signal}))
+    .then(r=>{ clearTimeout(timer); return r; },
+          err=>{ clearTimeout(timer);
+            if(err&&err.name==='AbortError') throw new Error('请求超时（'+Math.round(ms/1000)+'秒无响应），请检查网络或 BaseURL');
+            throw new Error('网络异常：'+(err&&err.message||'无法连接')+'（可能是 BaseURL 写错、被 CORS/代理拦截，或离线）');
+          });
+}
+/* —— 状态码 → 可操作的中文提示 —— */
+async function aiErrMsg(r){
+  let detail='';
+  try{ const t=await r.text(); if(t) detail=t.replace(/\s+/g,' ').slice(0,180); }catch(e){}
+  const map={
+    400:'请求被拒绝（400）：多为模型名不存在、参数不合法或 max_tokens 超限',
+    401:'鉴权失败（401）：API Key 错误、过期或未填写',
+    402:'余额不足（402）：账户额度已用尽',
+    403:'无权限（403）：Key 无权访问该模型，或所在地区被限制',
+    404:'地址不存在（404）：BaseURL 应形如 https://api.deepseek.com/v1，勿带 /chat/completions',
+    413:'请求体过大（413）：命盘数据或 max_tokens 过大',
+    429:'请求过频（429）：已触发限流，请等待几秒后重试',
+    500:'服务端内部错误（500）',502:'网关错误（502）',503:'服务暂不可用（503）',504:'网关超时（504）'
+  };
+  const base=map[r.status]||('请求失败（HTTP '+r.status+'）');
+  return detail ? base+' · '+detail : base;
+}
+/* —— 统一 SSE 流式：带静默超时 + 总时长上限，返回 {abort} —— */
+function aiStreamChat(url,opts,handlers){
+  handlers=handlers||{};
+  const idleMs=handlers.idleMs||90000;
+  const totalMs=handlers.totalMs||420000;
+  const ctrl=new AbortController();
+  let idleT=null,totalT=null,done=false;
+  const stop=()=>{ done=true; clearTimeout(idleT); clearTimeout(totalT); try{ctrl.abort();}catch(e){} };
+  const armIdle=()=>{
+    clearTimeout(idleT);
+    idleT=setTimeout(()=>{ if(!done){ stop(); handlers.onError&&handlers.onError(new Error('接口静默超过 '+Math.round(idleMs/1000)+' 秒，已中断（可重试）')); } },idleMs);
+  };
+  totalT=setTimeout(()=>{ if(!done){ stop(); handlers.onError&&handlers.onError(new Error('总时长超过 '+Math.round(totalMs/1000)+' 秒，已中断')); } },totalMs);
+  (async()=>{
+    try{
+      armIdle();
+      const r=await fetch(url,Object.assign({},opts,{signal:ctrl.signal}));
+      if(!r.ok) throw new Error(await aiErrMsg(r));
+      if(!r.body) throw new Error('当前浏览器不支持流式响应（请升级浏览器或改用非流式）');
+      const reader=r.body.getReader();const dec=new TextDecoder();
+      let acc='',buf='';
+      while(true){
+        const {done:fin,value}=await reader.read();
+        if(fin) break;
+        armIdle();
+        buf+=dec.decode(value,{stream:true});
+        const lines=buf.split(/\r?\n/);buf=lines.pop();
+        for(const line of lines){
+          const t=line.trim();
+          if(!t.startsWith('data:'))continue;
+          const data=t.slice(5).trim();
+          if(data==='[DONE]')continue;
+          try{
+            const j=JSON.parse(data);
+            const d=j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content;
+            if(d){ acc+=d; handlers.onDelta&&handlers.onDelta(d,acc); }
+          }catch(e){}
+        }
+      }
+      if(done)return;
+      done=true;clearTimeout(idleT);clearTimeout(totalT);
+      handlers.onDone&&handlers.onDone(acc);
+    }catch(e){
+      if(done)return;
+      done=true;clearTimeout(idleT);clearTimeout(totalT);
+      if(e&&e.name==='AbortError') e=new Error('已中断');
+      handlers.onError&&handlers.onError(e);
+    }
+  })();
+  return {abort:stop};
+}
 function aiOpenSettings(){
   const c=aiGetConfig();
   document.getElementById('ai-base').value=c.base||'';
-  document.getElementById('ai-key').value=c.key||'';
+  const kEl=document.getElementById('ai-key');
+  kEl.value='';                                   // 不回显明文 Key（防截图/录屏/共享屏幕泄漏）
+  kEl.placeholder=c.key?('已保存 '+aiMaskKey(c.key)+' — 留空则沿用'):'sk-...';
   document.getElementById('ai-model').value=c.model||'';
+  const mt=document.getElementById('ai-maxtok'); if(mt) mt.value=c.maxTok||'';
+  const so=document.getElementById('ai-session-only'); if(so) so.checked=!!c.sessionOnly;
+  const st=document.getElementById('ai-key-state');
+  if(st) st.textContent = c.key
+    ? ('当前 Key：'+aiMaskKey(c.key)+' · '+(c.sessionOnly?'仅本次会话（关浏览器失效）':'已持久化保存在本机'))
+    : '当前未配置 Key（可使用下方「提取 Prompt」通道，无需 Key）';
   document.getElementById('ai-test-msg').textContent='';
   document.getElementById('ai-modal').style.display='flex';
 }
 function aiSaveSettings(){
-  aiSaveConfig({base:document.getElementById('ai-base').value.trim()||AI_DEF.base,key:document.getElementById('ai-key').value.trim(),model:document.getElementById('ai-model').value.trim()||'deepseek-chat'});
-  document.getElementById('ai-test-msg').textContent='✅ 已保存';
-  document.getElementById('ai-modal').style.display='none';
+  const prev=aiGetConfig();
+  const typed=document.getElementById('ai-key').value.trim();
+  const so=document.getElementById('ai-session-only');
+  const mt=parseInt(document.getElementById('ai-maxtok').value||'0',10);
+  const next={
+    base:document.getElementById('ai-base').value.trim()||AI_DEF.base,
+    key:typed||prev.key||'',
+    model:document.getElementById('ai-model').value.trim()||'deepseek-chat',
+    maxTok:(isFinite(mt)&&mt>0)?mt:0,
+    sessionOnly:!!(so&&so.checked)
+  };
+  aiSaveConfig(next);
+  const msg=document.getElementById('ai-test-msg');
+  msg.textContent=next.key
+    ? ('✅ 已保存（'+aiMaskKey(next.key)+' · '+(next.sessionOnly?'仅本次会话':'本机持久')+'）')
+    : '✅ 已保存（未填 Key）';
+  aiOpenSettings();                               // 刷新状态条，保持弹窗打开让用户看到结果
+  document.getElementById('ai-test-msg').textContent=msg.textContent;
+}
+function aiClearKey(){
+  if(!confirm('确定清除本机保存的 API Key？\n清除后需重新填写才能一键生成（「提取 Prompt」通道不受影响）。')) return;
+  aiClearStoredKey();
+  const kEl=document.getElementById('ai-key'); if(kEl){kEl.value='';kEl.placeholder='sk-...';}
+  const so=document.getElementById('ai-session-only'); if(so) so.checked=false;
+  aiOpenSettings();
+  document.getElementById('ai-test-msg').textContent='🗑 已清除本机 Key';
 }
 function aiTestConn(){
   const c=aiGetConfig();
   const base=document.getElementById('ai-base').value.trim()||c.base;
-  const key=document.getElementById('ai-key').value.trim();
+  const key=document.getElementById('ai-key').value.trim()||c.key;
   const model=document.getElementById('ai-model').value.trim()||c.model;
   const msg=document.getElementById('ai-test-msg');
   if(!key){msg.textContent='⚠️ 请先填写 API Key';return;}
-  msg.textContent='⏳ 连接中…';
-  fetch(base.replace(/\/$/,'')+'/chat/completions',{
+  msg.textContent='⏳ 连接中…（最长 30 秒）';
+  aiFetch(aiEndpoint({base:base,key:key}),{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
     body:JSON.stringify({model:model,messages:[{role:'user',content:'请回复：连接成功'}],max_tokens:10})
-  }).then(r=>{
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    return r.json();
-  }).then(()=>{msg.textContent='✅ 连接成功！模型可用';})
-  .catch(e=>{msg.textContent='❌ 连接失败：'+e.message+'（检查 BaseURL/Key/模型名）';});
+  },30000).then(async r=>{
+    if(!r.ok) throw new Error(await aiErrMsg(r));
+    msg.textContent='✅ 连接成功！模型可用';
+  }).catch(e=>{ msg.textContent='❌ 连接失败：'+e.message; });
 }
 // 命盘数据序列化(喂给AI的客观数据)
 /* 基础信息(醒目放在Prompt最前,避免AI搞混命盘) */
@@ -4825,61 +4990,53 @@ function aiDeepAnalyze(){
   if(!lastZh){alert('请先排盘');return;}
   if(!box){alert('请先排盘（AI 深度解读随排盘结果生成）');return;}
   if(!c.key){
-    box.innerHTML='<div style="padding:14px;text-align:center;color:var(--ink3);font-size:.85rem">⚠️ 尚未配置 AI Key。<br>点击右上角「🤖 AI 深度解读设置」填入 API Key 后重试。<br><span style="font-size:.74rem;color:var(--ink2)">支持 DeepSeek / OpenAI / 通义千问等任意 OpenAI 兼容接口，Key 仅存本机。</span></div>';
+    box.innerHTML='<div style="padding:14px;text-align:center;color:var(--ink3);font-size:.85rem">⚠️ 尚未配置 AI Key。<br>点击右上角「🤖 AI 深度解读设置」填入 API Key 后重试。<br><span style="font-size:.74rem;color:var(--ink2)">支持 DeepSeek / OpenAI / 通义千问等任意 OpenAI 兼容接口，Key 仅存本机。没有 Key 也可用「📋 提取 Prompt」通道。</span></div>';
     return;
   }
   const btn=document.getElementById('ai-deep-btn');
   if(btn){btn.disabled=true;btn.textContent='⏳ AI 深度思考中…（约30-60秒）';}
   box.innerHTML='<div style="padding:16px;color:var(--ink3);font-size:.82rem;text-align:center">🤖 正在按<b>'+SCHOOLS[lastSchool]+'</b>视角，综合<b>命盘数据 + 典籍知识库</b>深度推演 18 个维度（含综合定档·风险提示）…<br><span style="font-size:.72rem">各维度将实时填入卡片</span></div>';
   const {system,user}=aiBuildSchoolPrompt(lastSchool,'deep');
-  fetch(c.base.replace(/\/$/,'')+'/chat/completions',{
+  // 预留渲染容器（原实现依赖 box.firstChild，先清空再插入更稳）
+  box.innerHTML='<div style="padding:6px 2px"></div>';
+  const container=box.firstChild;
+  const nearBottom=()=>box.scrollHeight-box.scrollTop-box.clientHeight<90;
+  let acc='';
+  const paint=()=>{
+    const stick=nearBottom();                       // 用户上翻阅读时不强行拽回底部
+    container.innerHTML=aiMd2Html(acc);
+    if(stick) box.scrollTop=box.scrollHeight;
+    try{aiRenderDims(acc);}catch(e){}
+  };
+  const finish=(ok)=>{
+    if(btn){btn.disabled=false;btn.textContent=ok?'🤖 AI 深度解读（重新生成）':'🤖 AI 深度解读';}
+  };
+  const payload={model:c.model,messages:[{role:'system',content:system},{role:'user',content:user}],temperature:0.7,stream:true};
+  if(c.maxTok>0) payload.max_tokens=c.maxTok;      // 避免 18 维被服务端默认值截断
+  aiStreamChat(aiEndpoint(c),{
     method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+c.key},
-    body:JSON.stringify({model:c.model,messages:[{role:'system',content:system},{role:'user',content:user}],temperature:0.7,stream:true})
-  }).then(async r=>{
-    if(!r.ok){const t=await r.text().catch(()=>'');throw new Error('HTTP '+r.status+(t?': '+t.slice(0,120):''));}
-    if(!r.body){throw new Error('浏览器不支持流式');}
-    const reader=r.body.getReader();const dec=new TextDecoder();
-    let acc='',buf='';
-    box.innerHTML='<div style="padding:6px 2px"></div>';
-    const container=box.firstChild;
-    const flush=()=>{
-      container.innerHTML=aiMd2Html(acc);
-      box.scrollTop=box.scrollHeight;
-      try{aiRenderDims(acc);}catch(e){}
-    };
-    while(true){
-      const {done,value}=await reader.read();
-      if(done)break;
-      buf+=dec.decode(value,{stream:true});
-      const lines=buf.split('\n');buf=lines.pop();
-      for(const line of lines){
-        const t=line.trim();
-        if(!t.startsWith('data:'))continue;
-        const data=t.slice(5).trim();
-        if(data==='[DONE]')continue;
-        try{
-          const j=JSON.parse(data);
-          const d=j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content;
-          if(d){acc+=d;flush();}
-        }catch(e){}
-      }
+    headers:aiHeaders(c),
+    body:JSON.stringify(payload)
+  },{
+    idleMs:90000,
+    totalMs:480000,
+    onDelta:(d)=>{ acc+=d; paint(); },
+    onDone:(full)=>{
+      acc=full||acc; paint();
+      try{ lastAIReply=acc; }catch(e){}
+      let fb=0; try{ fb=aiFallbackRisk(); }catch(e){}
+      try{ aiFallbackZwRef(); }catch(e){}
+      if(fb) box.innerHTML+='<div style="font-size:.8rem;color:var(--orange);margin-top:6px">⚠️ AI 未输出【18】风险提示，已用本地引擎自动兜底。</div>';
+      finish(true);
+    },
+    onError:(e)=>{
+      box.innerHTML='<div style="padding:14px;color:var(--red);font-size:.82rem">❌ 调用失败：'+esc0(e.message||e)+'<br><span style="color:var(--ink3);font-size:.74rem">检查「🤖 AI 深度解读设置」中的 BaseURL / Key / 模型名 / max_tokens；若因超时中断，可直接重试。</span></div>';
+      finish(false);
     }
-     flush();
-     // 保存全文供追问/导出使用
-     try{ lastAIReply=acc; }catch(e){}
-     // 【18】风险提示缺失时自动本地兜底(流式路径)
-     let fb=0;
-     try{ fb=aiFallbackRisk(); }catch(e){}
-     try{ aiFallbackZwRef(); }catch(e){}
-    const curBox=document.getElementById('ai-deep-box');
-    if(fb&&curBox) curBox.innerHTML+='<div style="font-size:.8rem;color:var(--orange);margin-top:6px">⚠️ AI 未输出【18】风险提示，已用本地引擎自动兜底。</div>';
-    if(btn){btn.disabled=false;btn.textContent='🤖 AI 深度解读（重新生成）';}
-  }).catch(e=>{
-    box.innerHTML='<div style="padding:14px;color:var(--red);font-size:.82rem">❌ 调用失败：'+e.message+'<br><span style="color:var(--ink3);font-size:.74rem">请检查右上角 AI 设置中的 BaseURL / Key / 模型名。</span></div>';
-    if(btn){btn.disabled=false;btn.textContent='🤖 AI 深度解读';}
   });
 }
+/* 极简转义（错误信息可能含后端原文） */
+function esc0(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function zhAnalysis(zh){
   const maxWx=zh.wxCount.indexOf(Math.max(...zh.wxCount));
   const minWx=zh.wxCount.indexOf(Math.min(...zh.wxCount));
@@ -6428,34 +6585,24 @@ function hhAiDeep(){
   box.innerHTML='<div style="color:var(--ink3);font-size:.82rem;text-align:center;padding:10px">🤖 双盘互参推演中…</div>';
   const system='你是一位精通传统合婚文化的命理研究者，深谙《三命通会》合婚法、《滴天髓》阴阳观与子平十神论。基于双方完整命盘独立研判（不依赖任何既有评分，自行从干支十神、合冲刑害、配偶星归位、阴阳纳音、紫微命卦等盘面推导）：输出五段【相处模式】【感情浓度】【潜在矛盾点】【经营建议】【综合断】，每段150-260字；每段引用双方具体干支十神与合冲关系作依据，推断过程可见；【综合断】给出缘分档位定性（上等/中上/中平/磨合/慎配）与一句总判，不必给精确分数；语言专业而有温度，结论只作倾向参考，禁止"必定离婚/注定不和"式断言。';
   const user=hhPromptBody(A,B,r)+'\n\n请基于以上完整盘面与准则，给出深度合婚研判。';
-  fetch(c.base.replace(/\/$/,'')+'/chat/completions',{
-    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+c.key},
-    body:JSON.stringify({model:c.model,messages:[{role:'system',content:system},{role:'user',content:user}],temperature:0.7,stream:true})
-  }).then(async resp=>{
-    if(!resp.ok){const t=await resp.text().catch(()=>'');throw new Error('HTTP '+resp.status+(t?': '+t.slice(0,120):''));}
-    if(!resp.body){throw new Error('浏览器不支持流式');}
-    const reader=resp.body.getReader();const dec=new TextDecoder();
-    let acc='',buf='';
-    const flush=()=>{box.innerHTML=aiMd2Html(acc);};
-    while(true){
-      const {done,value}=await reader.read();
-      if(done)break;
-      buf+=dec.decode(value,{stream:true});
-      const lines=buf.split('\n');buf=lines.pop();
-      for(const line of lines){
-        const t=line.trim();
-        if(!t.startsWith('data:'))continue;
-        const data=t.slice(5).trim();
-        if(data==='[DONE]')continue;
-        try{const j=JSON.parse(data);const d=j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content;if(d){acc+=d;flush();}}catch(e){}
-      }
+  const payload={model:c.model,messages:[{role:'system',content:system},{role:'user',content:user}],temperature:0.7,stream:true};
+  if(c.maxTok>0) payload.max_tokens=c.maxTok;
+  let acc='';
+  const paint=()=>{ box.innerHTML=aiMd2Html(acc); };
+  aiStreamChat(aiEndpoint(c),{
+    method:'POST',headers:aiHeaders(c),body:JSON.stringify(payload)
+  },{
+    idleMs:90000,totalMs:300000,
+    onDelta:(d)=>{ acc+=d; paint(); },
+    onDone:(full)=>{
+      acc=full||acc; paint();
+      try{ const dn=hhFillCards(hhParseDims(acc)); if(btn&&dn) btn.textContent='🤖 重新生成'; }catch(e){}
+      if(btn){btn.disabled=false;btn.textContent='🤖 重新生成';}
+    },
+    onError:(e)=>{
+      box.innerHTML='<div style="color:var(--red);font-size:.82rem;padding:10px">❌ '+esc0(e.message||e)+'</div>';
+      if(btn){btn.disabled=false;btn.textContent='🤖 AI 深度合婚分析';}
     }
-    flush();
-    try{ const dn=hhFillCards(hhParseDims(acc)); if(btn&&dn) btn.textContent='🤖 重新生成'; }catch(e){}
-    if(btn){btn.disabled=false;btn.textContent='🤖 重新生成';}
-  }).catch(e=>{
-    box.innerHTML='<div style="color:var(--red);font-size:.82rem;padding:10px">❌ '+e.message+'</div>';
-    if(btn){btn.disabled=false;btn.textContent='🤖 AI 深度合婚分析';}
   });
 }
 
@@ -6478,35 +6625,24 @@ function aiFollowUp(){
     {role:'assistant',content:lastAIReply.length>6000?lastAIReply.slice(-6000):lastAIReply},
     {role:'user',content:q}
   ];
-  fetch(c.base.replace(/\/$/,'')+'/chat/completions',{
-    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+c.key},
-    body:JSON.stringify({model:c.model,messages:messages,temperature:0.7,stream:true})
-  }).then(async resp=>{
-    if(!resp.ok){const t=await resp.text().catch(()=>'');throw new Error('HTTP '+resp.status+(t?': '+t.slice(0,120):''));}
-    if(!resp.body){throw new Error('浏览器不支持流式');}
-    const reader=resp.body.getReader();const dec=new TextDecoder();
-    let acc='',buf='';
-    const flush=()=>{ if(box){box.innerHTML='<div style="color:var(--ink3);font-size:.74rem;margin-bottom:6px">💬 '+q+'</div>'+aiMd2Html(acc);} };
-    while(true){
-      const {done,value}=await reader.read();
-      if(done)break;
-      buf+=dec.decode(value,{stream:true});
-      const lines=buf.split('\n');buf=lines.pop();
-      for(const line of lines){
-        const t=line.trim();
-        if(!t.startsWith('data:'))continue;
-        const data=t.slice(5).trim();
-        if(data==='[DONE]')continue;
-        try{const j=JSON.parse(data);const d=j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content;if(d){acc+=d;flush();}}catch(e){}
-      }
+  const payload={model:c.model,messages:messages,temperature:0.7,stream:true};
+  let acc='';
+  const paint=()=>{ if(box){box.innerHTML='<div style="color:var(--ink3);font-size:.74rem;margin-bottom:6px">💬 '+esc0(q)+'</div>'+aiMd2Html(acc);} };
+  aiStreamChat(aiEndpoint(c),{
+    method:'POST',headers:aiHeaders(c),body:JSON.stringify(payload)
+  },{
+    idleMs:90000,totalMs:180000,
+    onDelta:(d)=>{ acc+=d; paint(); },
+    onDone:(full)=>{
+      acc=full||acc; paint();
+      try{ lastAIReply+='\n\n【用户追问】'+q+'\n【追问解读】'+acc; }catch(e){}
+      if(btn){btn.disabled=false;btn.textContent='发送追问';}
+      if(inp) inp.value='';
+    },
+    onError:(e)=>{
+      if(box) box.innerHTML='<div style="color:var(--red);font-size:.82rem">❌ '+esc0(e.message||e)+'</div>';
+      if(btn){btn.disabled=false;btn.textContent='发送追问';}
     }
-    flush();
-    try{ lastAIReply+='\n\n【用户追问】'+q+'\n【追问解读】'+acc; }catch(e){}
-    if(btn){btn.disabled=false;btn.textContent='发送追问';}
-    if(inp) inp.value='';
-  }).catch(e=>{
-    if(box) box.innerHTML='<div style="color:var(--red);font-size:.82rem">❌ '+e.message+'</div>';
-    if(btn){btn.disabled=false;btn.textContent='发送追问';}
   });
 }
 /* ======================== 命盘导出（图片 + 记录备份） ======================== */
