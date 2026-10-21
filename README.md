@@ -27,12 +27,6 @@
 - 多模块解读记录留存（localStorage），换设备可导出/导入
 - 纯本地计算：出生信息不上传任何服务器
 
-## 🔒 隐私与 API Key 安全
-
-- **本仓库不含任何 API Key**。代码中默认配置为空（`key:''`），仅提供输入框由使用者运行时自行填入
-- Key 与所有排盘数据仅存于**使用者自己浏览器的 localStorage**，不经过任何第三方服务器（AI 请求为浏览器直连使用者所填的接口地址）
-- 若你 Fork 后自用，请注意不要把填过 Key 的浏览器数据或修改后的带 Key 代码提交回仓库
-
 ## 🚀 部署 / 运行
 
 ### 本地运行
@@ -54,10 +48,19 @@ bash sync_deploy.sh   # 把最新的 命理排盘.html 同步到 docs/index.html
 
 ```
 ├── 命理排盘.html      # 主文件（全部功能，单文件自包含）
-├── assets/            # 背景与太极图素材
 ├── docs/              # 部署副本（GitHub Pages 入口，/docs 模式）
 ├── sync_deploy.sh     # 源文件 → docs 同步脚本
+├── launcher.py        # 桌面版启动器（pywebview）
 └── .gitignore
+```
+
+## 🖥️ Windows 桌面版（exe）
+
+`Release` 页提供打包好的单文件 exe（基于 pywebview + PyInstaller，双击即用，无需安装浏览器之外任何依赖；Win10/11 自带 WebView2 运行时）。自行打包：
+
+```bash
+python -m venv venv && venv\Scripts\pip install pywebview pyinstaller
+venv\Scripts\pyinstaller --onefile --noconsole --name 命理排盘 --add-data "命理排盘.html;." launcher.py
 ```
 
 ## ⚠️ 免责声明
