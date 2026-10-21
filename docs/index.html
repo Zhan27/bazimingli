@@ -365,7 +365,7 @@ body[data-theme="xuanmo"] .btn-primary{background:#a9c1a0;color:#17291c;border-c
 <div id="ai-modal" role="dialog" aria-modal="true" aria-label="AI 深度解读设置" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(3px)">
 <div style="background:var(--card);border:1px solid var(--gold2);border-radius:14px;padding:22px;width:min(460px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.25)">
 <h3 style="margin:0 0 4px;color:var(--gold);font-size:1.05rem">🤖 AI 深度解读设置</h3>
-<div style="font-size:.74rem;color:var(--ink3);margin-bottom:12px;line-height:1.7">接入大模型 API（OpenAI 兼容协议），排盘后一键生成<b>综合典籍 + AI 深度思考</b>的多维解读。<br>Key 仅在<b>本机</b>生效，请求直接发往您填写的 API 地址，不经过任何第三方服务器。<b>填入后不会回显</b>，仅显示尾号。</div>
+<div style="font-size:.74rem;color:var(--ink3);margin-bottom:12px;line-height:1.7">接入大模型 API（OpenAI 兼容协议），排盘后一键生成多维解读。<br>主动请求时，Key 或访问码及命盘资料会发送到您填写的 API 地址；若使用中转，中转运营者也会接触这些数据。<b>Key 不回显</b>。请先阅读页面底部的「隐私与数据」。</div>
 <div id="ai-key-state" style="font-size:.72rem;color:var(--ink3);margin-bottom:10px;padding:6px 10px;background:var(--bg2);border:1px solid var(--line);border-radius:8px">当前未配置 Key</div>
 <div class="field" style="margin-bottom:10px"><label>API 地址 (BaseURL)</label><input id="ai-base" placeholder="https://api.deepseek.com/v1" style="width:100%"></div>
 <div class="field" style="margin-bottom:10px"><label>API Key</label><input id="ai-key" type="password" placeholder="sk-..." autocomplete="off" spellcheck="false" style="width:100%"></div>
@@ -378,7 +378,7 @@ body[data-theme="xuanmo"] .btn-primary{background:#a9c1a0;color:#17291c;border-c
 </label>
 <label style="display:flex;align-items:flex-start;gap:8px;font-size:.75rem;color:var(--ink2);margin:12px 0 4px;cursor:pointer;line-height:1.6">
   <input id="ai-session-only" type="checkbox" style="margin-top:3px;flex:0 0 auto">
-  <span><b>仅本次会话使用</b>（不写入磁盘，关闭浏览器/标签页即失效）<br><span style="color:var(--ink3);font-size:.7rem">共用电脑、录屏演示、网吧/公司设备请勾选</span></span>
+  <span><b>仅标签页会话保存（默认）</b><br><span style="color:var(--ink3);font-size:.7rem">浏览器恢复会话可能保留；使用后可点「清除 Key」。取消勾选才会长期保存在本机，保存内容未经加密。</span></span>
 </label>
 <div style="display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:16px;flex-wrap:wrap">
 <button class="btn btn-ghost" onclick="aiClearKey()" style="font-size:.78rem;border-color:var(--red);color:var(--red)">🗑 清除 Key</button>
@@ -11388,8 +11388,10 @@ function showWorkspaceDialog(kind){
   const previous=document.activeElement,overlay=document.createElement('div');overlay.className='workspace-dialog';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');
   const card=document.createElement('div');card.className='workspace-dialog-card';overlay.appendChild(card);
   const close=()=>{overlay.remove();previous?.focus();};
-  const heading=document.createElement('h2');heading.id='workspace-dialog-heading';heading.textContent=kind==='knowledge'?'术语小辞典':'从一张命盘开始';card.appendChild(heading);overlay.setAttribute('aria-labelledby',heading.id);
-  if(kind==='knowledge'){
+  const heading=document.createElement('h2');heading.id='workspace-dialog-heading';heading.textContent=kind==='privacy'?'隐私与数据':kind==='knowledge'?'术语小辞典':'从一张命盘开始';card.appendChild(heading);overlay.setAttribute('aria-labelledby',heading.id);
+  if(kind==='privacy'){
+    for(const text of ['排盘计算在当前设备运行。在线页面的托管服务会收到访问网页所需的网络信息；本项目未添加分析统计或自动上传命盘的功能。','姓名、出生日期、时间、地点和排盘记录可能属于个人信息。保存的记录、主题和偏好存放在当前站点或本地页面的浏览器存储中；同一设备的其他使用者可能读到。','API Key 默认保存在标签页会话存储。浏览器恢复会话可能保留它；只有主动取消会话选项才长期保存。浏览器存储未经加密，使用后请在 AI 设置中清除 Key。存储不可用时只在当前页面内存保留。','仅主动调用 AI 或测试连接时才向配置的 API 地址发送请求。完整解读会发送姓名、出生信息、命盘、知识片段等；中转运营者和上游模型服务商可能接触请求，数据保留取决于其政策。请确认服务地址可信，避免填写不需要的真实姓名。','导出备份和导出图片、复制摘要或 Prompt 都可能包含出生资料。备份不包含 API 设置，但文件和剪贴板由您自行保管；删除本地记录不会删除已导出的文件或服务商保存的数据。','可在记录管理中逐条或全部删除记录；AI 设置中的清除 Key 独立生效。清除浏览器站点数据会同时移除该站点本地记录和偏好，请先保存需要的备份。']){const p=document.createElement('p');p.textContent=text;card.appendChild(p);}
+  }else if(kind==='knowledge'){
     const note=document.createElement('p');note.textContent='查阅术语定义与来源状态。原项目的古籍、经验断语尚待逐条核验，请作为学习线索。';card.appendChild(note);
     const search=document.createElement('input');search.className='glossary-search';search.type='search';search.placeholder='搜索十神、藏干、换日……';search.setAttribute('aria-label','搜索术语');card.appendChild(search);
     const results=document.createElement('div');results.className='glossary-results';card.appendChild(results);
@@ -11452,6 +11454,7 @@ function initializeWorkbench(){
   const search=document.createElement('input');search.type='search';search.className='glossary-search';search.style.cssText='margin-bottom:6px;font-size:10px;padding:7px 8px';search.placeholder='搜索本地记录';search.setAttribute('aria-label','搜索本地排盘记录');records.querySelector('#zh-records').before(search);search.addEventListener('input',()=>records.querySelectorAll('.rec-item').forEach(r=>{r.hidden=!r.textContent.toLowerCase().includes(search.value.toLowerCase());}));
   document.querySelectorAll('.field').forEach(field=>{const label=field.querySelector('label'),control=field.querySelector('input,select,textarea');if(label&&control?.id&&!label.querySelector('input'))label.htmlFor=control.id;});
   const footer=document.createElement('footer');footer.className='app-footer';footer.innerHTML='传统文化学习与参考 · 计算事实与传统解释请分别理解<br>由 <a href="https://github.com/Zhan27/bazimingli" target="_blank" rel="noopener">Zhan27</a> 维护，主要借助 OpenAI Codex 开发 · <button class="btn btn-ghost" type="button" id="footer-knowledge" style="font-size:10px;padding:2px 6px;min-height:0">查阅术语</button>';wrap.appendChild(footer);document.getElementById('footer-knowledge').addEventListener('click',()=>showWorkspaceDialog('knowledge'));
+  const privacy=document.createElement('button');privacy.className='btn btn-ghost';privacy.type='button';privacy.id='footer-privacy';privacy.textContent='隐私与数据';privacy.style.cssText='font-size:10px;padding:2px 6px;min-height:0';privacy.addEventListener('click',()=>showWorkspaceDialog('privacy'));footer.appendChild(privacy);
   setWorkbenchMode(workbenchMode());enhanceWorkbenchChart();new MutationObserver(enhanceWorkbenchChart).observe(document.getElementById('zh-result'),{childList:true});
 }
 
@@ -14106,27 +14109,40 @@ function zhLiuNianTimeline(zh){
 }
 
 /* ======================== AI 深度解读（接入大模型 API） ======================== */
-const AI_DEF={base:'https://api.deepseek.com/v1',key:'',model:'deepseek-chat',maxTok:8000,sessionOnly:false,divine:false};
+const AI_DEF={base:'https://api.deepseek.com/v1',key:'',model:'deepseek-chat',maxTok:8000,sessionOnly:true,divine:false};
 const AI_NS='mingli_ai_cfg';
-/* —— Key 存储：默认 localStorage；sessionOnly=true 时写 sessionStorage（关浏览器即失效）—— */
+let aiMemoryConfig=null,aiKeyStorage='session';
+/* Default to tab-session storage; browser session restoration may retain it. */
 function aiMaskKey(k){ if(!k) return ''; return k.length<=10 ? '••••••' : k.slice(0,5)+'••••'+k.slice(-4); }
 function aiGetConfig(){
+  if(aiMemoryConfig)return {...aiMemoryConfig};
   let raw=null;
   try{ raw=sessionStorage.getItem(AI_NS); }catch(e){}
   if(!raw){ try{ raw=localStorage.getItem(AI_NS); }catch(e){} }
-  try{ return Object.assign({},AI_DEF,JSON.parse(raw||'null')||{}); }catch(e){ return Object.assign({},AI_DEF); }
+  try{
+    const saved=JSON.parse(raw||'null')||{},config=Object.assign({},AI_DEF,saved);
+    // Explicit previous persistence choices are preserved; older unmarked keys migrate.
+    if(raw&&typeof saved.sessionOnly!=='boolean'){config.sessionOnly=true;aiSaveConfig(config);}
+    else aiKeyStorage=config.sessionOnly?'session':'local';
+    return config;
+  }catch(e){ return Object.assign({},AI_DEF); }
 }
 function aiSaveConfig(c){
-  const payload=JSON.stringify(c);
+  aiMemoryConfig={...AI_DEF,...c};
+  const payload=JSON.stringify(aiMemoryConfig);
+  aiKeyStorage='memory';
+  try{localStorage.removeItem(AI_NS);}catch(e){}
+  try{sessionStorage.removeItem(AI_NS);}catch(e){}
   try{
-    if(c.sessionOnly){ sessionStorage.setItem(AI_NS,payload); localStorage.removeItem(AI_NS); }
-    else { localStorage.setItem(AI_NS,payload); sessionStorage.removeItem(AI_NS); }
+    if(c.sessionOnly){sessionStorage.setItem(AI_NS,payload);aiKeyStorage='session';}
+    else{localStorage.setItem(AI_NS,payload);aiKeyStorage='local';}
   }catch(e){
-    // 隐私模式/配额满：退化为仅内存
-    try{ sessionStorage.setItem(AI_NS,payload); }catch(e2){}
+    aiMemoryConfig.sessionOnly=true;
+    try{sessionStorage.setItem(AI_NS,JSON.stringify(aiMemoryConfig));aiKeyStorage='session';}catch(e2){}
   }
 }
 function aiClearStoredKey(){
+  aiMemoryConfig=null;aiKeyStorage='session';
   try{ localStorage.removeItem(AI_NS); }catch(e){}
   try{ sessionStorage.removeItem(AI_NS); }catch(e){}
 }
@@ -14167,7 +14183,7 @@ function aiOpenSettings(){
   const dv=document.getElementById('ai-divine'); if(dv) dv.checked=!!c.divine;
   const st=document.getElementById('ai-key-state');
   if(st) st.textContent = c.key
-    ? ('当前 Key：'+aiMaskKey(c.key)+' · '+(c.sessionOnly?'仅本次会话（关浏览器失效）':'已持久化保存在本机')+(c.divine?' · 🎭 服务端 Prompt':''))
+    ? ('当前 Key：'+aiMaskKey(c.key)+' · '+({memory:'仅当前页面内存（刷新失效）',session:'标签页会话保存（浏览器恢复会话可能保留）',local:'已持久化保存在本机'}[aiKeyStorage])+(c.divine?' · 🎭 服务端 Prompt':''))
     : '当前未配置 Key（可使用下方「提取 Prompt」通道，无需 Key）';
   document.getElementById('ai-test-msg').textContent='';
   document.getElementById('ai-modal').style.display='flex';

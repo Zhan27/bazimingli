@@ -300,7 +300,7 @@ header .sub{font-size:.78rem;color:var(--ink3);margin-top:6px;letter-spacing:.2e
 <div id="ai-modal" role="dialog" aria-modal="true" aria-label="AI 深度解读设置" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(3px)">
 <div style="background:var(--card);border:1px solid var(--gold2);border-radius:14px;padding:22px;width:min(460px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.25)">
 <h3 style="margin:0 0 4px;color:var(--gold);font-size:1.05rem">🤖 AI 深度解读设置</h3>
-<div style="font-size:.74rem;color:var(--ink3);margin-bottom:12px;line-height:1.7">接入大模型 API（OpenAI 兼容协议），排盘后一键生成<b>综合典籍 + AI 深度思考</b>的多维解读。<br>Key 仅在<b>本机</b>生效，请求直接发往您填写的 API 地址，不经过任何第三方服务器。<b>填入后不会回显</b>，仅显示尾号。</div>
+<div style="font-size:.74rem;color:var(--ink3);margin-bottom:12px;line-height:1.7">接入大模型 API（OpenAI 兼容协议），排盘后一键生成多维解读。<br>主动请求时，Key 或访问码及命盘资料会发送到您填写的 API 地址；若使用中转，中转运营者也会接触这些数据。<b>Key 不回显</b>。请先阅读页面底部的「隐私与数据」。</div>
 <div id="ai-key-state" style="font-size:.72rem;color:var(--ink3);margin-bottom:10px;padding:6px 10px;background:var(--bg2);border:1px solid var(--line);border-radius:8px">当前未配置 Key</div>
 <div class="field" style="margin-bottom:10px"><label>API 地址 (BaseURL)</label><input id="ai-base" placeholder="https://api.deepseek.com/v1" style="width:100%"></div>
 <div class="field" style="margin-bottom:10px"><label>API Key</label><input id="ai-key" type="password" placeholder="sk-..." autocomplete="off" spellcheck="false" style="width:100%"></div>
@@ -313,7 +313,7 @@ header .sub{font-size:.78rem;color:var(--ink3);margin-top:6px;letter-spacing:.2e
 </label>
 <label style="display:flex;align-items:flex-start;gap:8px;font-size:.75rem;color:var(--ink2);margin:12px 0 4px;cursor:pointer;line-height:1.6">
   <input id="ai-session-only" type="checkbox" style="margin-top:3px;flex:0 0 auto">
-  <span><b>仅本次会话使用</b>（不写入磁盘，关闭浏览器/标签页即失效）<br><span style="color:var(--ink3);font-size:.7rem">共用电脑、录屏演示、网吧/公司设备请勾选</span></span>
+  <span><b>仅标签页会话保存（默认）</b><br><span style="color:var(--ink3);font-size:.7rem">浏览器恢复会话可能保留；使用后可点「清除 Key」。取消勾选才会长期保存在本机，保存内容未经加密。</span></span>
 </label>
 <div style="display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:16px;flex-wrap:wrap">
 <button class="btn btn-ghost" onclick="aiClearKey()" style="font-size:.78rem;border-color:var(--red);color:var(--red)">🗑 清除 Key</button>

@@ -65,8 +65,8 @@ $html = $html.Substring(0, $anchorAt) + $guard + $html.Substring($anchorAt)
 Write-Host "  · aiExtractPrompt: 已改为提示信息"
 
 # ---- 4. 默认开启服务端 Prompt 模式 ----
-if ($html.IndexOf('sessionOnly:false,divine:false}') -lt 0) { throw "找不到 AI_DEF 的 divine 字段" }
-$html = $html.Replace('sessionOnly:false,divine:false}', 'sessionOnly:false,divine:true}')
+if ($html.IndexOf('sessionOnly:true,divine:false}') -lt 0) { throw "找不到 AI_DEF 的 divine 字段" }
+$html = $html.Replace('sessionOnly:true,divine:false}', 'sessionOnly:true,divine:true}')
 Write-Host "  · AI_DEF: divine 默认 true"
 
 # ---- 5. 移除「提取 Prompt」按钮，避免用户点了个必然失败的功能 ----

@@ -1,6 +1,15 @@
 const {test,expect}=require('@playwright/test');
 const fs=require('node:fs'),path=require('node:path');
 const screenshots=path.resolve('verification/screenshots');
+test('privacy disclosure is available offline and key persistence is opt-in',async({page})=>{
+  await page.goto('/');await page.locator('#footer-privacy').click();
+  await expect(page.getByRole('dialog')).toContainText('中转运营者和上游模型服务商');await expect(page.getByRole('dialog')).toContainText('备份不包含 API 设置');
+  await page.keyboard.press('Escape');await expect(page.locator('#footer-privacy')).toBeFocused();
+  await page.getByRole('button',{name:'AI 解读设置',exact:true}).click();await expect(page.locator('#ai-session-only')).toBeChecked();
+  await page.locator('#ai-key').fill('synthetic-test-key');await page.getByRole('button',{name:'保存',exact:true}).click();
+  expect(await page.evaluate(()=>localStorage.getItem('mingli_ai_cfg'))).toBeNull();
+  await page.reload();await page.getByRole('button',{name:'AI 解读设置',exact:true}).click();await expect(page.locator('#ai-key')).toHaveValue('');await expect(page.locator('#ai-key-state')).toContainText('标签页会话保存');
+});
 test('study layout shows four pillars first, retains hidden options and switches reader views',async({page})=>{
   await page.setViewportSize({width:1440,height:1050});await page.goto('/');await expect(page.locator('.primary-pillars')).toBeVisible();
   await expect(page.locator('#advanced-options')).not.toHaveAttribute('open','');await expect(page.locator('.reader-extra').first()).toBeHidden();

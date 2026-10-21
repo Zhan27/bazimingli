@@ -2648,27 +2648,40 @@ function zhLiuNianTimeline(zh){
 }
 
 /* ======================== AI 深度解读（接入大模型 API） ======================== */
-const AI_DEF={base:'https://api.deepseek.com/v1',key:'',model:'deepseek-chat',maxTok:8000,sessionOnly:false,divine:false};
+const AI_DEF={base:'https://api.deepseek.com/v1',key:'',model:'deepseek-chat',maxTok:8000,sessionOnly:true,divine:false};
 const AI_NS='mingli_ai_cfg';
-/* —— Key 存储：默认 localStorage；sessionOnly=true 时写 sessionStorage（关浏览器即失效）—— */
+let aiMemoryConfig=null,aiKeyStorage='session';
+/* Default to tab-session storage; browser session restoration may retain it. */
 function aiMaskKey(k){ if(!k) return ''; return k.length<=10 ? '••••••' : k.slice(0,5)+'••••'+k.slice(-4); }
 function aiGetConfig(){
+  if(aiMemoryConfig)return {...aiMemoryConfig};
   let raw=null;
   try{ raw=sessionStorage.getItem(AI_NS); }catch(e){}
   if(!raw){ try{ raw=localStorage.getItem(AI_NS); }catch(e){} }
-  try{ return Object.assign({},AI_DEF,JSON.parse(raw||'null')||{}); }catch(e){ return Object.assign({},AI_DEF); }
+  try{
+    const saved=JSON.parse(raw||'null')||{},config=Object.assign({},AI_DEF,saved);
+    // Explicit previous persistence choices are preserved; older unmarked keys migrate.
+    if(raw&&typeof saved.sessionOnly!=='boolean'){config.sessionOnly=true;aiSaveConfig(config);}
+    else aiKeyStorage=config.sessionOnly?'session':'local';
+    return config;
+  }catch(e){ return Object.assign({},AI_DEF); }
 }
 function aiSaveConfig(c){
-  const payload=JSON.stringify(c);
+  aiMemoryConfig={...AI_DEF,...c};
+  const payload=JSON.stringify(aiMemoryConfig);
+  aiKeyStorage='memory';
+  try{localStorage.removeItem(AI_NS);}catch(e){}
+  try{sessionStorage.removeItem(AI_NS);}catch(e){}
   try{
-    if(c.sessionOnly){ sessionStorage.setItem(AI_NS,payload); localStorage.removeItem(AI_NS); }
-    else { localStorage.setItem(AI_NS,payload); sessionStorage.removeItem(AI_NS); }
+    if(c.sessionOnly){sessionStorage.setItem(AI_NS,payload);aiKeyStorage='session';}
+    else{localStorage.setItem(AI_NS,payload);aiKeyStorage='local';}
   }catch(e){
-    // 隐私模式/配额满：退化为仅内存
-    try{ sessionStorage.setItem(AI_NS,payload); }catch(e2){}
+    aiMemoryConfig.sessionOnly=true;
+    try{sessionStorage.setItem(AI_NS,JSON.stringify(aiMemoryConfig));aiKeyStorage='session';}catch(e2){}
   }
 }
 function aiClearStoredKey(){
+  aiMemoryConfig=null;aiKeyStorage='session';
   try{ localStorage.removeItem(AI_NS); }catch(e){}
   try{ sessionStorage.removeItem(AI_NS); }catch(e){}
 }
@@ -2709,7 +2722,7 @@ function aiOpenSettings(){
   const dv=document.getElementById('ai-divine'); if(dv) dv.checked=!!c.divine;
   const st=document.getElementById('ai-key-state');
   if(st) st.textContent = c.key
-    ? ('当前 Key：'+aiMaskKey(c.key)+' · '+(c.sessionOnly?'仅本次会话（关浏览器失效）':'已持久化保存在本机')+(c.divine?' · 🎭 服务端 Prompt':''))
+    ? ('当前 Key：'+aiMaskKey(c.key)+' · '+({memory:'仅当前页面内存（刷新失效）',session:'标签页会话保存（浏览器恢复会话可能保留）',local:'已持久化保存在本机'}[aiKeyStorage])+(c.divine?' · 🎭 服务端 Prompt':''))
     : '当前未配置 Key（可使用下方「提取 Prompt」通道，无需 Key）';
   document.getElementById('ai-test-msg').textContent='';
   document.getElementById('ai-modal').style.display='flex';
