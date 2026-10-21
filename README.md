@@ -1,11 +1,19 @@
 # 命理排盘 · 八字合婚一体机
 
-一个**单文件、纯前端、本地计算**的传统命理排盘应用：八字排盘 + 紫微斗数 + 奇门遁甲 + 六爻 + 合婚配对 + AI 深度解读，全部逻辑内嵌于一个 HTML 文件，无需后端、无需安装。
+一个**单文件、纯前端、本地计算**的传统命理排盘应用：八字排盘 + 紫微斗数 + 奇门遁甲 + 六爻 + 合婚配对 + AI 深度解读，发布文件包含全部逻辑，无需后端、无需安装。开发源码已拆分到 `src/`，经构建生成两个完全一致的单 HTML 文件。
 
 > 🌐 在线体验：https://d59403144e4747e6b7bd9898c99cdee7.sh5.agentos-app.net
 > 🖥️ Windows 桌面版：见 [Release](https://github.com/Zhan27/bazimingli/releases)（`mingli-paipan.exe`）
 
 ## ✨ 功能特性
+
+### 5.17：计算规则与可追溯结果
+- 明确选择子初23:00或子正00:00换日；原钟表时刻、UTC偏移、手动夏令时修正、东八区时刻和真太阳时分项显示。默认仍为东八区，不自动查询历史时区。
+- 内置2,704个 GeoNames 城市点位（WGS84、稳定ID、来源版本），使用精确别名或地点选择器；同名点位要求选择，不猜测匹配。数据按 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 使用，来源为 [GeoNames](https://www.geonames.org/)。
+- 未知时辰显示按时辰、换日、交节等边界划分的候选区间和稳定/变化四柱，不生成确定时柱、大运或默认评分。
+- 五行支持天干、天干加本气、天干加全部藏干三种不加权统计；页面列出得令、通根、得势评分。显示口径不改变原有评分模型。
+- 五套流派配置统一驱动显示、取用策略及Prompt。象法、格局派保留其解释重点，量化扶抑仅供参考；未声称实现完整古典流派算法。
+- 每次CI运行全部历史基准，生成输入、来源、预期、实际和差异报告。新增逐项说明见 [11—20验收报告](ACCEPTANCE-11-20.md)。
 
 ### 排盘体系
 - **P1 命格总断**：四柱八字、身强弱判定、用神取用、格局定名、过三关断语（可勾选留存）
@@ -29,7 +37,7 @@
 ### 其他
 - 多模块解读记录留存（localStorage），换设备可导出/导入
 - 三套主题（米白纸韵 / 玄墨青 / 青绿山水）、打印与导出 PNG、命盘摘要一键复制
-- 纯本地计算：出生信息不上传任何服务器
+- 排盘计算在本地；主动使用 AI 时，命盘与输入信息会发送到你配置的服务地址
 
 ## 🚀 部署 / 运行
 
@@ -43,14 +51,28 @@
 
 > 注：GitHub Pages 分支部署模式仅支持根目录（root）或 `/docs`，故部署副本放在 `docs/`。
 
-### 更新内容后重新同步
+### 开发与更新发布文件
+
+需要 Node.js 22+；修改 `src/` 或 `data/` 后执行：
+
+```bash
+npm ci
+npm run build
+npm run check
+npm test
+npm run regression
+npx playwright install chromium
+npm run test:e2e
+```
+
+也可运行兼容入口：
 
 ```bash
 pwsh -File sync_deploy.ps1   # Windows
 bash sync_deploy.sh          # macOS / Linux / WSL
 ```
 
-两个脚本都会：同步 `命理排盘.html → docs/index.html`、做**硬编码密钥自检**（命中即中止）、校验 SHA256 一致。
+两个入口均调用 `scripts/build.mjs`：按 `scripts/source-list.cjs` 清单嵌入源码、数据和固定版本历法库，检查 JS 语法及疑似密钥，再生成相同的 `命理排盘.html` 与 `docs/index.html`。`npm run check` 只比对、不写文件；GitHub Actions 自动检查、运行测试并保存计算回归报告。
 
 ## 🖥️ Windows 桌面版（exe）
 
@@ -65,6 +87,14 @@ venv\Scripts\pyinstaller --onefile --noconsole --name 命理排盘 --add-data "�
 `launcher.py` 用固定端口 `127.0.0.1:8765` 起本地回环服务再套原生窗口 —— 这样 origin 稳定，localStorage 里的记录和 AI 配置不会每次启动就丢（`file://` 直接加载在不透明源下写入不稳定）。
 
 ## 📁 目录结构
+
+开发源码与规则说明见 [CONTRIBUTING.md](CONTRIBUTING.md)；测试资料和精度边界见 [SOURCES.md](tests/fixtures/SOURCES.md)；长期任务见 [ROADMAP.md](ROADMAP.md)。
+
+- `src/calendar/`、`src/bazi/`：无 DOM 的历法与四柱基础计算。综合引擎仍逐步拆分。
+- `src/storage/`、`src/ai/`：版本化备份与纯文本分段。
+- `src/ui/`、`src/template.html`：现有交互、术数与页面模板。
+- `vendor/`：内嵌历法库与原始 MIT 许可证。
+- `tests/`、`scripts/`、`.github/workflows/`：基准、构建、浏览器验证与 CI。
 
 ```
 ├── 命理排盘.html      # 主文件（全部功能，单文件自包含）
@@ -100,6 +130,16 @@ venv\Scripts\pyinstaller --onefile --noconsole --name 命理排盘 --add-data "�
 
 ## 📝 更新记录
 
+### v5.16
+- 统一 `ml_records`，兼容旧 `mingli_records` 和 v4 备份；v5 备份逐字段验证，排除 API 设置，导入失败回滚。
+- 从弱、身弱、中和、身强、身极强完整传递至命盘、摘要、Prompt 和 PNG；中和不再按身弱显示。
+- 节气使用 lunar-javascript 1.7.7 的交节时刻；支持具体出生时分和子初/子正换日。真太阳时实际参与日/时柱计算，保留跨日信息。
+- 日期范围明确为公历 **1900-01-31 至 2099-12-31**，非法农历/闰月/经度明确报错。
+- 年/月柱按出生瞬间的东八区标准时交节；日/时柱按所选太阳时与换日规则。历史夏令时不自动还原；仅知时辰、城市中心经度和近似均时差的精度限制在页面标示。
+- 增加历法来源与回归测试、18维异常解析测试、真实浏览器备份/恶意输入/离线/PNG检查，以及自动构建同步校验。
+- 修复姓名、地点、合婚详情和历史记录的动态 HTML 边界；新增 MIT、贡献指南和 Roadmap。
+
+
 ### v5.15
 - **服务端 Prompt 模式**：设置里勾选「🎭 使用服务端 Prompt」后，18 维研判准则改由 worker 注入，请求走 `/v1/divine`，浏览器只上传命盘事实
 - **模板自动抽取**：`worker/extract-prompt.ps1` 从源码抽出 5 流派模板（18,918 字符），代入占位符，内置往返校验 10/10
@@ -126,4 +166,4 @@ venv\Scripts\pyinstaller --onefile --noconsole --name 命理排盘 --add-data "�
 
 ## 📄 许可
 
-仅供学习交流使用。
+本项目采用 [MIT License](LICENSE)，允许复制、修改和分发（包括商业使用），须保留版权和许可声明；第三方依赖见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。命理文化用途的免责声明与软件许可分别适用。

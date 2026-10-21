@@ -29,3 +29,8 @@ _fetch_wheels.py
 # Prompt 模板与校验样本（含核心研判准则，绝不入库）
 worker/prompt-template.json
 _gt.json
+
+# Development dependencies and generated verification evidence
+node_modules/
+test-results/
+playwright-report/
