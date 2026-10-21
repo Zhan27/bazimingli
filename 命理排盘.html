@@ -9217,7 +9217,7 @@ function freezeRules(value){
   Object.values(value).forEach(v=>{if(v&&typeof v==='object'&&!Object.isFrozen(v))freezeRules(v);});
   return Object.freeze(value);
 }
-const RULE_VERSION='5.18.0';
+const RULE_VERSION='5.18.1';
 const STRENGTH_RULES=freezeRules({id:'legacy-strength-v1',
   month:{same:3,resource:2.5,output:-1.5,officer:-2.5,wealth:-1.5},
   root:{same:[1.5,0.5,0.25],resource:[1,0.3,0.15],dayBonus:0.8,monthBonus:0.3},
@@ -10994,6 +10994,21 @@ function comparePair(a,b,referenceYear){
   return {left:calculateChart(a),right:calculateChart(b),comparison:heHunCompute(raw(a),raw(b),'甲方','乙方',referenceYear),scoreMeaning:'传统规则的主观分档，未经现实关系预测校准'};
 }
 
+/* Source: src/knowledge/catalog.js */
+const KNOWLEDGE_VERSION='1.0.0';
+const KNOWLEDGE_ENTRIES=freezeRules([
+  {id:'rule.hidden-stems',title:'地支藏干表',book:'应用规则表',chapter:'src/bazi/data.js',original:null,explanation:'按锁定藏干表列出本中余气。',schools:['all'],status:'implementation-verified',source:'tests/calculation-rules.test.cjs'},
+  {id:'rule.branch-relations',title:'地支合冲关系',book:'应用规则表',chapter:'src/api/chart.js',original:null,explanation:'六合与六冲关系，解释效果未校准。',schools:['all'],status:'implementation-verified',source:'tests/api.test.cjs'},
+  {id:'rule.strength',title:'得令通根得势',book:'应用评分约定',chapter:'src/bazi/scoring.js',original:null,explanation:'沿用应用权重，分类阈值与分项有软件测试。',schools:['combined','balance','image','structure','climate'],status:'implementation-verified',source:'tests/calculation-rules.test.cjs'},
+  {id:'rule.climate',title:'冬火夏水与扶抑分歧',book:'传统调候应用约定',chapter:null,original:null,explanation:'保留调候与扶抑两条路径，并列展示冲突，非科学预测。',schools:['combined','climate'],status:'traditional-unverified',source:'src/bazi/profiles.js'},
+  ...Object.entries(KB_TERMS).map(([title,t],i)=>({id:'term.'+String(i+1).padStart(3,'0'),title,book:'原项目术语汇编',chapter:t.w,original:null,explanation:t.d,schools:['all'],status:'citation-pending',source:'data/terms.json'}))
+]);
+function searchKnowledge(query='',school='all'){
+  const q=String(query).trim().toLowerCase();if(q.length>200)throw new RangeError('检索词过长');
+  return KNOWLEDGE_ENTRIES.filter(k=>(school==='all'||k.schools.includes('all')||k.schools.includes(school))&&(!q||[k.title,k.book,k.chapter,k.explanation].join(' ').toLowerCase().includes(q))).map(k=>({...k}));
+}
+function knowledgeCitation(id){const k=KNOWLEDGE_ENTRIES.find(x=>x.id===id);return k?{id:k.id,book:k.book,chapter:k.chapter,status:k.status,source:k.source,original:k.original}:null;}
+
 /* Source: src/storage/records.js */
 /* Versioned local record backups. No settings/API credentials are serialized. */
 const REC_KEY='ml_records';
@@ -11111,106 +11126,119 @@ function parseAiDimensions(input){
   return {sections,missing,duplicates};
 }
 
-/* Source: src/ai/transport.js */
-/* Extracted without calculation changes. See docs/ARCHITECTURE.md. */
-function aiEndpoint(c){
-  let base=String(c.base||AI_DEF.base).trim().replace(/\/+$/,'');
-  if(/\/chat\/completions$/.test(base)) return base;      // 用户直接填了完整路径
-  return base+'/chat/completions';
+/* Source: src/ai/contracts.js */
+/** Versioned model output contract; the engine chart remains immutable. */
+const AI_CONTRACT_VERSION='1.0.0';
+const AI_DIM_TITLES=['旺衰平衡','子平格局','穷通调候','盲派做功','神煞辅助','纳音意象','性格特质','财富运势','事业学业','婚姻感情','六亲缘分','健康提示','人际贵人','大运总览','流年应期','开运建议','综合参考','风险提示'];
+const AI_DIM_CONTRACTS=freezeRules(AI_DIM_TITLES.map((title,i)=>({id:i+1,title,inputFields:i===13?['pillars','dayun','rules']:i===2?['pillars','useGod','time','rules']:['pillars','wuxing','strength','rules'],requiredOutput:['conclusion','facts','rules','explanation','uncertainty','alternatives'],quality:'引用存在的事实ID和规则ID；区分计算与传统解释；说明条件和不确定性；不作确定的健康、财富或学历预测'})));
+function chartFactId(chart){
+  const text=JSON.stringify([chart.schemaVersion,chart.input,chart.rules,chart.pillars?.map(p=>p.text)]);let h=2166136261;
+  for(let i=0;i<text.length;i++)h=Math.imul(h^text.charCodeAt(i),16777619);
+  return 'chart-'+(h>>>0).toString(16); // Correlation identifier, never authentication.
+}
+function aiFacts(chart){
+  if(chart.kind!=='chart')throw new TypeError('未知时辰须先核对候选时段');
+  const facts=Object.fromEntries(chart.pillars.map(p=>['pillar.'+p.id,p.text]));
+  for(const p of chart.pillars)facts['hidden.'+p.id]=p.hidden;
+  for(const [i,w] of WUXING.entries())facts['wuxing.'+w]=chart.wuxing.counts[i];
+  return {...facts,'strength.score':chart.strength.score,'strength.type':chart.strength.type,'useGod.current':chart.useGod.element,'useGod.alternatives':chart.useGod.alternatives.map(i=>WUXING[i]),'rule.profile':chart.rules.profile,'dayun.startAge':chart.dayun.startAge};
+}
+function aiOutputSchema(){
+  const text={type:'string',maxLength:8000};
+  return {type:'object',additionalProperties:false,required:['schemaVersion','chartId','pillars','dimensions'],properties:{schemaVersion:{type:'string',enum:[AI_CONTRACT_VERSION]},chartId:{type:'string'},pillars:{type:'array',minItems:4,maxItems:4,items:{type:'string'}},dimensions:{type:'array',minItems:1,maxItems:18,items:{type:'object',additionalProperties:false,required:['id','title','conclusion','facts','rules','explanation','uncertainty','alternatives'],properties:{id:{type:'integer',minimum:1,maximum:18},title:text,conclusion:text,facts:{type:'array',minItems:1,maxItems:30,items:{type:'string'}},rules:{type:'array',minItems:1,maxItems:20,items:{type:'string'}},explanation:text,uncertainty:{type:'string',enum:['high','medium','low']},alternatives:{type:'array',maxItems:5,items:{type:'string',maxLength:2000}}}}}}};
+}
+function validateAiResult(value,chart,{dimensionIds=AI_DIM_CONTRACTS.map(d=>d.id)}={}){
+  const errors=[],add=(type,path,message)=>errors.push({type,path,message}),facts=aiFacts(chart);
+  if(!value||typeof value!=='object'||Array.isArray(value))return {ok:false,errors:[{type:'EXPRESSION_ERROR',path:'root',message:'输出须为JSON对象'}],dimensions:[],missing:dimensionIds};
+  for(const k of Object.keys(value))if(!['schemaVersion','chartId','pillars','dimensions'].includes(k))add('RULE_INCONSISTENCY',k,'存在契约外字段');
+  if(value.schemaVersion!==AI_CONTRACT_VERSION)add('RULE_INCONSISTENCY','schemaVersion','输出契约版本不匹配');
+  if(value.chartId!==chartFactId(chart))add('FACT_ERROR','chartId','命盘标识不匹配');
+  if(JSON.stringify(value.pillars)!==JSON.stringify(chart.pillars.map(p=>p.text)))add('FACT_ERROR','pillars','AI四柱与计算事实不同，禁止覆盖');
+  const dims=Array.isArray(value.dimensions)?value.dimensions:[],seen=new Set();
+  if(!Array.isArray(value.dimensions)||dims.length>18)add('EXPRESSION_ERROR','dimensions','维度数组无效');
+  for(const d of dims.slice(0,18)){
+    const p='dimensions.'+d?.id;
+    if(!d||typeof d!=='object'||!Number.isInteger(d.id)||!dimensionIds.includes(d.id)||seen.has(d.id)){add('RULE_INCONSISTENCY',p,'维度ID无效、重复或不属于请求范围');continue;}seen.add(d.id);
+    for(const field of ['title','conclusion','explanation'])if(typeof d[field]!=='string'||!d[field].trim()||d[field].length>8000)add('EXPRESSION_ERROR',p+'.'+field,'文字缺失或过长');
+    if(!['high','medium','low'].includes(d.uncertainty))add('RULE_INCONSISTENCY',p+'.uncertainty','须说明high/medium/low不确定性');
+    if(!Array.isArray(d.facts)||!d.facts.length||d.facts.length>30)add('REASONING_GAP',p+'.facts','结论缺少盘面依据');
+    else for(const f of d.facts)if(typeof f!=='string'||!Object.hasOwn(facts,f))add('FACT_ERROR',p+'.facts','引用了不存在的盘面事实ID');
+    if(!Array.isArray(d.rules)||!d.rules.length||d.rules.length>20)add('REASONING_GAP',p+'.rules','结论缺少规则出处');
+    else for(const r of d.rules)if(!KNOWLEDGE_ENTRIES.some(k=>k.id===r))add('RULE_INCONSISTENCY',p+'.rules','规则ID不在版本化来源目录');
+    if(!Array.isArray(d.alternatives)||d.alternatives.length>5||d.alternatives.some(x=>typeof x!=='string'||x.length>2000))add('EXPRESSION_ERROR',p+'.alternatives','竞争解释须为有界文本数组');
+    if(chart.useGod.conflict&&d.id===3&&(!Array.isArray(d.alternatives)||!d.alternatives.length))add('REASONING_GAP',p+'.alternatives','调候与扶抑存在分歧，须保留竞争解释');
+    if(/必(?:死|灾|离婚|破财)|注定|财富.{0,8}\d+万|学历上限.{0,8}(博士|硕士)/.test((d.conclusion||'')+(d.explanation||'')))add('RULE_INCONSISTENCY',p,'禁止宿命或未校准的量化预测');
+  }
+  const missing=dimensionIds.filter(id=>!seen.has(id));
+  for(const id of missing)add('REASONING_GAP','dimensions.'+id,'缺失维度');
+  return {ok:!errors.length,errors,missing,dimensions:dims.slice(0,18),facts};
+}
+function parseStructuredAi(text,chart,options={}){
+  const raw=String(text||'').trim();if(raw.length>1000000)throw new RangeError('AI回复最多100万字符');
+  try{return {...validateAiResult(JSON.parse(raw.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'')),chart,options),format:'json'};}
+  catch(e){if(options.partial)return {format:'json',pending:true,dimensions:[],errors:[]};return {format:'json',ok:false,dimensions:[],errors:[{type:'EXPRESSION_ERROR',path:'root',message:'JSON未完整结束或格式无效'}]};}
+}
+function aiPromptVersion(schoolId){const p=getRuleProfile(schoolId);return 'evidence-'+p.key+'-1.0.0';}
+function buildEvidencePrompt(chart,schoolId,{dimensionIds=AI_DIM_CONTRACTS.map(d=>d.id),mode='json'}={}){
+  const profile=getRuleProfile(schoolId),facts=aiFacts(chart);
+  const system='你是传统文化学习助手。计算事实只读，不得改写四柱。每项按结论、盘面事实ID、规则ID、解释、不确定性、竞争解释输出。未核验的典籍引文只作待核验线索，不可说成已核对原文。不得给命运必然结论、医学诊断、财富金额、学历上下限或看似精确的预测分数。\n流派独立配置：'+JSON.stringify(profile)+'\n本流派Prompt版本：'+aiPromptVersion(schoolId)+'\n流派任务：'+profile.focus+'\n输出维度契约：'+JSON.stringify(AI_DIM_CONTRACTS.filter(d=>dimensionIds.includes(d.id)))+'\n'+(mode==='markdown'?'兼容Markdown：每项以【维度ID】开头，保留全部依据字段。':'仅输出符合此JSON Schema的JSON：'+JSON.stringify(aiOutputSchema()));
+  const user=JSON.stringify({schemaVersion:AI_CONTRACT_VERSION,chartId:chartFactId(chart),pillars:chart.pillars.map(p=>p.text),facts,rules:chart.rules,requestedDimensionIds:dimensionIds,knowledge:searchKnowledge('',profile.key).slice(0,20)});
+  return {system,user,version:aiPromptVersion(schoolId),knowledgeVersion:KNOWLEDGE_VERSION};
+}
+function evaluateAiResponse(text,chart,options={}){
+  const result=parseStructuredAi(text,chart,options),counts=Object.fromEntries(['FACT_ERROR','RULE_INCONSISTENCY','REASONING_GAP','EXPRESSION_ERROR'].map(k=>[k,result.errors.filter(e=>e.type===k).length]));
+  return {contractVersion:AI_CONTRACT_VERSION,chartId:chartFactId(chart),complete:!result.missing?.length,pass:result.ok===true,errorCounts:counts,dimensionCount:result.dimensions?.length||0,errors:result.errors,scope:'Contract/explicit fact-reference checks only; prose factual accuracy and predictive validity are not established'};
 }
 
-function aiHeaders(c){
-  const h={'Content-Type':'application/json'};
-  const k=String(c.key||'').trim();
-  if(k) h['Authorization']='Bearer '+k;
-  return h;
+/* Source: src/ai/request.js */
+/** Shared transport. Paid retries are explicit; no automatic duplicate requests. */
+const AI_REQUESTS=new Set();
+function aiEndpoint(c){const base=String(c.base||'https://api.deepseek.com/v1').trim().replace(/\/+$/,'');return /\/chat\/completions$/.test(base)?base:base+'/chat/completions';}
+function aiDivineEndpoint(c){return aiEndpoint(c).replace(/\/chat\/completions$/,'/divine');}
+function aiHeaders(c){const h={'Content-Type':'application/json'};if(c.key)h.Authorization='Bearer '+String(c.key).trim();return h;}
+function aiTransportError(code,message){const e=new Error(message);e.code=code;return e;}
+async function aiErrMsg(r){return ({400:'请求参数或模型不兼容',401:'鉴权失败，请检查Key',402:'额度不足',403:'服务拒绝访问',404:'接口地址不存在',413:'请求过大',429:'调用频率已达上限',500:'上游内部错误',502:'上游网关错误',503:'上游暂不可用',504:'上游响应超时'})[r.status]||('请求失败 HTTP '+r.status);}
+async function aiFetch(url,opts={},timeoutMs=60000){
+  const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),timeoutMs),external=()=>ctrl.abort();opts.signal?.addEventListener('abort',external,{once:true});
+  try{return await fetch(url,{...opts,signal:ctrl.signal});}
+  catch(e){throw aiTransportError(e.name==='AbortError'?'TIMEOUT':'NETWORK',e.name==='AbortError'?'请求已取消或超时':'网络连接失败，请检查服务地址后重试');}
+  finally{clearTimeout(timer);opts.signal?.removeEventListener('abort',external);}
 }
-
-function aiDivineEndpoint(c){
-  let base=String(c.base||AI_DEF.base).trim().replace(/\/+$/,'');
-  base=base.replace(/\/chat\/completions$/,'');
-  return base+'/divine';
-}
-
-function aiFetch(url,opts,timeoutMs){
-  const ctrl=new AbortController();
-  const ms=timeoutMs||60000;
-  const timer=setTimeout(()=>{ try{ctrl.abort();}catch(e){} },ms);
-  return fetch(url,Object.assign({},opts,{signal:ctrl.signal}))
-    .then(r=>{ clearTimeout(timer); return r; },
-          err=>{ clearTimeout(timer);
-            if(err&&err.name==='AbortError') throw new Error('请求超时（'+Math.round(ms/1000)+'秒无响应），请检查网络或 BaseURL');
-            throw new Error('网络异常：'+(err&&err.message||'无法连接')+'（可能是 BaseURL 写错、被 CORS/代理拦截，或离线）');
-          });
-}
-
-async function aiErrMsg(r){
-  let detail='';
-  try{ const t=await r.text(); if(t) detail=t.replace(/\s+/g,' ').slice(0,180); }catch(e){}
-  const map={
-    400:'请求被拒绝（400）：多为模型名不存在、参数不合法或 max_tokens 超限',
-    401:'鉴权失败（401）：API Key 错误、过期或未填写',
-    402:'余额不足（402）：账户额度已用尽',
-    403:'无权限（403）：Key 无权访问该模型，或所在地区被限制',
-    404:'地址不存在（404）：BaseURL 应形如 https://api.deepseek.com/v1，勿带 /chat/completions',
-    413:'请求体过大（413）：命盘数据或 max_tokens 过大',
-    429:'请求过频（429）：已触发限流，请等待几秒后重试',
-    500:'服务端内部错误（500）',502:'网关错误（502）',503:'服务暂不可用（503）',504:'网关超时（504）'
+function createAiSseParser(onText,{maxCharacters=1000000}={}){
+  let buffer='',acc='',ended=false;
+  const dataLine=raw=>{
+    if(!raw||raw.startsWith(':')||!raw.startsWith('data:'))return;
+    const data=raw.slice(5).trim();if(data==='[DONE]'){ended=true;return;}if(ended||!data)return;
+    let value;try{value=JSON.parse(data);}catch(e){throw aiTransportError('INVALID_STREAM','流式响应含无效JSON帧，已保留草稿');}
+    if(value.error)throw aiTransportError('UPSTREAM_ERROR','上游返回流式错误，已保留草稿');
+    const text=value.choices?.[0]?.delta?.content??value.choices?.[0]?.message?.content??'';
+    if(typeof text!=='string')throw aiTransportError('INVALID_STREAM','流式内容类型不兼容');
+    acc+=text;if(acc.length>maxCharacters)throw aiTransportError('RESPONSE_TOO_LARGE','回复超过长度上限');if(text)onText(text,acc);
   };
-  const base=map[r.status]||('请求失败（HTTP '+r.status+'）');
-  return detail ? base+' · '+detail : base;
+  return {feed(chunk){buffer+=chunk;if(buffer.length>maxCharacters*2)throw aiTransportError('RESPONSE_TOO_LARGE','流式帧超过上限');const lines=buffer.split(/\r?\n/);buffer=lines.pop();for(const line of lines)dataLine(line);},finish(){if(buffer.trim())dataLine(buffer);buffer='';return acc;},get text(){return acc;},get ended(){return ended;}};
 }
-
-function aiStreamChat(url,opts,handlers){
-  handlers=handlers||{};
-  const idleMs=handlers.idleMs||90000;
-  const totalMs=handlers.totalMs||420000;
-  const ctrl=new AbortController();
-  let idleT=null,totalT=null,done=false;
-  const stop=()=>{ done=true; clearTimeout(idleT); clearTimeout(totalT); try{ctrl.abort();}catch(e){} };
-  const armIdle=()=>{
-    clearTimeout(idleT);
-    idleT=setTimeout(()=>{ if(!done){ stop(); handlers.onError&&handlers.onError(new Error('接口静默超过 '+Math.round(idleMs/1000)+' 秒，已中断（可重试）')); } },idleMs);
-  };
-  totalT=setTimeout(()=>{ if(!done){ stop(); handlers.onError&&handlers.onError(new Error('总时长超过 '+Math.round(totalMs/1000)+' 秒，已中断')); } },totalMs);
+function aiStreamChat(url,opts,handlers={}){
+  const ctrl=new AbortController();let done=false,idle,total,reader;
+  const clear=()=>{clearTimeout(idle);clearTimeout(total);AI_REQUESTS.delete(handle);};
+  const fail=e=>{if(done)return;done=true;clear();ctrl.abort();if(reader)reader.cancel().catch(()=>{});handlers.onError?.(e);};
+  const handle={abort(){fail(aiTransportError('CANCELED','已取消；已收到的结果保留为草稿'));}};AI_REQUESTS.add(handle);
+  const arm=()=>{clearTimeout(idle);idle=setTimeout(()=>fail(aiTransportError('IDLE_TIMEOUT','连接静默超时，可从缺失维度重新生成')),handlers.idleMs??90000);};
+  total=setTimeout(()=>fail(aiTransportError('TOTAL_TIMEOUT','请求超过总时限')),handlers.totalMs??420000);
   (async()=>{
     try{
-      armIdle();
-      const r=await fetch(url,Object.assign({},opts,{signal:ctrl.signal}));
-      if(!r.ok) throw new Error(await aiErrMsg(r));
-      if(!r.body) throw new Error('当前浏览器不支持流式响应（请升级浏览器或改用非流式）');
-      const reader=r.body.getReader();const dec=new TextDecoder();
-      let acc='',buf='';
-      while(true){
-        const {done:fin,value}=await reader.read();
-        if(fin) break;
-        armIdle();
-        buf+=dec.decode(value,{stream:true});
-        const lines=buf.split(/\r?\n/);buf=lines.pop();
-        for(const line of lines){
-          const t=line.trim();
-          if(!t.startsWith('data:'))continue;
-          const data=t.slice(5).trim();
-          if(data==='[DONE]')continue;
-          try{
-            const j=JSON.parse(data);
-            const d=j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content;
-            if(d){ acc+=d; handlers.onDelta&&handlers.onDelta(d,acc); }
-          }catch(e){}
-        }
-      }
-      if(done)return;
-      done=true;clearTimeout(idleT);clearTimeout(totalT);
-      handlers.onDone&&handlers.onDone(acc);
-    }catch(e){
-      if(done)return;
-      done=true;clearTimeout(idleT);clearTimeout(totalT);
-      if(e&&e.name==='AbortError') e=new Error('已中断');
-      handlers.onError&&handlers.onError(e);
-    }
-  })();
-  return {abort:stop};
+      arm();const r=await fetch(url,{...opts,signal:ctrl.signal});if(!r.ok)throw aiTransportError('HTTP_'+r.status,await aiErrMsg(r));
+      if(!r.body)throw aiTransportError('NO_STREAM','浏览器不支持响应流');reader=r.body.getReader();
+      const decoder=new TextDecoder(),parser=createAiSseParser((d,all)=>{if(!done)handlers.onDelta?.(d,all);},{maxCharacters:handlers.maxCharacters});
+      const isJson=(r.headers.get('content-type')||'').includes('application/json');let jsonText='';
+      while(!done){const {done:finished,value}=await reader.read();if(finished)break;arm();const chunk=decoder.decode(value,{stream:true});if(isJson){jsonText+=chunk;if(jsonText.length>1000000)throw aiTransportError('RESPONSE_TOO_LARGE','回复超过长度上限');}else parser.feed(chunk);}
+      if(done)return;let all;
+      if(isJson){jsonText+=decoder.decode();const j=JSON.parse(jsonText);if(j.error)throw aiTransportError('UPSTREAM_ERROR','上游返回错误');all=j.choices?.[0]?.message?.content;if(typeof all!=='string')throw aiTransportError('INVALID_RESPONSE','响应缺少文本');handlers.onDelta?.(all,all);}
+      else {parser.feed(decoder.decode());all=parser.finish();}
+      done=true;clear();handlers.onDone?.(all);
+    }catch(e){fail(e.name==='AbortError'?aiTransportError('CANCELED','连接已中断；草稿已保留'):e);}
+  })();return handle;
 }
+function cancelAiRequests(){for(const request of [...AI_REQUESTS])request.abort();}
 
 /* Source: src/ui/calculation-controls.js */
 let lastCandidates=null;

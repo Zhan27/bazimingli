@@ -1,0 +1,9 @@
+# AI contract and current scope
+
+The new pure contract in `src/ai/contracts.js` defines18 dimension inputs and required conclusion / fact IDs / rule IDs / explanation / uncertainty / alternative paths. It validates JSON structure, chart identity, pillar equality, referenced fact and source IDs, missing dimensions and explicit disallowed predictions. Error classes are `FACT_ERROR`, `RULE_INCONSISTENCY`, `REASONING_GAP`, `EXPRESSION_ERROR`. A dimension subset can be requested for a future partial-retry UI.
+
+`buildEvidencePrompt` creates separately versioned school prompts; `aiOutputSchema` provides a JSON Schema for compatible providers; Markdown parsing remains available. `src/knowledge/catalog.js` records original-project terms as **citation-pending**, with no invented original text or verified ancient edition. Implementation checks and traditional claims have different statuses. `evaluateAiResponse` evaluates only explicit contract/reference compliance; it does not prove correctness of free prose or predictive quality.
+
+The shared request layer handles final SSE frames, chunk boundaries, UTF8 decoding, JSON-mode provider replies, bounded responses, idle/total timeouts and explicit cancellation. It never silently repeats a paid request and never displays raw server error bodies that could contain credentials. Tests use synthetic fixtures and mocked requests; no live paid-model comparisons were performed.
+
+At the user's request, the wider roadmap is paused to prioritize frontend work. The legacy18-card user flow continues to work. Switching all prompts to JSON, full draft persistence, per-card paid regeneration, automatic model comparisons and the remaining infrastructure tasks have **not** been declared complete. Existing deployments of the optional Worker are not changed by source uploads.
