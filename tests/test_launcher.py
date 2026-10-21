@@ -1,6 +1,7 @@
 """Real loopback HTTP tests and mocked window failures; no native GUI is opened."""
 import errno
 import importlib.util
+import io
 from pathlib import Path
 import socket
 import sys
@@ -69,6 +70,15 @@ class LauncherTests(unittest.TestCase):
     def test_bind_failure_returns_actionable_exit_code(self):
         with patch.object(app, 'serve_preferred', side_effect=OSError(errno.EADDRINUSE, 'synthetic')), patch.object(sys, 'argv', ['launcher.py']):
             self.assertEqual(app.main(), 3)
+
+    def test_english_windows_console_cannot_break_startup_cleanup(self):
+        server = app.serve(0)
+        port = server.server_port
+        with io.TextIOWrapper(io.BytesIO(), encoding='cp1252', errors='strict') as output:
+            with patch.object(sys, 'stdout', output), patch.object(sys, 'stderr', output), patch.object(sys, 'argv', ['launcher.py', '--browser']), patch.object(app, 'serve_preferred', return_value=server), patch.object(app.webbrowser, 'open', return_value=False):
+                self.assertEqual(app.main(), 4)
+        with socket.socket() as probe:
+            self.assertNotEqual(probe.connect_ex(('127.0.0.1', port)), 0)
 
 
 if __name__ == '__main__':

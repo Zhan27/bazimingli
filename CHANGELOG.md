@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.19.2 — 2026-10-21
+- Fixed Chinese console output on English Windows/Python cp1252 streams; all logging after server binding now remains inside the cleanup boundary.
+- Added an explicit cp1252 regression test. This supersedes the unpublished5.19.1 tag whose Windows release gate caught the encoding failure; the older tag is retained unchanged.
+
 ## 5.19.1 — 2026-10-21
 - Resumed unfinished roadmap after frontend delivery. Default new API keys to tab-session storage, migrate unmarked legacy settings, preserve explicit persistence choices and retain keys in page memory if storage is unavailable.
 - Added offline privacy disclosure and accurate AI relay/provider data-transfer and browser-session restoration information.

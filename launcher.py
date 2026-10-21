@@ -101,6 +101,14 @@ def serve_preferred() -> ThreadingHTTPServer:
 
 
 def main() -> int:
+    # Windows redirected output can use cp1252. Never let a Chinese status line
+    # prevent shutdown; frozen --noconsole builds may have no stream at all.
+    for stream in (sys.stdout, sys.stderr):
+        if stream is not None and hasattr(stream, 'reconfigure'):
+            try:
+                stream.reconfigure(errors='backslashreplace')
+            except (OSError, ValueError):
+                pass
     html_path = os.path.join(app_dir(), APP_FILE)
     if not os.path.isfile(html_path):
         print(f"[×] 找不到 {APP_FILE}，请确认它与启动器在同一目录。", file=sys.stderr)
@@ -127,12 +135,11 @@ def main() -> int:
     port = httpd.server_port
     url = f"http://127.0.0.1:{port}/{APP_FILE}"
 
-    print(f"[·] 本地服务: http://127.0.0.1:{port}/")
-    print(f"[·] 应用目录: {app_dir()}")
-    if port != PREFERRED_PORTS[0]:
-        print("[!] 首选端口被占用，已换端口；不同端口的浏览器记录独立，请勿误以为旧记录已删除。")
-
     try:
+        print(f"[·] 本地服务: http://127.0.0.1:{port}/")
+        print(f"[·] 应用目录: {app_dir()}")
+        if port != PREFERRED_PORTS[0]:
+            print("[!] 首选端口被占用，已换端口；不同端口的浏览器记录独立，请勿误以为旧记录已删除。")
         if not force_browser:
             try:
                 import webview
