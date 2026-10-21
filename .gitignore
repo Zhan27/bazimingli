@@ -32,5 +32,6 @@ _gt.json
 
 # Development dependencies and generated verification evidence
 node_modules/
+__pycache__/
 test-results/
 playwright-report/

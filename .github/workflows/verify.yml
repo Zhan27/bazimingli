@@ -14,9 +14,13 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - run: npm run check
       - run: npm run lint
       - run: npm test
+      - run: npm run test:desktop
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v4

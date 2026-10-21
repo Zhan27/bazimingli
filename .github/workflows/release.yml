@@ -23,6 +23,7 @@ jobs:
       - run: npm run check
       - run: npm run lint
       - run: npm test
+      - run: npm run test:desktop
       - run: npx playwright install chromium
       - run: npm run test:e2e
       - name: Build Windows application

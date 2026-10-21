@@ -30,7 +30,7 @@
 ======================================================================
 """
 import os
-import socket
+import errno
 import sys
 import threading
 import webbrowser
@@ -61,11 +61,11 @@ class AppHandler(SimpleHTTPRequestHandler):
             return os.path.join(app_dir(), APP_FILE)
         return ""  # 交给 send_head 判定为不存在
 
-    def do_GET(self):  # noqa: N802
+    def send_head(self):
         if not self.translate_path(self.path):
             self.send_error(404, "Not Found")
-            return
-        super().do_GET()
+            return None
+        return super().send_head()
 
     def log_message(self, fmt, *args):  # 静默，避免控制台被刷
         pass
@@ -73,33 +73,31 @@ class AppHandler(SimpleHTTPRequestHandler):
     def end_headers(self):
         # 开发期避免缓存住旧版 HTML
         self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
         super().end_headers()
-
-
-def port_free(port: int) -> bool:
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        try:
-            s.bind(("127.0.0.1", port))
-            return True
-        except OSError:
-            return False
-
-
-def pick_port() -> int:
-    for p in PREFERRED_PORTS:
-        if port_free(p):
-            return p
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(("127.0.0.1", 0))
-        return s.getsockname()[1]
 
 
 def serve(port: int) -> ThreadingHTTPServer:
     handler = partial(AppHandler, directory=app_dir())
     httpd = ThreadingHTTPServer(("127.0.0.1", port), handler)
     httpd.daemon_threads = True
-    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    try:
+        threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    except BaseException:
+        httpd.server_close()
+        raise
     return httpd
+
+
+def serve_preferred() -> ThreadingHTTPServer:
+    """Bind directly; do not release a probe socket before the real bind."""
+    for port in (*PREFERRED_PORTS, 0):
+        try:
+            return serve(port)
+        except OSError as exc:
+            if port == 0 or exc.errno not in (errno.EADDRINUSE, errno.EACCES):
+                raise
+    raise OSError("无法绑定本地服务端口")
 
 
 def main() -> int:
@@ -121,42 +119,40 @@ def main() -> int:
             server.server_close()
 
     force_browser = "--browser" in sys.argv
-    port = pick_port()
+    try:
+        httpd = serve_preferred()
+    except OSError:
+        print("[×] 无法启动本地服务，请检查端口权限。", file=sys.stderr)
+        return 3
+    port = httpd.server_port
     url = f"http://127.0.0.1:{port}/{APP_FILE}"
-    httpd = serve(port)
 
     print(f"[·] 本地服务: http://127.0.0.1:{port}/")
     print(f"[·] 应用目录: {app_dir()}")
+    if port != PREFERRED_PORTS[0]:
+        print("[!] 首选端口被占用，已换端口；不同端口的浏览器记录独立，请勿误以为旧记录已删除。")
 
-    if not force_browser:
-        try:
-            import webview  # pywebview
-        except ImportError:
-            print("[!] 未安装 pywebview，降级为系统浏览器打开。")
-            print("    安装：pip install pywebview")
-            force_browser = True
-        else:
-            webview.create_window(
-                APP_TITLE,
-                url,
-                width=1180,
-                height=880,
-                min_size=(900, 640),
-                text_select=True,   # 允许复制命盘文字
-            )
-            try:
-                webview.start()     # 阻塞到窗口关闭
-            finally:
-                httpd.shutdown()
-                httpd.server_close()
-            return 0
-
-    webbrowser.open(url)
-    print("[·] 已在默认浏览器中打开。按 Ctrl+C 结束服务。")
     try:
+        if not force_browser:
+            try:
+                import webview
+            except ImportError:
+                print("[!] 未安装 pywebview，降级为系统浏览器打开。")
+            else:
+                webview.create_window(APP_TITLE, url, width=1180, height=880,
+                                      min_size=(900, 640), text_select=True)
+                webview.start()
+                return 0
+        if not webbrowser.open(url):
+            print("[×] 无法打开系统浏览器。", file=sys.stderr)
+            return 4
+        print("[·] 已在默认浏览器中打开。按 Ctrl+C 结束服务。")
         threading.Event().wait()
     except KeyboardInterrupt:
         pass
+    except Exception:
+        print("[×] 窗口启动失败，本地服务已关闭。", file=sys.stderr)
+        return 4
     finally:
         httpd.shutdown()
         httpd.server_close()

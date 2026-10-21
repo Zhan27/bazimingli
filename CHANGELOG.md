@@ -6,6 +6,8 @@
 - Hardened optional Worker source with exact origin/model allowlists, bounded UTF-8 bodies/messages/tokens, HTTPS/no redirects, cancellable total upstream timeout, bounded streaming responses and sanitized uncached errors.
 - Added bounded isolate-local code/IP quotas and documented their distributed-limit boundary. Existing deployed Workers were not redeployed.
 - Added nine Node and one browser regression tests using synthetic data/mocked providers; no paid model requests.
+- Fixed desktop bind races by binding preferred ports directly, warned when a changed origin hides previous records, restricted both GET/HEAD paths, and closed the server on window/browser startup failure. Added four Python loopback/lifecycle tests to both CI workflows.
+- Added an English getting-started/international birth-time guide with explicit timezone/DST, location coverage, privacy and validation boundaries; the interface remains Chinese.
 
 ## 5.19.0 — 2026-10-21
 - Redesigned the frontend as a jade-and-paper study workbench with persistent module navigation, side-by-side desktop entry/chart and stacked mobile layout.

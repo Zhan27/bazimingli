@@ -1,6 +1,6 @@
 # 贡献指南
 
-需要 Node.js 22 或更高版本。用户直接打开发布 HTML，无需 Node、npm 或网络。
+开发完整验证需要 Node.js 22+ 和 Python3.12+，执行 `npm run verify` 包含计算、浏览器与桌面回环服务测试。用户直接打开发布 HTML，无需 Node、npm 或网络；可选AI需要网络。
 
 ```sh
 npm ci

@@ -1,5 +1,7 @@
 # 命理排盘 · 八字合婚一体机
 
+[English guide / 国际用户指南](README.en.md)
+
 本项目面向世界各地对中国传统文化、八字及相关术数感兴趣的学习者与爱好者，提供排盘参考、规则查阅和学习交流工具。项目主要借助 **OpenAI Codex** 辅助完成代码编写与修改、数据整理与统计、测试验证及文档维护，持续提升计算过程的透明度与可复现性。项目内容用于传统文化学习与参考，不代表经过科学验证的预测结论。
 
 一个**单文件、纯前端、本地计算**的传统命理排盘应用：八字排盘 + 紫微斗数 + 奇门遁甲 + 六爻 + 合婚配对 + AI 深度解读，发布文件包含全部逻辑，无需后端、无需安装。开发源码已拆分到 `src/`，经构建生成两个完全一致的单 HTML 文件。
@@ -86,7 +88,7 @@ bash sync_deploy.sh          # macOS / Linux / WSL
 
 ## 🖥️ Windows 桌面版（exe）
 
-`Release` 页提供打包好的单文件 exe（基于 pywebview + PyInstaller，双击即用；Win10/11 自带 WebView2 运行时）。自行打包：
+`Release` 页提供打包好的单文件 exe（基于 pywebview + PyInstaller，运行需要可用的 WebView2 运行时）。自行打包：
 
 ```bash
 python -m venv venv
