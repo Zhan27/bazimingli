@@ -1,0 +1,17 @@
+# 测试与临时脚本
+_*.js
+*.log
+
+# WorkBuddy 工作区数据（本地会话记录，不上传）
+.workbuddy/
+
+# 内部工作文档与构建素材（主文件自包含，不依赖这些）
+direction-approved.md
+排盘App对比优化建议.md
+mingli_knowledge.json
+design-demos/
+
+# 杂项
+WUXING\[w\]
+.DS_Store
+Thumbs.db
