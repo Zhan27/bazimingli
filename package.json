@@ -1,15 +1,16 @@
 {
   "name": "bazimingli",
-  "version": "5.17.0",
+  "version": "5.18.0",
   "description": "Single-file traditional calendrical chart application",
-  "main": "src/bazi/engine.js",
+  "main": "lib/index.cjs",
   "scripts": {
     "build": "node scripts/build.mjs",
     "check": "node scripts/build.mjs --check",
     "test": "node --test tests/*.test.cjs",
     "test:e2e": "playwright test",
-    "verify": "npm run check && npm test && npm run test:e2e",
-    "regression": "node scripts/regression.cjs"
+    "verify": "npm run check && npm run lint && npm test && npm run test:e2e",
+    "regression": "node scripts/regression.cjs",
+    "lint": "node scripts/lint.cjs"
   },
   "repository": {
     "type": "git",
@@ -28,7 +29,9 @@
   },
   "devDependencies": {
     "@playwright/test": "1.64.1",
-    "astronomy-engine": "2.1.19"
+    "acorn": "8.15.0",
+    "astronomy-engine": "2.1.19",
+    "eslint": "10.13.0"
   },
   "private": true
 }

@@ -9,7 +9,7 @@ function memoryStorage(initial={}){
 function loadEngine({ui=false}={}){
   const context=vm.createContext({Date,console,localStorage:memoryStorage(),sessionStorage:memoryStorage(),setTimeout:()=>0,clearTimeout:()=>{},URL,AbortController,
     document:{querySelectorAll:()=>[],querySelector:()=>null,addEventListener:()=>{},getElementById:()=>null,body:{setAttribute:()=>{}}},window:{addEventListener:()=>{}},navigator:{},alert:()=>{}});
-  if(!ui){delete context.document;delete context.window;delete context.navigator;}
+  if(!ui){delete context.document;delete context.window;delete context.navigator;delete context.localStorage;delete context.sessionStorage;}
   const {sources,sourceText}=require('../scripts/source-list.cjs');
   for(const file of sources.filter(f=>f!=='src/ui/app.js')) vm.runInContext(sourceText(root,file),context,{filename:file});
   if(ui){

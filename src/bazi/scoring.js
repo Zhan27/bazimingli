@@ -47,7 +47,7 @@ function computeStrength(pillars,rules=STRENGTH_RULES){
   assertPillars(pillars);
   const month=scoreMonthCommand(pillars[2][0],pillars[1][1],rules),roots=scoreRoots(pillars,rules),momentum=scoreMomentum(pillars,rules);
   const score=Number((month.value+roots.value+momentum.value).toFixed(8));
-  return {rule:rules.id,score,type:classifyStrength(score),parts:{month,roots,momentum}};
+  return {rule:rules.id,score,type:classifyStrengthWithRules(score,rules),parts:{month,roots,momentum}};
 }
 function selectProfileUseGod(base,climate,profile){
   const {balanced,climateElement,climateCandidate}=base;

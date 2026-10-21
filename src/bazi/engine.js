@@ -223,7 +223,7 @@ function zhCompute(date,hourIdx,gender,place,options={}){
   [yearGZ[1],monthGZ[1],dayGZ[1],hourGZ[1]].forEach(z=>{tsCount[tenGod(dg,ZHI_HIDDEN[z][0])]++;});
   const mainTenGods=[...tsCount].map((c,i)=>({c,i})).sort((a,b)=>b.c-a.c).slice(0,2).filter(x=>x.c>0);
   const dayWX=GAN_WX[dg], shengMe=(dayWX+4)%5;
-  const strength=computeStrength(pillars);
+  const strength=computeStrength(pillars,options.strengthRules||STRENGTH_RULES);
   const strengthScore=strength.score,strengthType=strength.type;
   const strong=strengthType==='身强'||strengthType==='身极强';
   const congGe=strengthType==='从弱';
@@ -350,9 +350,10 @@ function zhCompute(date,hourIdx,gender,place,options={}){
 }
 
 // Explicit state is authoritative. Boolean flags remain for binary scoring rules.
-function classifyStrength(score){
+function classifyStrength(score){return classifyStrengthWithRules(score,STRENGTH_RULES);}
+function classifyStrengthWithRules(score,rules){
   if(!Number.isFinite(score)) throw new RangeError('旺衰评分无效');
-  const t=STRENGTH_RULES.thresholds;
+  const t=rules.thresholds;
   return score<=t.following?'从弱':score<t.weak?'身弱':score<t.balanced?'中和':score<t.strong?'身强':'身极强';
 }
 function strengthLabel(zh){ return zh.strengthType||classifyStrength(zh.strengthScore); }

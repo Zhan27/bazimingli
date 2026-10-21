@@ -1,0 +1,1014 @@
+{
+  "errors": [],
+  "warnings": [
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'m' is assigned a value but never used.",
+      "line": 857,
+      "column": 30,
+      "messageId": "unusedVar",
+      "endLine": 857,
+      "endColumn": 31,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "m"
+          },
+          "fix": {
+            "range": [
+              39923,
+              39941
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'm'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'d' is assigned a value but never used.",
+      "line": 857,
+      "column": 48,
+      "messageId": "unusedVar",
+      "endLine": 857,
+      "endColumn": 49,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "d"
+          },
+          "fix": {
+            "range": [
+              39941,
+              39958
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'd'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'y' is assigned a value but never used.",
+      "line": 1088,
+      "column": 12,
+      "messageId": "unusedVar",
+      "endLine": 1088,
+      "endColumn": 13,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "y"
+          },
+          "fix": {
+            "range": [
+              49339,
+              49340
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'y'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'m' is assigned a value but never used.",
+      "line": 1088,
+      "column": 14,
+      "messageId": "unusedVar",
+      "endLine": 1088,
+      "endColumn": 15,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "m"
+          },
+          "fix": {
+            "range": [
+              49341,
+              49342
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'm'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'d' is assigned a value but never used.",
+      "line": 1088,
+      "column": 16,
+      "messageId": "unusedVar",
+      "endLine": 1088,
+      "endColumn": 17,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "d"
+          },
+          "fix": {
+            "range": [
+              49342,
+              49344
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'd'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'yinNan' is assigned a value but never used.",
+      "line": 1355,
+      "column": 9,
+      "messageId": "unusedVar",
+      "endLine": 1355,
+      "endColumn": 15,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "yinNan"
+          },
+          "fix": {
+            "range": [
+              64467,
+              64519
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'yinNan'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'yangNv' is assigned a value but never used.",
+      "line": 1356,
+      "column": 9,
+      "messageId": "unusedVar",
+      "endLine": 1356,
+      "endColumn": 15,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "yangNv"
+          },
+          "fix": {
+            "range": [
+              64522,
+              64574
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'yangNv'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'t' is assigned a value but never used.",
+      "line": 1443,
+      "column": 9,
+      "messageId": "unusedVar",
+      "endLine": 1443,
+      "endColumn": 10,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "t"
+          },
+          "fix": {
+            "range": [
+              67564,
+              67636
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 't'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'dSel' is assigned a value but never used.",
+      "line": 2133,
+      "column": 9,
+      "messageId": "unusedVar",
+      "endLine": 2133,
+      "endColumn": 13,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "dSel"
+          },
+          "fix": {
+            "range": [
+              108511,
+              108555
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'dSel'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'maxM' is assigned a value but never used.",
+      "line": 2138,
+      "column": 9,
+      "messageId": "unusedVar",
+      "endLine": 2138,
+      "endColumn": 13,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "maxM"
+          },
+          "fix": {
+            "range": [
+              108660,
+              108684
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'maxM'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'leap' is assigned a value but never used.",
+      "line": 2153,
+      "column": 9,
+      "messageId": "unusedVar",
+      "endLine": 2153,
+      "endColumn": 13,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "leap"
+          },
+          "fix": {
+            "range": [
+              109365,
+              109389
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'leap'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'y' is assigned a value but never used.",
+      "line": 2175,
+      "column": 10,
+      "messageId": "unusedVar",
+      "endLine": 2175,
+      "endColumn": 11,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "y"
+          },
+          "fix": {
+            "range": [
+              110130,
+              110131
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'y'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'m' is assigned a value but never used.",
+      "line": 2175,
+      "column": 12,
+      "messageId": "unusedVar",
+      "endLine": 2175,
+      "endColumn": 13,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "m"
+          },
+          "fix": {
+            "range": [
+              110132,
+              110133
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'm'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'d' is assigned a value but never used.",
+      "line": 2175,
+      "column": 14,
+      "messageId": "unusedVar",
+      "endLine": 2175,
+      "endColumn": 15,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "d"
+          },
+          "fix": {
+            "range": [
+              110133,
+              110135
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'd'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'hasSS' is assigned a value but never used.",
+      "line": 2411,
+      "column": 9,
+      "messageId": "unusedVar",
+      "endLine": 2411,
+      "endColumn": 14,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "hasSS"
+          },
+          "fix": {
+            "range": [
+              126028,
+              126065
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'hasSS'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'allZhi' is assigned a value but never used.",
+      "line": 2412,
+      "column": 9,
+      "messageId": "unusedVar",
+      "endLine": 2412,
+      "endColumn": 15,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "allZhi"
+          },
+          "fix": {
+            "range": [
+              126068,
+              126131
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'allZhi'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'y' is assigned a value but never used.",
+      "line": 2464,
+      "column": 10,
+      "messageId": "unusedVar",
+      "endLine": 2464,
+      "endColumn": 11,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "y"
+          },
+          "fix": {
+            "range": [
+              128550,
+              128551
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'y'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'m' is assigned a value but never used.",
+      "line": 2464,
+      "column": 12,
+      "messageId": "unusedVar",
+      "endLine": 2464,
+      "endColumn": 13,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "m"
+          },
+          "fix": {
+            "range": [
+              128552,
+              128553
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'm'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'d' is assigned a value but never used.",
+      "line": 2464,
+      "column": 14,
+      "messageId": "unusedVar",
+      "endLine": 2464,
+      "endColumn": 15,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "d"
+          },
+          "fix": {
+            "range": [
+              128553,
+              128555
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'd'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'layout' is assigned a value but never used.",
+      "line": 2551,
+      "column": 9,
+      "messageId": "unusedVar",
+      "endLine": 2551,
+      "endColumn": 15,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "layout"
+          },
+          "fix": {
+            "range": [
+              130889,
+              130934
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'layout'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'y' is assigned a value but never used.",
+      "line": 2788,
+      "column": 10,
+      "messageId": "unusedVar",
+      "endLine": 2788,
+      "endColumn": 11,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "y"
+          },
+          "fix": {
+            "range": [
+              143732,
+              143733
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'y'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'m' is assigned a value but never used.",
+      "line": 2788,
+      "column": 12,
+      "messageId": "unusedVar",
+      "endLine": 2788,
+      "endColumn": 13,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "m"
+          },
+          "fix": {
+            "range": [
+              143734,
+              143735
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'm'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'d' is assigned a value but never used.",
+      "line": 2788,
+      "column": 14,
+      "messageId": "unusedVar",
+      "endLine": 2788,
+      "endColumn": 15,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "d"
+          },
+          "fix": {
+            "range": [
+              143735,
+              143737
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'd'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'jm' is assigned a value but never used.",
+      "line": 3498,
+      "column": 13,
+      "messageId": "unusedVar",
+      "endLine": 3498,
+      "endColumn": 15,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "jm"
+          },
+          "fix": {
+            "range": [
+              181482,
+              181507
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'jm'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'jd' is assigned a value but never used.",
+      "line": 3499,
+      "column": 13,
+      "messageId": "unusedVar",
+      "endLine": 3499,
+      "endColumn": 15,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "jd"
+          },
+          "fix": {
+            "range": [
+              181514,
+              181541
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'jd'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'jd2' is assigned a value but never used.",
+      "line": 3503,
+      "column": 11,
+      "messageId": "unusedVar",
+      "endLine": 3503,
+      "endColumn": 14,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "jd2"
+          },
+          "fix": {
+            "range": [
+              181701,
+              181731
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'jd2'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'zhis' is assigned a value but never used.",
+      "line": 3650,
+      "column": 9,
+      "messageId": "unusedVar",
+      "endLine": 3650,
+      "endColumn": 13,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "zhis"
+          },
+          "fix": {
+            "range": [
+              190267,
+              190356
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'zhis'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'bi' is assigned a value but never used.",
+      "line": 3668,
+      "column": 26,
+      "messageId": "unusedVar",
+      "endLine": 3668,
+      "endColumn": 28,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "bi"
+          },
+          "fix": {
+            "range": [
+              191454,
+              191470
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'bi'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'yHidden' is assigned a value but never used.",
+      "line": 4035,
+      "column": 9,
+      "messageId": "unusedVar",
+      "endLine": 4035,
+      "endColumn": 16,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "yHidden"
+          },
+          "fix": {
+            "range": [
+              214264,
+              214289
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'yHidden'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'mHidden' is assigned a value but never used.",
+      "line": 4035,
+      "column": 35,
+      "messageId": "unusedVar",
+      "endLine": 4035,
+      "endColumn": 42,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "mHidden"
+          },
+          "fix": {
+            "range": [
+              214288,
+              214314
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'mHidden'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'woSheng' is assigned a value but never used.",
+      "line": 4113,
+      "column": 9,
+      "messageId": "unusedVar",
+      "endLine": 4113,
+      "endColumn": 16,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "woSheng"
+          },
+          "fix": {
+            "range": [
+              218210,
+              218233
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'woSheng'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'minWx' is assigned a value but never used.",
+      "line": 4229,
+      "column": 44,
+      "messageId": "unusedVar",
+      "endLine": 4229,
+      "endColumn": 49,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "minWx"
+          },
+          "fix": {
+            "range": [
+              223126,
+              223161
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'minWx'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'midY' is assigned a value but never used.",
+      "line": 4379,
+      "column": 27,
+      "messageId": "unusedVar",
+      "endLine": 4379,
+      "endColumn": 31
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'dimList' is assigned a value but never used.",
+      "line": 5161,
+      "column": 9,
+      "messageId": "unusedVar",
+      "endLine": 5161,
+      "endColumn": 16,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "dimList"
+          },
+          "fix": {
+            "range": [
+              275427,
+              275454
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'dimList'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'zwFb' is assigned a value but never used.",
+      "line": 5226,
+      "column": 20,
+      "messageId": "unusedVar",
+      "endLine": 5226,
+      "endColumn": 24
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'tagColor' is assigned a value but never used.",
+      "line": 6073,
+      "column": 9,
+      "messageId": "unusedVar",
+      "endLine": 6073,
+      "endColumn": 17,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "tagColor"
+          },
+          "fix": {
+            "range": [
+              335296,
+              335550
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'tagColor'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'y' is assigned a value but never used.",
+      "line": 6401,
+      "column": 10,
+      "messageId": "unusedVar",
+      "endLine": 6401,
+      "endColumn": 11,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "y"
+          },
+          "fix": {
+            "range": [
+              365587,
+              365588
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'y'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'m' is assigned a value but never used.",
+      "line": 6401,
+      "column": 12,
+      "messageId": "unusedVar",
+      "endLine": 6401,
+      "endColumn": 13,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "m"
+          },
+          "fix": {
+            "range": [
+              365589,
+              365590
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'm'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'d' is assigned a value but never used.",
+      "line": 6401,
+      "column": 14,
+      "messageId": "unusedVar",
+      "endLine": 6401,
+      "endColumn": 15,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "d"
+          },
+          "fix": {
+            "range": [
+              365590,
+              365592
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'd'."
+        }
+      ]
+    },
+    {
+      "ruleId": "no-unused-vars",
+      "severity": 1,
+      "message": "'dc' is assigned a value but never used.",
+      "line": 6463,
+      "column": 13,
+      "messageId": "unusedVar",
+      "endLine": 6463,
+      "endColumn": 15,
+      "suggestions": [
+        {
+          "messageId": "removeVar",
+          "data": {
+            "varName": "dc"
+          },
+          "fix": {
+            "range": [
+              369580,
+              369655
+            ],
+            "text": ""
+          },
+          "desc": "Remove unused variable 'dc'."
+        }
+      ]
+    }
+  ],
+  "baselinePolicy": "Existing unused local variables are recorded; new unused warnings or any undefined name are rejected."
+}
