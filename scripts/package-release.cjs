@@ -1,0 +1,11 @@
+const fs=require('node:fs'),path=require('node:path'),{createHash}=require('node:crypto'),{execFileSync}=require('node:child_process');
+const root=path.resolve(__dirname,'..'),version=require('../package.json').version,tag=process.argv[2];
+if(tag!=='v'+version)throw new Error('Tag must match package version');
+execFileSync(process.execPath,['scripts/build.mjs','--check'],{cwd:root,stdio:'inherit'});
+const exe=fs.readFileSync(path.join(root,'dist/mingli-paipan.exe'));if(exe.toString('ascii',0,2)!=='MZ'||exe.length<1000000)throw new Error('Missing Windows executable');
+const dest=path.join(root,'release/assets');fs.mkdirSync(dest,{recursive:true});
+for(const [from,to] of [['命理排盘.html','mingli-paipan.html'],['dist/mingli-paipan.exe','mingli-paipan.exe'],['LICENSE','LICENSE.txt'],['THIRD_PARTY_NOTICES.md','THIRD_PARTY_NOTICES.md']])fs.copyFileSync(path.join(root,from),path.join(dest,to));
+const hashes=fs.readdirSync(dest).filter(f=>f!=='SHA256SUMS.txt').map(f=>createHash('sha256').update(fs.readFileSync(path.join(dest,f))).digest('hex')+'  '+f).join('\n');
+fs.writeFileSync(path.join(dest,'SHA256SUMS.txt'),hashes+'\n');
+const intro='面向世界各地对中国传统文化、八字及相关术数感兴趣的学习者与爱好者，提供排盘参考、规则查阅和学习交流工具。主要借助 OpenAI Codex 辅助代码编写与修改、数据整理与统计、测试和文档维护。\n\n';
+fs.writeFileSync(path.join(root,'release/notes.md'),'# '+tag+'\n\n'+intro+'## 下载\n- mingli-paipan.exe：Windows x64；已检查打包后内嵌HTML及本地回环服务，可用性仍依赖本机WebView2。\n- mingli-paipan.html：独立网页，下载后直接用浏览器打开。\n- SHA256SUMS.txt：附件校验值。\n\n## 更新与兼容性\n'+fs.readFileSync(path.join(root,'CHANGELOG.md'),'utf8')+'\n\n用于传统文化学习与参考，不代表经过科学验证的预测结论。此次未更新已部署的第三方网站或Worker，旧本地记录和设置应保留。\n');

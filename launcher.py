@@ -34,6 +34,7 @@ import socket
 import sys
 import threading
 import webbrowser
+import hashlib
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import unquote, urlparse
@@ -107,6 +108,18 @@ def main() -> int:
         print(f"[×] 找不到 {APP_FILE}，请确认它与启动器在同一目录。", file=sys.stderr)
         return 1
 
+    if '--self-test' in sys.argv:
+        from urllib.request import urlopen
+        server = serve(0)
+        try:
+            with open(html_path, 'rb') as source:
+                expected = hashlib.sha256(source.read()).digest()
+            with urlopen(f'http://127.0.0.1:{server.server_port}/', timeout=10) as response:
+                return 0 if server.server_address[0] == '127.0.0.1' and hashlib.sha256(response.read()).digest() == expected else 2
+        finally:
+            server.shutdown()
+            server.server_close()
+
     force_browser = "--browser" in sys.argv
     port = pick_port()
     url = f"http://127.0.0.1:{port}/{APP_FILE}"
@@ -135,6 +148,7 @@ def main() -> int:
                 webview.start()     # 阻塞到窗口关闭
             finally:
                 httpd.shutdown()
+                httpd.server_close()
             return 0
 
     webbrowser.open(url)
@@ -145,6 +159,7 @@ def main() -> int:
         pass
     finally:
         httpd.shutdown()
+        httpd.server_close()
     return 0
 
 
