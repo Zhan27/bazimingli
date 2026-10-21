@@ -4,7 +4,7 @@
 
 一个**单文件、纯前端、本地计算**的传统命理排盘应用：八字排盘 + 紫微斗数 + 奇门遁甲 + 六爻 + 合婚配对 + AI 深度解读，发布文件包含全部逻辑，无需后端、无需安装。开发源码已拆分到 `src/`，经构建生成两个完全一致的单 HTML 文件。
 
-> 🌐 在线体验：https://d59403144e4747e6b7bd9898c99cdee7.sh5.agentos-app.net
+> 🌐 在线体验：[玄机命理工作台](https://zhan27.github.io/bazimingli/docs/)
 > 🖥️ Windows 桌面版：见 [Release](https://github.com/Zhan27/bazimingli/releases)（`mingli-paipan.exe`）
 
 ## ✨ 功能特性
