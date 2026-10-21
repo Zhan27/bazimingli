@@ -1,6 +1,7 @@
 # 测试与临时脚本
 _*.js
 *.log
+_gt.html
 
 # WorkBuddy 工作区数据（本地会话记录，不上传）
 .workbuddy/
@@ -24,3 +25,7 @@ dist/
 venv/
 wheels/
 _fetch_wheels.py
+
+# Prompt 模板与校验样本（含核心研判准则，绝不入库）
+worker/prompt-template.json
+_gt.json

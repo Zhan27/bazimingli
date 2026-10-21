@@ -308,6 +308,10 @@ header .sub{font-size:.78rem;color:var(--ink3);margin-top:6px;letter-spacing:.2e
 <div class="field" style="margin-bottom:10px"><label>输出长度上限 (max_tokens)</label><input id="ai-maxtok" type="number" min="0" max="65536" step="256" placeholder="8000" style="width:100%">
 <div style="font-size:.7rem;color:var(--ink3);margin-top:4px;line-height:1.6">18 维全量输出约需 6000+ tokens；默认 8000。若接口报 400/参数超限，改小或留 0 表示不指定（用服务端默认，可能被截断导致【18】缺失）。</div></div>
 <label style="display:flex;align-items:flex-start;gap:8px;font-size:.75rem;color:var(--ink2);margin:12px 0 4px;cursor:pointer;line-height:1.6">
+  <input id="ai-divine" type="checkbox" style="margin-top:3px;flex:0 0 auto">
+  <span><b>🎭 使用服务端 Prompt</b>（需已部署中转服务的 <code>/v1/divine</code>）<br><span style="color:var(--ink3);font-size:.7rem">开启后 18 维研判准则由服务端注入，浏览器只发命盘事实与知识库片段</span></span>
+</label>
+<label style="display:flex;align-items:flex-start;gap:8px;font-size:.75rem;color:var(--ink2);margin:12px 0 4px;cursor:pointer;line-height:1.6">
   <input id="ai-session-only" type="checkbox" style="margin-top:3px;flex:0 0 auto">
   <span><b>仅本次会话使用</b>（不写入磁盘，关闭浏览器/标签页即失效）<br><span style="color:var(--ink3);font-size:.7rem">共用电脑、录屏演示、网吧/公司设备请勾选</span></span>
 </label>
@@ -4302,7 +4306,7 @@ function zhLiuNianTimeline(zh){
 }
 
 /* ======================== AI 深度解读（接入大模型 API） ======================== */
-const AI_DEF={base:'https://api.deepseek.com/v1',key:'',model:'deepseek-chat',maxTok:8000,sessionOnly:false};
+const AI_DEF={base:'https://api.deepseek.com/v1',key:'',model:'deepseek-chat',maxTok:8000,sessionOnly:false,divine:false};
 const AI_NS='mingli_ai_cfg';
 /* —— Key 存储：默认 localStorage；sessionOnly=true 时写 sessionStorage（关浏览器即失效）—— */
 function aiMaskKey(k){ if(!k) return ''; return k.length<=10 ? '••••••' : k.slice(0,5)+'••••'+k.slice(-4); }
@@ -4337,6 +4341,26 @@ function aiHeaders(c){
   const k=String(c.key||'').trim();
   if(k) h['Authorization']='Bearer '+k;
   return h;
+}
+/* —— 服务端 Prompt 模式：研判准则不下发，只上传命盘事实 —— */
+function aiDivineEndpoint(c){
+  let base=String(c.base||AI_DEF.base).trim().replace(/\/+$/,'');
+  base=base.replace(/\/chat\/completions$/,'');
+  return base+'/divine';
+}
+function aiDivinePayload(schoolIdx){
+  const el=document.getElementById('zh-zw-ref');
+  const withZiwei=!!(el&&el.checked);
+  const p={
+    school:schoolIdx,
+    withZiwei:withZiwei,
+    knowledge:aiBuildKnowledge(lastZh),
+    basic:aiBasicInfo(lastZh),
+    chart:aiBuildChart(lastZh),
+    zwRef:withZiwei?zhZwRefText(lastZh):'',
+    zwGuide:withZiwei?zhZwRefGuide():''
+  };
+  return p;
 }
 /* —— 超时包装：非流式请求 —— */
 function aiFetch(url,opts,timeoutMs){
@@ -4427,9 +4451,10 @@ function aiOpenSettings(){
   document.getElementById('ai-model').value=c.model||'';
   const mt=document.getElementById('ai-maxtok'); if(mt) mt.value=c.maxTok||'';
   const so=document.getElementById('ai-session-only'); if(so) so.checked=!!c.sessionOnly;
+  const dv=document.getElementById('ai-divine'); if(dv) dv.checked=!!c.divine;
   const st=document.getElementById('ai-key-state');
   if(st) st.textContent = c.key
-    ? ('当前 Key：'+aiMaskKey(c.key)+' · '+(c.sessionOnly?'仅本次会话（关浏览器失效）':'已持久化保存在本机'))
+    ? ('当前 Key：'+aiMaskKey(c.key)+' · '+(c.sessionOnly?'仅本次会话（关浏览器失效）':'已持久化保存在本机')+(c.divine?' · 🎭 服务端 Prompt':''))
     : '当前未配置 Key（可使用下方「提取 Prompt」通道，无需 Key）';
   document.getElementById('ai-test-msg').textContent='';
   document.getElementById('ai-modal').style.display='flex';
@@ -4438,13 +4463,15 @@ function aiSaveSettings(){
   const prev=aiGetConfig();
   const typed=document.getElementById('ai-key').value.trim();
   const so=document.getElementById('ai-session-only');
+  const dv=document.getElementById('ai-divine');
   const mt=parseInt(document.getElementById('ai-maxtok').value||'0',10);
   const next={
     base:document.getElementById('ai-base').value.trim()||AI_DEF.base,
     key:typed||prev.key||'',
     model:document.getElementById('ai-model').value.trim()||'deepseek-chat',
     maxTok:(isFinite(mt)&&mt>0)?mt:0,
-    sessionOnly:!!(so&&so.checked)
+    sessionOnly:!!(so&&so.checked),
+    divine:!!(dv&&dv.checked)
   };
   aiSaveConfig(next);
   const msg=document.getElementById('ai-test-msg');
@@ -4996,7 +5023,6 @@ function aiDeepAnalyze(){
   const btn=document.getElementById('ai-deep-btn');
   if(btn){btn.disabled=true;btn.textContent='⏳ AI 深度思考中…（约30-60秒）';}
   box.innerHTML='<div style="padding:16px;color:var(--ink3);font-size:.82rem;text-align:center">🤖 正在按<b>'+SCHOOLS[lastSchool]+'</b>视角，综合<b>命盘数据 + 典籍知识库</b>深度推演 18 个维度（含综合定档·风险提示）…<br><span style="font-size:.72rem">各维度将实时填入卡片</span></div>';
-  const {system,user}=aiBuildSchoolPrompt(lastSchool,'deep');
   // 预留渲染容器（原实现依赖 box.firstChild，先清空再插入更稳）
   box.innerHTML='<div style="padding:6px 2px"></div>';
   const container=box.firstChild;
@@ -5011,9 +5037,21 @@ function aiDeepAnalyze(){
   const finish=(ok)=>{
     if(btn){btn.disabled=false;btn.textContent=ok?'🤖 AI 深度解读（重新生成）':'🤖 AI 深度解读';}
   };
-  const payload={model:c.model,messages:[{role:'system',content:system},{role:'user',content:user}],temperature:0.7,stream:true};
-  if(c.maxTok>0) payload.max_tokens=c.maxTok;      // 避免 18 维被服务端默认值截断
-  aiStreamChat(aiEndpoint(c),{
+  // 组装请求：服务端 Prompt 模式只上传命盘事实；直连模式在本地拼 system
+  let payload,url;
+  if(c.divine){
+    url=aiDivineEndpoint(c);
+    payload=aiDivinePayload(lastSchool);
+    payload.model=c.model;
+    payload.temperature=0.7;
+    if(c.maxTok>0) payload.max_tokens=c.maxTok;
+  }else{
+    const sp=aiBuildSchoolPrompt(lastSchool,'deep');
+    url=aiEndpoint(c);
+    payload={model:c.model,messages:[{role:'system',content:sp.system},{role:'user',content:sp.user}],temperature:0.7,stream:true};
+    if(c.maxTok>0) payload.max_tokens=c.maxTok;   // 避免 18 维被服务端默认值截断
+  }
+  aiStreamChat(url,{
     method:'POST',
     headers:aiHeaders(c),
     body:JSON.stringify(payload)

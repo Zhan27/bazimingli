@@ -69,7 +69,12 @@ venv\Scripts\pyinstaller --onefile --noconsole --name 命理排盘 --add-data "�
 ```
 ├── 命理排盘.html      # 主文件（全部功能，单文件自包含）
 ├── docs/index.html    # 部署副本（GitHub Pages 入口，/docs 模式）
-├── worker/            # 可选：Cloudflare Worker 中转服务（隐藏 API Key）
+├── worker/            # Cloudflare Worker 中转服务（隐藏 Key 与 Prompt）
+│   ├── worker.js            # 中转 + 服务端 Prompt 注入
+│   ├── extract-prompt.ps1   # 从源码自动抽取 Prompt 模板（含往返校验）
+│   ├── verify-prompt.mjs    # 模板一致性校验（逐字节比对）
+│   ├── build-thin.ps1       # 构建剥离 Prompt 的精简发布版
+│   └── README.md
 ├── launcher.py        # 桌面版启动器（pywebview）
 ├── sync_deploy.ps1    # 源文件 → docs 同步（Windows，含密钥自检）
 ├── sync_deploy.sh     # 源文件 → docs 同步（macOS / Linux / WSL）
@@ -85,7 +90,22 @@ venv\Scripts\pyinstaller --onefile --noconsole --name 命理排盘 --add-data "�
 - 仓库默认 `key:''`，**不含任何 Key**；导出备份也不包含 Key
 - 想把 Key 放到服务端（例如做成"打开就能用"的版本），见 [`worker/README.md`](worker/README.md) —— 前端零改动，BaseURL 填 Worker 地址、Key 栏填访问码即可
 
+### 🎭 服务端 Prompt 模式（防逆向）
+
+开启设置里的「使用服务端 Prompt」后，18 维研判准则（流派人格 / 独立评分标准 / 研究纪律 / 命格原型参照 / 输出格式）由 worker 的 `/v1/divine` 注入，浏览器只发命盘事实与知识库片段。
+
+- 配套 `worker/build-thin.ps1` 可把 Prompt **从发布版 HTML 里物理删除**，产出 `dist/index.html`
+- 已有校验脚本 `worker/verify-prompt.mjs`：Worker 拼出的 prompt 与原始输出**逐字节一致**（实测 20/20）
+- ⚠️ 前提：**源仓库必须不公开**。只要仓库还是 public，别人直接读源码就看到全部 Prompt，发精简版没有意义。详见 [`worker/README.md`](worker/README.md)
+
 ## 📝 更新记录
+
+### v5.15
+- **服务端 Prompt 模式**：设置里勾选「🎭 使用服务端 Prompt」后，18 维研判准则改由 worker 注入，请求走 `/v1/divine`，浏览器只上传命盘事实
+- **模板自动抽取**：`worker/extract-prompt.ps1` 从源码抽出 5 流派模板（18,918 字符），代入占位符，内置往返校验 10/10
+- **一致性校验**：`worker/verify-prompt.mjs` 从 worker 源码真实取出 `buildDivine()` 执行，与浏览器原始输出比对 —— **20 项逐字节一致**（含用另一张命盘交叉验证）
+- **精简发布版**：`worker/build-thin.ps1` 剥离 10,381 字符的 Prompt 实体，强制服务端模式，校验 8 项敏感标记全部清除 + JS 语法通过
+- **模板不入库**：`worker/prompt-template.json` 与校验样本已加入 `.gitignore`
 
 ### v5.14
 - **AI 请求层重构**：四处 `fetch` 合并为统一 `aiFetch()` / `aiStreamChat()`，删掉三份重复的 SSE 解析

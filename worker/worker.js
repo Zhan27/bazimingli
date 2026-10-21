@@ -6,18 +6,21 @@
  *
  * 部署（免费额度足够个人使用）：
  *   1) npm i -g wrangler && wrangler login
- *   2) cd worker && wrangler deploy
- *   3) 配密钥（不要写进代码 / 不要提交）：
+ *   2) powershell -File worker\extract-prompt.ps1   # 先抽取 Prompt 模板（生成 secrets/ 之外的本地文件）
+ *   3) cd worker && wrangler deploy
+ *   4) 配密钥（不要写进代码 / 不要提交）：
  *        wrangler secret put API_KEY          # 真实上游 Key，如 sk-xxx
  *        wrangler secret put ACCESS_CODES     # 自己定，逗号分隔多个，如 code-a,code-b
- *        wrangler secret put SYSTEM_PROMPT    # 可选：/v1/divine 用的服务端 Prompt
- *   4) wrangler tail 看日志
+ *   5) wrangler tail 看日志
  *
  * 前端设置：
  *   BaseURL = https://<你的子域>.workers.dev/v1
  *   API Key = <你设的访问码>
  *   模型名   = deepseek-chat（或 ALLOWED_MODELS 里的任意一个）
+ *   勾选「🎭 使用服务端 Prompt」后，18 维研判准则不再从浏览器发出
  */
+
+import PROMPT_TEMPLATE from './prompt-template.json';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',            // 生产可改为你的站点域名
@@ -130,6 +133,42 @@ async function forward(env, payload, request) {
   });
 }
 
+/* ---------- 服务端 Prompt 注入：研判准则与知识库框架永不下发浏览器 ---------- */
+function buildDivine(body) {
+  const root = PROMPT_TEMPLATE;
+  if (!root || !root.schools || !Object.keys(root.schools).length) {
+    throw new Error('服务端未载入 Prompt 模板（请先运行 worker/extract-prompt.ps1 后重新部署）');
+  }
+  const n = parseInt(body.school, 10);
+  const idx = (isFinite(n) && n >= 0 && n <= 4) ? n : 0;
+  const sch = root.schools[String(idx)];
+  if (!sch || !sch.template) throw new Error('模板缺少该流派：' + body.school);
+
+  const knowledge = String(body.knowledge || '');
+  if (knowledge.length < 50) throw new Error('knowledge 过短，拒绝生成（前端可能未完成排盘）');
+
+  const withZiwei = !!body.withZiwei;
+  let system = sch.template.split('{{KNOWLEDGE}}').join(knowledge.slice(0, 60000));
+  system = system.split('{{ZW_BLOCK}}').join(withZiwei ? String(root.zwBlock || '') : '');
+
+  const basic = String(body.basic || '').slice(0, 4000);
+  const chart = typeof body.chart === 'string' ? body.chart : JSON.stringify(body.chart || {});
+  let user = '【基础信息（确认本盘身份，勿与它盘混淆）】\n' + basic +
+             '\n\n【命盘数据】\n' + chart.slice(0, 60000);
+  if (withZiwei) {
+    const zwRef = String(body.zwRef || '');
+    const zwGuide = String(body.zwGuide || '');
+    if (zwRef) user += '\n\n' + zwRef.slice(0, 8000) + '\n\n' + zwGuide.slice(0, 8000);
+  }
+
+  body.messages = [
+    { role: 'system', content: system },
+    { role: 'user', content: user }
+  ];
+  body.stream = true;
+  return body;
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
@@ -168,19 +207,15 @@ export default {
     let body;
     try { body = await request.json(); } catch (e) { return oaiError('请求体不是合法 JSON', 400); }
 
-    // 服务端注入 Prompt 的模式：前端只发命盘数据，system prompt 永不下发
+    // 服务端注入 Prompt 的模式：前端只发命盘事实与知识库片段，研判准则永不下发
+    let bodyForChat = body;
     if (isDivine) {
-      const sp = env.SYSTEM_PROMPT;
-      if (!sp) return oaiError('服务端未配置 SYSTEM_PROMPT', 500, 'config_error');
-      body.messages = [
-        { role: 'system', content: sp },
-        { role: 'user', content: String(body.chart ? JSON.stringify(body.chart) : body.user || '').slice(0, 120000) }
-      ];
-      body.stream = true;
+      try { bodyForChat = buildDivine(body); }
+      catch (e) { return oaiError(e.message, 400, 'template_error'); }
     }
 
     let payload;
-    try { payload = sanitizeChat(body, env); } catch (e) { return oaiError(e.message, 400); }
+    try { payload = sanitizeChat(bodyForChat, env); } catch (e) { return oaiError(e.message, 400); }
 
     try {
       return await forward(env, payload, request);
