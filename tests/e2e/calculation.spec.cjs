@@ -1,5 +1,5 @@
 const {test,expect}=require('@playwright/test');
-test.beforeEach(async({page})=>{await page.goto('/');await expect(page.locator('#zh-result')).toContainText('命格总断');});
+test.beforeEach(async({page})=>{await page.addInitScript(()=>localStorage.setItem('mingli_view_mode','professional'));await page.goto('/');await expect(page.locator('#zh-result')).toContainText('命格总断');});
 test('offset and DST controls convert the input, restore history, and retain the same instant',async({page})=>{
   const errors=[],dialogs=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',async d=>{dialogs.push(d.message());await d.dismiss();});
   await page.locator('#zh-name').fill('时区验收');await page.locator('#zh-solar').fill('2024-02-09');await page.locator('#zh-time').fill('12:30');

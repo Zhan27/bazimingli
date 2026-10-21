@@ -4727,6 +4727,8 @@ zhCast();
 renderRecords();
 ['zw','bz','qm','ly'].forEach(mod=>renderModRecords(mod));
 
+initializeWorkbench();
+
 /* ============ v2 可访问性 & UX（2026-08-28） ============ */
 (function(){
   // 1) 键盘可达: Tab/主题点/历史记录/过三关条目按 Enter/Space 触发点击

@@ -13,7 +13,7 @@ export function render(){
   const scripts='/* lunar-javascript 1.7.7 — third-party license\n'+license+'\n*/\n'+sources.map(path=>'/* Source: '+path+' */\n'+sourceList.sourceText(root,path).trim()).join('\n\n');
   new vm.Script(scripts,{filename:'release-inline.js'});
   const patterns=[/sk-[A-Za-z0-9_-]{16,}/,/AIza[0-9A-Za-z_-]{20,}/,/gh[pousr]_[A-Za-z0-9]{20,}/,/xox[baprs]-[A-Za-z0-9-]{10,}/,/\bkey\s*:\s*['"][^'"\s]{16,}['"]/];
-  const template=read('src/template.html');
+  const template=read('src/template.html').replace('</style>',read('src/ui/workbench.css')+'\n</style>');
   if(patterns.some(re=>re.test(template+'\n'+scripts))) throw new Error('疑似硬编码密钥：发布已中止（不输出匹配内容）');
   if(template.split('<!-- APP_SCRIPTS -->').length!==2) throw new Error('模板必须含一个 APP_SCRIPTS 标记');
   return template.replace('<!-- APP_SCRIPTS -->','<script>\n'+scripts.replace(/<\/script/gi,'<\\/script')+'\n</script>');

@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.19.0 — 2026-10-21
+- Redesigned the frontend as a jade-and-paper study workbench with persistent module navigation, side-by-side desktop entry/chart and stacked mobile layout.
+- Brought four pillars before dense narrative sections; added learning/professional views and collapsible time assumptions/settings without changing chart calculation.
+- Added a synthetic example, focus-managed help/glossary dialogs, source-status lookup, local-record search, keyboard navigation and print layout.
+- Preserved original inputs, local records, backups, six chart modules and single-file offline operation. Added desktop/mobile/dark screenshots and four browser regression cases.
+- Long-term roadmap work beyond the finished API/AI foundation is paused at the user's request. No live model evaluation, optional Worker redeployment or unfinished advanced features are claimed complete.
+
 ## 5.18.1 — 2026-10-21
 - Added pure18-dimension JSON contracts, versioned school prompts and source-status catalog, with explicit error categories.
 - Replaced shared AI transport to support final SSE frames, bounded replies, cancellation and provider JSON responses without automatic paid retries.

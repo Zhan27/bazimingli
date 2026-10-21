@@ -9,6 +9,14 @@
 
 ## ✨ 功能特性
 
+### 5.19：传统文化学习工作台
+
+黛青导航与暖白内容区；桌面并排填写资料与核对命盘，手机按阅读顺序排列。学习/专业视图可以切换，复杂时区、流派和换日设置保留在展开区域。新增合成示例、入门指引、可检索的术语与出处状态、本地记录搜索和键盘导航。原有计算、六个模块、记录与备份继续保留。
+
+![工作台实际截图](verification/screenshots/workbench-desktop.png)
+
+设计参考与许可证核对见 [前端参考说明](docs/UI-REFERENCES.md)。当前版本下载见 [Releases](https://github.com/Zhan27/bazimingli/releases/latest)。本轮已完成的开发与暂停范围见 [进度说明](PROGRESS-21-96.md)。
+
 ### 5.17：计算规则与可追溯结果
 - 明确选择子初23:00或子正00:00换日；原钟表时刻、UTC偏移、手动夏令时修正、东八区时刻和真太阳时分项显示。默认仍为东八区，不自动查询历史时区。
 - 内置2,704个 GeoNames 城市点位（WGS84、稳定ID、来源版本），使用精确别名或地点选择器；同名点位要求选择，不猜测匹配。数据按 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 使用，来源为 [GeoNames](https://www.geonames.org/)。

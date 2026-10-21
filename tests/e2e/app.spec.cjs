@@ -1,4 +1,5 @@
 const {test,expect}=require('@playwright/test');
+test.beforeEach(async({page})=>{await page.addInitScript(()=>{try{localStorage.setItem('mingli_view_mode','professional');}catch(e){}});});
 test('single HTML starts and all chart modules calculate without script errors',async({page})=>{
   const errors=[],dialogs=[];
   page.on('pageerror',e=>errors.push(e.message));
