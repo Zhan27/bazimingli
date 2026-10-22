@@ -1,149 +1,154 @@
 
-> bazimingli@5.21.0 verify
+> bazimingli@5.22.0 verify
 > npm run check && npm run lint && npm test && npm run test:desktop && npm run test:e2e
 
 
-> bazimingli@5.21.0 check
+> bazimingli@5.22.0 check
 > node scripts/build.mjs --check
 
-已校验单文件与 docs/index.html，SHA256 dd0366b5c111b17646944936f00a4726a9a5e5cca6c3ecdbf88f18f027272ee3
+已校验单文件与 docs/index.html，SHA256 5860433aedb8d36102e3431bd134f12545ec4e8756f582ae2282ae31060add11
 
-> bazimingli@5.21.0 lint
+> bazimingli@5.22.0 lint
 > node scripts/lint.cjs
 
-Static check: 0 errors, 38 recorded warnings, 0 new warnings
+Static check: 0 errors, 37 recorded warnings, 0 new warnings
 
-> bazimingli@5.21.0 test
+> bazimingli@5.22.0 test
 > node --test tests/*.test.cjs
 
-✔ structured output validates 18 dimensions and preserves all computed facts (2.2651ms)
-✔ fact errors, rules, missing evidence and unclear expression are distinguished (1.3757ms)
-✔ versioned knowledge has explicit verification status and independent school prompts (1.3446ms)
-✔ SSE parser handles Unicode chunks, final frame without newline, malformed/error frames and length limits (1.038ms)
-✔ shared request layer streams a mocked provider and supports explicit cancellation without retry (20.6256ms)
-✔ versioned synthetic AI contract fixtures emit a bounded report and reject injected faults (143.399ms)
-✔ attempts accept valid dimensions independently and reject root fact changes without touching the chart (155.1064ms)
-✔ cancel/failure preserves accepted cards, partial text and metadata; restored running attempts are interrupted (136.954ms)
-✔ Markdown compatibility is explicitly unverified and does not replace unrelated completed dimensions (159.4441ms)
-✔ malformed dimensions, extra properties, duplicates and uncalibrated prediction fields cannot be accepted (610.3664ms)
-✔ 18 dimensions parse standard, Markdown, numbered and fullwidth heading variants (2.3293ms)
-✔ missing, reordered, duplicate, incomplete streaming headings and supplementary sections (0.6957ms)
-✔ long replies retain content without truncation; oversized replies fail clearly (3.2766ms)
-✔ AI HTML rendering keeps script, SVG, handlers, entities and markdown links inert (0.6384ms)
-✔ public engine calculates without a DOM or storage and keeps its JSON input immutable (153.2855ms)
-✔ three separated modules share independent inputs/outputs and deterministic reference years (17.6053ms)
-✔ JSON chart differences, debug facts, school conflicts, evidence graph and bounded batch are usable (11.3749ms)
-✔ custom declarative scoring packs are validated, isolated and identify changed results (126.5687ms)
-✔ release check detects stale artifacts; secret/syntax failures do not overwrite output (703.0627ms)
-✔ all 100 ten-god mappings agree with the independent published lookup table (3.582ms)
-✔ three wuxing count conventions give hand-counted totals without changing core facts (28.8081ms)
-✔ strength command, root, and momentum components have independent hand-counted cases (0.7974ms)
-✔ five immutable school configurations share pillars but apply explicit use-god strategies (7.1513ms)
-✔ fixed UTC offsets, manual DST, fractional offsets and midnight/year crossing preserve one instant (0.887ms)
-✔ NOAA solar-time components agree with independent Astronomy Engine hour-angle reference (19.8492ms)
-✔ city database uses sourced WGS84 stable IDs, exact aliases and explicit ambiguity (19.8096ms)
-✔ unknown hour partitions all day, early/late Zi, exact Jie, solar crossing and unsupported edges (32.2759ms)
-✔ HKO solar/lunar benchmarks and labeled legacy epoch in both directions (64.8838ms)
-✔ seeded random Gregorian/lunar round trips, including endpoints (2002 cases) (6307.6778ms)
-✔ every lunar month start/end and leap boundary for all 200 supported lunar years (8093.9722ms)
-✔ invalid lunar dates/leap months and out-of-range solar dates are rejected (21.624ms)
-✔ sexagenary cycles wrap in both directions; all 60 pairs invert (12.0223ms)
-✔ all 24 solar terms for all supported years: before/at/after, year/month invariants (952.806ms)
-✔ 2026 major solar terms agree with HKO minute-resolution independent data within 60 seconds (0.287ms)
-✔ four pillars fixed benchmark plus early/late Zi and exact Jie instant (0.692ms)
-✔ NOAA equation of time, longitude sign, hour/day crossing and civil Jie separation (0.9256ms)
-✔ January DaYun uses previous December Jie and continuous fractional-day interval (0.3605ms)
-✔ keys default to session storage; explicit persistence remains opt-in and can be cleared (168.6212ms)
-✔ unmarked legacy keys migrate; explicit saved choices survive reload (267.9408ms)
-✔ denied browser storage retains keys in page memory and reports the actual mode (99.2339ms)
-✔ unified listing searches notes/places, filters categories and applies deterministic sorting (154.5926ms)
-✔ batch deletion identifies records by category and ID, and never touches API settings (99.3877ms)
-✔ selected backup format merges safely, retains notes, and refuses category overflow before writes (123.4027ms)
-✔ failed batch writes roll back preceding categories, and clear removes legacy resurrection without touching settings (97.5962ms)
-✔ backup uses ml_records; round trip restores all five categories and excludes secrets (4.2607ms)
-✔ v4 mingli_records backups migrate, both keys merge without duplicate IDs (0.6048ms)
-✔ local legacy key migrates once and cannot resurrect after clearing (0.3294ms)
-✔ malformed imports fail before any storage mutation (1.9611ms)
-✔ storage quota failure rolls back preceding category writes (0.4249ms)
-✔ every frozen v5.16 baseline recalculates unchanged and emits an inspectable report (263.2395ms)
-✔ five strength states retain all classification thresholds (1.2269ms)
-✔ chart, summary and AI prompt retain exact five-state labels (44.2729ms)
-✔ Worker rejects unlisted/null origins, unknown routes, wrong methods and invalid credentials before upstream (29.919ms)
-✔ Worker bounds both declared and chunked UTF-8 bodies and rejects malformed requests without forwarding (8.9225ms)
-✔ Worker sanitizes payloads, caps tokens, publishes only allowed models and keeps responses uncached (3.9685ms)
-✔ Worker quota follows access code across IP changes, expires daily, and memory stays bounded (130.1354ms)
-✔ Worker suppresses upstream secrets/errors, rejects insecure upstream config, and cancels on timeout (18.6723ms)
-✔ Worker preserves SSE bytes, rejects incompatible content and caps streaming output (11.3779ms)
-✔ Worker forwards bounded inline JSON Schema formats and rejects invalid or reference-based schemas (2.2439ms)
-ℹ tests 59
+✔ structured output validates 18 dimensions and preserves all computed facts (1.7882ms)
+✔ fact errors, rules, missing evidence and unclear expression are distinguished (1.3625ms)
+✔ versioned knowledge has explicit verification status and independent school prompts (1.7242ms)
+✔ SSE parser handles Unicode chunks, final frame without newline, malformed/error frames and length limits (0.8482ms)
+✔ shared request layer streams a mocked provider and supports explicit cancellation without retry (19.2215ms)
+✔ versioned synthetic AI contract fixtures emit a bounded report and reject injected faults (141.4324ms)
+✔ attempts accept valid dimensions independently and reject root fact changes without touching the chart (135.3215ms)
+✔ cancel/failure preserves accepted cards, partial text and metadata; restored running attempts are interrupted (120.018ms)
+✔ Markdown compatibility is explicitly unverified and does not replace unrelated completed dimensions (126.4239ms)
+✔ malformed dimensions, extra properties, duplicates and uncalibrated prediction fields cannot be accepted (655.3566ms)
+✔ 18 dimensions parse standard, Markdown, numbered and fullwidth heading variants (1.9569ms)
+✔ missing, reordered, duplicate, incomplete streaming headings and supplementary sections (0.4781ms)
+✔ long replies retain content without truncation; oversized replies fail clearly (2.7298ms)
+✔ AI HTML rendering keeps script, SVG, handlers, entities and markdown links inert (0.4178ms)
+✔ public engine calculates without a DOM or storage and keeps its JSON input immutable (156.4209ms)
+✔ three separated modules share independent inputs/outputs and deterministic reference years (15.2422ms)
+✔ JSON chart differences, debug facts, school conflicts, evidence graph and bounded batch are usable (7.2211ms)
+✔ custom declarative scoring packs are validated, isolated and identify changed results (130.6819ms)
+✔ release check detects stale artifacts; secret/syntax failures do not overwrite output (695.4068ms)
+✔ all 100 ten-god mappings agree with the independent published lookup table (5.4456ms)
+✔ three wuxing count conventions give hand-counted totals without changing core facts (20.9442ms)
+✔ strength command, root, and momentum components have independent hand-counted cases (0.5181ms)
+✔ five immutable school configurations share pillars but apply explicit use-god strategies (4.5889ms)
+✔ fixed UTC offsets, manual DST, fractional offsets and midnight/year crossing preserve one instant (0.8983ms)
+✔ NOAA solar-time components agree with independent Astronomy Engine hour-angle reference (25.7975ms)
+✔ city database uses sourced WGS84 stable IDs, exact aliases and explicit ambiguity (17.4471ms)
+✔ unknown hour partitions all day, early/late Zi, exact Jie, solar crossing and unsupported edges (22.3021ms)
+✔ HKO solar/lunar benchmarks and labeled legacy epoch in both directions (58.2399ms)
+✔ seeded random Gregorian/lunar round trips, including endpoints (2002 cases) (6208.3509ms)
+✔ every lunar month start/end and leap boundary for all 200 supported lunar years (7427.9133ms)
+✔ invalid lunar dates/leap months and out-of-range solar dates are rejected (20.6537ms)
+✔ sexagenary cycles wrap in both directions; all 60 pairs invert (13.6107ms)
+✔ all 24 solar terms for all supported years: before/at/after, year/month invariants (948.0172ms)
+✔ 2026 major solar terms agree with HKO minute-resolution independent data within 60 seconds (0.4954ms)
+✔ four pillars fixed benchmark plus early/late Zi and exact Jie instant (1.7773ms)
+✔ NOAA equation of time, longitude sign, hour/day crossing and civil Jie separation (1.8109ms)
+✔ January DaYun uses previous December Jie and continuous fractional-day interval (0.5797ms)
+✔ self-punishment connects each named pillar instead of looping back to the first repeated branch (2.6072ms)
+✔ group relations include repeated participants and binary relations retain exact pillar identities (0.4767ms)
+✔ dense and empty presentations preserve rule results, bounded SVGs and escaped labels (1.3146ms)
+✔ keys default to session storage; explicit persistence remains opt-in and can be cleared (173.1519ms)
+✔ unmarked legacy keys migrate; explicit saved choices survive reload (233.0158ms)
+✔ denied browser storage retains keys in page memory and reports the actual mode (105.8827ms)
+✔ unified listing searches notes/places, filters categories and applies deterministic sorting (163.3869ms)
+✔ batch deletion identifies records by category and ID, and never touches API settings (125.4386ms)
+✔ selected backup format merges safely, retains notes, and refuses category overflow before writes (119.351ms)
+✔ failed batch writes roll back preceding categories, and clear removes legacy resurrection without touching settings (84.2729ms)
+✔ backup uses ml_records; round trip restores all five categories and excludes secrets (3.3773ms)
+✔ v4 mingli_records backups migrate, both keys merge without duplicate IDs (0.6336ms)
+✔ local legacy key migrates once and cannot resurrect after clearing (0.2777ms)
+✔ malformed imports fail before any storage mutation (1.857ms)
+✔ storage quota failure rolls back preceding category writes (0.5754ms)
+✔ every frozen v5.16 baseline recalculates unchanged and emits an inspectable report (257.4609ms)
+✔ five strength states retain all classification thresholds (1.0959ms)
+✔ chart, summary and AI prompt retain exact five-state labels (42.5758ms)
+✔ Worker rejects unlisted/null origins, unknown routes, wrong methods and invalid credentials before upstream (21.9559ms)
+✔ Worker bounds both declared and chunked UTF-8 bodies and rejects malformed requests without forwarding (5.2465ms)
+✔ Worker sanitizes payloads, caps tokens, publishes only allowed models and keeps responses uncached (2.7385ms)
+✔ Worker quota follows access code across IP changes, expires daily, and memory stays bounded (91.7419ms)
+✔ Worker suppresses upstream secrets/errors, rejects insecure upstream config, and cancels on timeout (17.8441ms)
+✔ Worker preserves SSE bytes, rejects incompatible content and caps streaming output (13.7558ms)
+✔ Worker forwards bounded inline JSON Schema formats and rejects invalid or reference-based schemas (2.4579ms)
+ℹ tests 62
 ℹ suites 0
-ℹ pass 59
+ℹ pass 62
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 15937.7102
+ℹ duration_ms 15133.4558
 
-> bazimingli@5.21.0 test:desktop
+> bazimingli@5.22.0 test:desktop
 > python -m unittest discover -s tests -p test_launcher.py
 
-[×] 无法启动本地服务，请检查端口权限。
-....[×] 窗口启动失败，本地服务已关闭。
-[·] 本地服务: http://127.0.0.1:59650/
-[×] 无法打开系统浏览器。
-[·] 应用目录: C:\Users\zhanzhan27\Documents\ChatGPT\八字\bazimingli
-[!] 首选端口被占用，已换端口；不同端口的浏览器记录独立，请勿误以为旧记录已删除。
+[��] �޷��������ط�������˿�Ȩ�ޡ�
+....[��] ��������ʧ�ܣ����ط����ѹرա�
+[��] ���ط���: http://127.0.0.1:59868/
+[��] Ӧ��Ŀ¼: C:\Users\zhanzhan27\Documents\ChatGPT\����\bazimingli
+[!] ��ѡ�˿ڱ�ռ�ã��ѻ��˿ڣ���ͬ�˿ڵ��������¼��������������Ϊ�ɼ�¼��ɾ����
+[��] �޷���ϵͳ�������
 .
 ----------------------------------------------------------------------
-Ran 5 tests in 8.782s
+Ran 5 tests in 8.885s
 
 OK
-[·] 本地服务: http://127.0.0.1:59655/
-[·] 应用目录: C:\Users\zhanzhan27\Documents\ChatGPT\八字\bazimingli
-[!] 首选端口被占用，已换端口；不同端口的浏览器记录独立，请勿误以为旧记录已删除。
+[��] ���ط���: http://127.0.0.1:60119/
+[��] Ӧ��Ŀ¼: C:\Users\zhanzhan27\Documents\ChatGPT\����\bazimingli
+[!] ��ѡ�˿ڱ�ռ�ã��ѻ��˿ڣ���ͬ�˿ڵ��������¼��������������Ϊ�ɼ�¼��ɾ����
 
-> bazimingli@5.21.0 test:e2e
+> bazimingli@5.22.0 test:e2e
 > playwright test
 
-[WebServer] (node:1568) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (node:35584) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 [WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
 
-Running 33 tests using 1 worker
+Running 35 tests using 1 worker
 
-(node:7812) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(node:10996) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 (Use `node --trace-warnings ...` to show where the warning was created)
-  ok  1 tests\e2e\ai-workflow.spec.cjs:11:1 › JSON cards expose facts/rules/uncertainty and metadata without changing computed facts or executing HTML (1.8s)
+  ok  1 tests\e2e\ai-workflow.spec.cjs:11:1 › JSON cards expose facts/rules/uncertainty and metadata without changing computed facts or executing HTML (1.7s)
   ok  2 tests\e2e\ai-workflow.spec.cjs:22:1 › invalid dimensions stay missing, retry requests only missing IDs, and bad regeneration preserves accepted content (2.4s)
-  ok  3 tests\e2e\ai-workflow.spec.cjs:34:1 › cancel retains partial text and reload/restore never automatically sends another API request (2.8s)
-  ok  4 tests\e2e\ai-workflow.spec.cjs:41:1 › late old-chart responses cannot fill a new chart and storage denial leaves an actionable memory-only state (1.9s)
+  ok  3 tests\e2e\ai-workflow.spec.cjs:34:1 › cancel retains partial text and reload/restore never automatically sends another API request (2.4s)
+  ok  4 tests\e2e\ai-workflow.spec.cjs:41:1 › late old-chart responses cannot fill a new chart and storage denial leaves an actionable memory-only state (1.8s)
   ok  5 tests\e2e\ai-workflow.spec.cjs:48:1 › Markdown is explicitly unverified; schema errors do not trigger automatic paid fallback or score mutation (1.5s)
-  ok  6 tests\e2e\ai-workflow.spec.cjs:53:1 › a draft restores a different chart with its exact time and offset without calling the provider (2.9s)
-  ok  7 tests\e2e\ai-workflow.spec.cjs:60:1 › legacy server-template mode blocks unsupported JSON and partial generation before any paid request (1.4s)
-  ok  8 tests\e2e\ai-workflow.spec.cjs:65:1 › single-card collapse, copy and JSON export retain evidence and status while excluding API settings (2.6s)
-  ok  9 tests\e2e\app.spec.cjs:3:1 › single HTML starts and all chart modules calculate without script errors (1.5s)
-  ok 10 tests\e2e\app.spec.cjs:16:1 › backup download, clear, v5 import, reload and exact input restoration (3.1s)
-  ok 11 tests\e2e\app.spec.cjs:40:1 › user names, places, legacy records and AI HTML cannot create executable elements (2.1s)
-  ok 12 tests\e2e\app.spec.cjs:57:1 › invalid imported data and unsupported dates show errors without changing history (1.1s)
-  ok 13 tests\e2e\app.spec.cjs:68:1 › exact time drives Jie transition and both Zi rules through real form controls (3.0s)
-  ok 14 tests\e2e\app.spec.cjs:76:1 › all five computed states match UI, prompts, summaries and actual PNG canvas text (1.5s)
+  ok  6 tests\e2e\ai-workflow.spec.cjs:53:1 › a draft restores a different chart with its exact time and offset without calling the provider (3.0s)
+  ok  7 tests\e2e\ai-workflow.spec.cjs:60:1 › legacy server-template mode blocks unsupported JSON and partial generation before any paid request (1.3s)
+  ok  8 tests\e2e\ai-workflow.spec.cjs:65:1 › single-card collapse, copy and JSON export retain evidence and status while excluding API settings (2.5s)
+  ok  9 tests\e2e\app.spec.cjs:3:1 › single HTML starts and all chart modules calculate without script errors (1.4s)
+  ok 10 tests\e2e\app.spec.cjs:16:1 › backup download, clear, v5 import, reload and exact input restoration (2.7s)
+  ok 11 tests\e2e\app.spec.cjs:40:1 › user names, places, legacy records and AI HTML cannot create executable elements (2.3s)
+  ok 12 tests\e2e\app.spec.cjs:57:1 › invalid imported data and unsupported dates show errors without changing history (992ms)
+  ok 13 tests\e2e\app.spec.cjs:68:1 › exact time drives Jie transition and both Zi rules through real form controls (2.9s)
+  ok 14 tests\e2e\app.spec.cjs:76:1 › all five computed states match UI, prompts, summaries and actual PNG canvas text (1.4s)
   ok 15 tests\e2e\app.spec.cjs:96:1 › real cards accept all 18 Markdown dimensions and incremental streaming prefixes (1.2s)
-  ok 16 tests\e2e\app.spec.cjs:102:1 › release opens directly as a local file with network disabled (804ms)
+  ok 16 tests\e2e\app.spec.cjs:102:1 › release opens directly as a local file with network disabled (833ms)
   ok 17 tests\e2e\app.spec.cjs:108:1 › Beijing form inputs remain identical in UTC, Shanghai, New York and Sydney browsers (4.2s)
   ok 18 tests\e2e\app.spec.cjs:124:1 › lunar leap month controls refresh actual day counts and synchronize Gregorian date (1.6s)
-  ok 19 tests\e2e\app.spec.cjs:135:1 › unknown time shows candidates, disables exact input and never fabricates a default chart (3.1s)
-  ok 20 tests\e2e\calculation.spec.cjs:3:1 › offset and DST controls convert the input, restore history, and retain the same instant (2.6s)
-  ok 21 tests\e2e\calculation.spec.cjs:14:1 › standard city picker selects an attributed coordinate instead of substring matching (1.6s)
+  ok 19 tests\e2e\app.spec.cjs:135:1 › unknown time shows candidates, disables exact input and never fabricates a default chart (2.9s)
+  ok 20 tests\e2e\calculation.spec.cjs:3:1 › offset and DST controls convert the input, restore history, and retain the same instant (2.7s)
+  ok 21 tests\e2e\calculation.spec.cjs:14:1 › standard city picker selects an attributed coordinate instead of substring matching (1.5s)
   ok 22 tests\e2e\calculation.spec.cjs:23:1 › Bazi hour-only history retains the original clock hour after timezone conversion (2.8s)
   ok 23 tests\e2e\calculation.spec.cjs:37:1 › all five school selections drive the displayed rule, calculation and serialized prompt (3.5s)
   ok 24 tests\e2e\calculation.spec.cjs:48:1 › wuxing display changes convention without changing pillars or the scoring model (2.2s)
   ok 25 tests\e2e\calculation.spec.cjs:57:1 › unknown-time history reloads as candidates, and both Zi conventions change only their defined facts (3.3s)
-  ok 26 tests\e2e\record-manager.spec.cjs:3:1 › one keyboard-accessible view searches/filters/sorts five categories and safely preserves notes across reload (2.4s)
-  ok 27 tests\e2e\record-manager.spec.cjs:9:1 › selected export uses merge-only format; batch delete and global clear preserve key configuration (1.4s)
-  ok 28 tests\e2e\record-manager.spec.cjs:15:1 › record manager controls fit a mobile screen and filter selections remain explicit (1.2s)
-  ok 29 tests\e2e\workbench.spec.cjs:4:1 › privacy disclosure is available offline and key persistence is opt-in (1.8s)
-  ok 30 tests\e2e\workbench.spec.cjs:13:1 › study layout shows four pillars first, retains hidden options and switches reader views (3.1s)
-  ok 31 tests\e2e\workbench.spec.cjs:24:1 › guide and source-aware glossary are keyboard reachable, trap focus, and restore it (1.2s)
-  ok 32 tests\e2e\workbench.spec.cjs:29:1 › mobile form, tabs, chart and dialogs fit a 390px screen, including dark theme (2.9s)
-  ok 33 tests\e2e\workbench.spec.cjs:39:1 › local records can be searched without changing or deleting saved data (1.8s)
+  ok 26 tests\e2e\gan-zhi-relations.spec.cjs:14:1 › dense diagram filters by type and pillar, highlights exact endpoints and resets without changing calculations (4.1s)
+  ok 27 tests\e2e\gan-zhi-relations.spec.cjs:37:1 › mobile and dark rails fit the viewport; repeated branches remain four separate nodes (2.2s)
+  ok 28 tests\e2e\record-manager.spec.cjs:3:1 › one keyboard-accessible view searches/filters/sorts five categories and safely preserves notes across reload (2.1s)
+  ok 29 tests\e2e\record-manager.spec.cjs:9:1 › selected export uses merge-only format; batch delete and global clear preserve key configuration (1.4s)
+  ok 30 tests\e2e\record-manager.spec.cjs:15:1 › record manager controls fit a mobile screen and filter selections remain explicit (1.1s)
+  ok 31 tests\e2e\workbench.spec.cjs:4:1 › privacy disclosure is available offline and key persistence is opt-in (1.7s)
+  ok 32 tests\e2e\workbench.spec.cjs:13:1 › study layout shows four pillars first, retains hidden options and switches reader views (2.6s)
+  ok 33 tests\e2e\workbench.spec.cjs:24:1 › guide and source-aware glossary are keyboard reachable, trap focus, and restore it (1.2s)
+  ok 34 tests\e2e\workbench.spec.cjs:29:1 › mobile form, tabs, chart and dialogs fit a 390px screen, including dark theme (2.4s)
+  ok 35 tests\e2e\workbench.spec.cjs:39:1 › local records can be searched without changing or deleting saved data (1.9s)
 
-  33 passed (1.2m)
+  35 passed (1.3m)

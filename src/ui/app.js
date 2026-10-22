@@ -2170,131 +2170,6 @@ function zhGanZhiMap(zh){
   }
   return rels;
 }
-// 干支作用 SVG 关系图(字与字直线箭头: 8字两行排布, 按"柱+字"独立定位(重复字不重叠), 有关系的字间画直线+箭头, 标签单字上下交错防重叠, 明细由图下方卡片列表展示)
-function gzRelSvg(zh){
-  try{
-    const rels=typeof zhGanZhiMap==='function'?zhGanZhiMap(zh):[];
-    if(!rels.length) return '';
-    const cols=['年','月','日','时'], xs=[85,205,325,445], yGan=46, yZhi=138;
-    const pos={};
-    const gans=[['年',zh.yearGZ[0]],['月',zh.monthGZ[0]],['日',zh.dayGZ[0]],['时',zh.hourGZ[0]]];
-    const zhis=[['年',zh.yearGZ[1]],['月',zh.monthGZ[1]],['日',zh.dayGZ[1]],['时',zh.hourGZ[1]]];
-    // 按"柱+字"定位: 四柱出现重复字(如两个甲)时各自独立坐标, 不会覆盖少字
-    gans.forEach((p,i)=>{ pos[p[0]+GAN[p[1]]]={x:xs[i],y:yGan}; });
-    zhis.forEach((p,i)=>{ pos[p[0]+ZHI[p[1]]]={x:xs[i],y:yZhi}; });
-    // 按字反查首个位置(用于三合/三刑/自刑等无柱名的多字关系)
-    const findChar=(ch)=>{
-      for(const p of gans){ if(GAN[p[1]]===ch) return {x:xs[cols.indexOf(p[0])],y:yGan}; }
-      for(const p of zhis){ if(ZHI[p[1]]===ch) return {x:xs[cols.indexOf(p[0])],y:yZhi}; }
-      return null;
-    };
-    const clsC={he:'#b08a3e',chong:'#9e2b25',xing:'#c87a2d',hai:'#7a7261',po:'#6a5a8a',anhe:'#3a7a72',sanhe:'#4a7a4a'};
-    const clsL={he:'合',chong:'冲',xing:'刑',hai:'害',po:'破',anhe:'暗',sanhe:'三合'};
-    let s='';
-    Object.keys(clsC).forEach(k=>{
-      s+=`<marker id="arr-${k}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${clsC[k]}"/></marker>`;
-    });
-    // 画8个字(每柱独立圆)
-    gans.forEach(p=>{
-      const P=pos[p[0]+GAN[p[1]]];
-      if(!P) return;
-      s+=`<g><circle cx="${P.x}" cy="${P.y}" r="25" style="fill:var(--card2);stroke:var(--gold2);stroke-width:1.2"/><text x="${P.x}" y="${P.y-4}" text-anchor="middle" font-size="10" style="fill:var(--ink3)">${p[0]}</text><text x="${P.x}" y="${P.y+13}" text-anchor="middle" font-size="16" font-weight="700" style="fill:var(--ink);font-family:'Noto Serif SC',serif">${GAN[p[1]]}</text></g>`;
-    });
-    zhis.forEach(p=>{
-      const P=pos[p[0]+ZHI[p[1]]];
-      if(!P) return;
-      s+=`<g><circle cx="${P.x}" cy="${P.y}" r="25" style="fill:var(--card2);stroke:var(--gold2);stroke-width:1.2"/><text x="${P.x}" y="${P.y-4}" text-anchor="middle" font-size="10" style="fill:var(--ink3)">${p[0]}</text><text x="${P.x}" y="${P.y+13}" text-anchor="middle" font-size="16" font-weight="700" style="fill:var(--ink);font-family:'Noto Serif SC',serif">${ZHI[p[1]]}</text></g>`;
-    });
-    // 折线分层布线: 天干-天干走上通道(y16起递减), 地支-地支走下通道(y166起递增), 跨排走中间通道(y92±10k)
-    // 垂直段只穿起终点自己的圆(先水平微偏再竖直), 水平段全在空白带, 不压任何字
-    let ganN=0, zhN=0, crossN=0;
-    const drawFold=(A,B,r)=>{
-      const c=clsC[r.cls]||'#7a7261';
-      const dash=r.cls==='chong'?'6,4':r.cls==='xing'||r.cls==='hai'||r.cls==='anhe'?'3,3':r.cls==='po'?'1,4':'';
-      let path,midX,midY,tagY;
-      if(A.y===B.y){
-        if(A.y<80){ // 天干-天干: 上方通道(圆顶y=21, 通道≤16)
-          const n=ganN++;
-          const chY=16-8*n;
-          const off=(n%2?1:-1)*4;
-          path=`M${A.x},${A.y} L${A.x+off},${chY} L${B.x-off},${chY} L${B.x},${B.y}`;
-          midX=(A.x+B.x)/2; midY=chY; tagY=chY-6;
-        }else{ // 地支-地支: 下方通道(圆底y=163, 通道≥166)
-          const n=zhN++;
-          const chY=166+8*n;
-          const off=(n%2?1:-1)*4;
-          path=`M${A.x},${A.y} L${A.x+off},${chY} L${B.x-off},${chY} L${B.x},${B.y}`;
-          midX=(A.x+B.x)/2; midY=chY; tagY=chY-6;
-        }
-      }else{ // 跨排: 中间通道(空白带71~113)
-        const n=(crossN++)%5;
-        const chY=92+((n%2?1:-1)*Math.ceil(n/2)*10); // 92,102,82,112,72
-        const off=(n%2?1:-1)*3;
-        path=`M${A.x},${A.y} L${A.x+off},${chY} L${B.x-off},${chY} L${B.x},${B.y}`;
-        midX=(A.x+B.x)/2; midY=chY; tagY=chY-6;
-      }
-      s+=`<path d="${path}" fill="none" stroke="${c}" stroke-width="1.4" stroke-dasharray="${dash}" opacity=".85" marker-end="url(#arr-${r.cls})"/>`;
-      s+=`<text x="${midX.toFixed(1)}" y="${tagY.toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="700" style="fill:${c}">${clsL[r.cls]||''}</text>`;
-    };
-    rels.forEach(r=>{
-      const fc=[...String(r.from)].filter(c=>GAN.includes(c)||ZHI.includes(c));
-      const tc=[...String(r.to)].filter(c=>GAN.includes(c)||ZHI.includes(c));
-      if(r.to&&tc.length){
-        // 二元: from/to 可能是"柱+字"(如 年甲/日己) → 优先直接定位; 否则按字反查
-        const fpts=fc.map(c=>{
-          const m=String(r.from).match(new RegExp('[年月日时]'+c));
-          return m?pos[m[0]]:(findChar(c));
-        }).filter(Boolean);
-        const tpts=tc.map(c=>{
-          const m=String(r.to).match(new RegExp('[年月日时]'+c));
-          return m?pos[m[0]]:(findChar(c));
-        }).filter(Boolean);
-        fpts.forEach(fp=>tpts.forEach(tp=>{
-          if(!fp||!tp||(fp===tp)) return;
-          drawFold(fp,tp,r);
-        }));
-      }else if(fc.length>=2){
-        // 三合/三刑/自刑: 折线环 + 中心标签; 自刑同字(重复) → 按坐标去重后画自环
-        const c=clsC[r.cls]||'#7a7261';
-        const rawPts=fc.map(findChar).filter(Boolean);
-        const pts=rawPts.filter((p,i)=>rawPts.findIndex(q=>q.x===p.x&&q.y===p.y)===i);
-        if(pts.length>=2){
-          for(let i=0;i<pts.length;i++){
-            const A=pts[i],B=pts[(i+1)%pts.length];
-            const dash='4,3';
-            if(A.y===B.y){ // 同排: 折线走通道
-              const n=zhN++;
-              const chY=166+8*n;
-              const off=(n%2?1:-1)*4;
-              s+=`<path d="M${A.x},${A.y} L${A.x+off},${chY} L${B.x-off},${chY} L${B.x},${B.y}" fill="none" stroke="${c}" stroke-width="1.3" stroke-dasharray="${dash}" opacity=".75"/>`;
-            }else{
-              const n=(crossN++)%5;
-              const chY=92+((n%2?1:-1)*Math.ceil(n/2)*10);
-              const off=(n%2?1:-1)*3;
-              s+=`<path d="M${A.x},${A.y} L${A.x+off},${chY} L${B.x-off},${chY} L${B.x},${B.y}" fill="none" stroke="${c}" stroke-width="1.3" stroke-dasharray="${dash}" opacity=".75"/>`;
-            }
-          }
-          const cx=pts.reduce((a,p)=>a+p.x,0)/pts.length, cy=pts.reduce((a,p)=>a+p.y,0)/pts.length;
-          s+=`<text x="${cx.toFixed(1)}" y="${(cy-6).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="700" style="fill:${c}">${clsL[r.cls]||''}</text>`;
-        }else if(pts.length===1){
-          // 自刑同字: 小圆弧自环
-          const P=pts[0];
-          s+=`<path d="M${P.x-20},${P.y+16} a20,20 0 1,0 40,0" fill="none" stroke="${c}" stroke-width="1.3" stroke-dasharray="3,3" opacity=".8" marker-end="url(#arr-${r.cls})"/>`;
-          s+=`<text x="${P.x}" y="${P.y+34}" text-anchor="middle" font-size="9" font-weight="700" style="fill:${c}">${clsL[r.cls]||''}</text>`;
-        }
-      }
-    });
-    // 图例
-    s+=`<g font-size="8.8">`;
-    let lx=30;
-    Object.keys(clsL).forEach(k=>{
-      s+=`<line x1="${lx}" y1="200" x2="${lx+16}" y2="200" stroke="${clsC[k]}" stroke-width="2"/><text x="${lx+20}" y="203" style="fill:${clsC[k]}">${clsL[k]}</text>`;
-      lx+=52;
-    });
-    s+=`</g>`;
-    return `<svg viewBox="0 0 530 212" style="width:100%;max-width:530px;display:block;margin:4px auto 8px">${s}</svg>`;
-  }catch(e){return '';}
-}
 // 五行流通环形图(圆大小=命局数量, 金色实线=相生, 红色虚线=相克)
 function wxFlowSvg(zh){
   try{
@@ -3756,18 +3631,8 @@ function renderZongHe(zh,name){
   });
   html+=`<div style="display:flex;align-items:center;gap:10px;margin:5px 0;padding:6px 10px;background:rgba(107,100,87,.06);border-radius:8px;border-left:3px solid var(--ink2)"><span style="width:36px;font-size:.8rem;font-weight:700;color:var(--ink2)">${tterm('闲神')}</span><span style="font-size:.9rem;font-weight:700;color:var(--ink2)">${ls.xian.map(w=>WUXING[w]).join('、')||'—'}</span><span style="font-size:.72rem;color:var(--ink3)">${ls.xian.map(w=>ls.count(w)+'位').join(' ')}</span><span style="font-size:.72rem;color:var(--ink2);flex:1">${ls.roles.xian} · 大运流年来才见真章</span></div>`;
   html+=`</div></div>`;
-  // 干支合冲刑害图示
-  const gzMap=zhGanZhiMap(d);
-  if(gzMap.length){
-    const clsMap={he:'var(--gold)',chong:'var(--red)',sanhe:'var(--jade)',xing:'#c87a2d',hai:'var(--purple)',po:'#b04a6a',anhe:'#8a5aa8'};
-    const labelMap={he:'合',chong:'冲',sanhe:'三合',xing:'刑',hai:'害',po:'破',anhe:'暗合'};
-    const termMap={he:'六合',chong:'六冲',sanhe:'三合',xing:'三刑',hai:'六害',po:'地支相破',anhe:'地支暗合'};
-    html+=`<div style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:10px"><div style="font-size:.8rem;color:var(--ink2);letter-spacing:.15em;margin-bottom:6px">干支互动（合·冲·刑·害·破·暗合）</div>${typeof gzRelSvg==='function'?gzRelSvg(d):''}<div style="display:flex;flex-wrap:wrap;gap:8px">`;
-    gzMap.forEach(r=>{
-      html+=`<span style="display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid ${clsMap[r.cls]};color:${clsMap[r.cls]};padding:5px 11px;border-radius:14px;font-size:.76rem"><b>${tterm(termMap[r.cls]||labelMap[r.cls])}</b> ${r.name} <span style="color:var(--ink3)">${r.from}${r.to?'·'+r.to:''}</span></span>`;
-    });
-    html+=`</div></div>`;
-  }
+  // Presentation-only relation explorer; calculation results remain in zhGanZhiMap.
+  html+=renderGanZhiRelations(d);
   // v3 命格总断卡 + 五维能量雷达(先总后分: 四柱既定先观命骨, 再展十神能量结构)
   html+=zhMingGeCard(d);
   html+=zhBirthPlace(d);
@@ -3915,6 +3780,7 @@ function renderZongHe(zh,name){
   html+=`</div>`;
   document.getElementById('zh-result').innerHTML=html;
   aiEvidenceMount();
+  mountGanZhiRelations(document.getElementById('zh-result'));
   // 时间轴详情条: 初始显示当前年
   try{ if(typeof tlSelect==='function'&&window._tlData) tlSelect(new Date().getFullYear()); }catch(e){}
 }

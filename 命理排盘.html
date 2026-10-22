@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="application-version" content="5.21.0">
+<meta name="application-version" content="5.22.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="description" content="玄机命理排盘：八字四柱、紫微斗数、奇门遁甲、六爻卜筮在线排盘工具，支持 AI 深度解读与多流派分析。">
 <meta name="keywords" content="八字排盘,紫微斗数,奇门遁甲,六爻,合婚,真太阳时,命理排盘,AI命理解读">
@@ -282,6 +282,22 @@ header .sub{font-size:.78rem;color:var(--ink3);margin-top:6px;letter-spacing:.2e
 /* 6) 滚动容器布局稳定（防重绘） */
 .sec-nav{contain:layout paint}
 /* Original study-workbench design; no third-party styles or assets copied. */
+.gz-explorer{--gz-he:#8c652c;--gz-chong:#a24337;--gz-sanhe:#34664d;--gz-xing:#9a5b29;--gz-hai:#626986;--gz-po:#9b4f72;--gz-anhe:#287c7a;container-type:inline-size;border:1px solid var(--line);border-radius:8px;padding:24px;margin-top:24px;background:var(--card2);min-width:0}
+.gz-explorer [hidden]{display:none!important}
+.gz-heading{padding:0 0 16px;margin-bottom:0;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px}.gz-eyebrow{font-size:9px;letter-spacing:1.7px;color:var(--ink3)}.gz-heading h3{font:600 23px "Songti SC","SimSun",serif;letter-spacing:2px;margin:6px 0 0;color:var(--ink)}.gz-heading small{font:11px "Microsoft YaHei",sans-serif;letter-spacing:0;color:var(--ink3);margin-left:7px}
+.gz-explorer button{font-family:inherit;cursor:pointer;box-shadow:none;transform:none}.gz-reset{font-size:11px;color:var(--ink2);background:transparent;border:0;border-bottom:1px solid var(--line);padding:6px 0;white-space:nowrap;min-height:36px}.gz-intro{font-size:11px;color:var(--ink2);line-height:1.9;margin:14px 0}
+.gz-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px}.gz-type{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);border-radius:5px;background:var(--card);color:var(--ink2);padding:6px 10px;min-height:36px;font-size:11px}.gz-type span{font-size:10px;opacity:.65}.gz-type i{display:block;width:6px;height:6px;border-radius:50%;background:var(--relation-color)}.gz-type[aria-pressed=true]{background:var(--jade);color:var(--card);border-color:var(--jade)}.gz-type[aria-pressed=true] i{background:currentColor}
+.gz-type-he{--relation-color:var(--gz-he)}.gz-type-chong{--relation-color:var(--gz-chong)}.gz-type-sanhe{--relation-color:var(--gz-sanhe)}.gz-type-xing{--relation-color:var(--gz-xing)}.gz-type-hai{--relation-color:var(--gz-hai)}.gz-type-po{--relation-color:var(--gz-po)}.gz-type-anhe{--relation-color:var(--gz-anhe)}
+.gz-lane+.gz-lane{margin-top:24px}.gz-lane-heading,.gz-relation{display:grid;grid-template-columns:155px minmax(0,1fr);align-items:center;gap:12px}.gz-lane-heading{padding:0 12px 10px}.gz-lane-heading h4{font-size:13px;letter-spacing:3px;color:var(--ink);margin:0 0 2px}.gz-lane-heading [data-gz-lane-count]{font-size:10px;color:var(--ink3)}.gz-pillars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+.gz-pillar{display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid transparent;border-radius:5px;background:transparent;padding:5px 0;color:var(--ink);transition:background .15s,border-color .15s}.gz-pillar span{font-size:10px;color:var(--ink3)}.gz-pillar b{font:500 24px "Songti SC","SimSun",serif}.gz-pillar.is-related{background:var(--card);border-color:var(--line)}.gz-pillar[aria-pressed=true]{border-color:var(--jade);background:var(--card)}.gz-pillar[aria-pressed=true] span{color:var(--jade)}
+.gz-lane-rows{display:grid;gap:6px}.gz-relation{width:100%;padding:2px 12px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:6px;color:var(--relation-color);transition:border-color .15s,background .15s}.gz-relation.is-related,.gz-relation[aria-pressed=true]{border-color:var(--relation-color);background:color-mix(in srgb,var(--relation-color) 5%,var(--card))}.gz-relation[aria-pressed=true]{box-shadow:inset 3px 0 var(--relation-color)}.gz-relation-caption{display:flex;flex-direction:column;gap:2px;min-width:0;padding:8px 0}.gz-relation-kind{font-size:10px;letter-spacing:.5px;color:var(--relation-color)}.gz-relation-caption strong{font-size:12px;font-weight:500;color:var(--ink);overflow-wrap:anywhere;line-height:1.7}
+.gz-rail{display:block;width:100%;height:auto;overflow:visible;color:var(--relation-color)}.gz-rail-guide{stroke:var(--line);stroke-width:1;stroke-dasharray:2 5}.gz-rail-link{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.gz-type-chong .gz-rail-link{stroke-dasharray:7 5}.gz-type-xing .gz-rail-link{stroke-dasharray:3 4}.gz-type-hai .gz-rail-link{stroke-dasharray:2 6}.gz-type-po .gz-rail-link{stroke-dasharray:9 4 2 4}.gz-type-anhe .gz-rail-link{stroke-dasharray:2 4}.gz-rail-node{fill:var(--card);stroke:currentColor;stroke-width:1.3}.gz-rail text{fill:currentColor;font:500 22px "Songti SC","SimSun",serif}.gz-relation.is-related .gz-rail-link{stroke-width:2.8}
+.gz-lane-empty{border:1px dashed var(--line);border-radius:5px;text-align:center;padding:20px 10px;font-size:12px;color:var(--ink3)}.gz-status{font-size:11px;color:var(--ink2);line-height:1.8;min-height:36px;margin:18px 0 0;border-top:1px solid var(--line);padding-top:12px;overflow-wrap:anywhere}.gz-footnote{font-size:10px;color:var(--ink3);margin:2px 0 0;line-height:1.8}.gz-explorer button:focus-visible{outline:2px solid var(--jade);outline-offset:3px}
+body[data-theme="xuanmo"] .gz-explorer{--gz-he:#d8b276;--gz-chong:#e79a89;--gz-sanhe:#a3c49a;--gz-xing:#deb184;--gz-hai:#b0b9dc;--gz-po:#dba0ba;--gz-anhe:#85c4bd}
+@container (max-width:500px){.gz-lane-heading,.gz-relation{grid-template-columns:minmax(0,1fr);gap:0}.gz-lane-heading>div:first-child{display:flex;align-items:center;gap:10px;margin-bottom:8px}.gz-relation-caption{flex-direction:row;align-items:baseline;justify-content:space-between;gap:8px;padding:9px 0 0}.gz-relation-kind{flex-shrink:0}.gz-relation-caption strong{font-size:11px;text-align:right}.gz-rail{margin:0 auto 3px}.gz-pillars{margin-top:2px}.gz-lane+.gz-lane{margin-top:20px}.gz-intro{font-size:11px}.gz-type{padding:6px 9px}}
+@media(max-width:760px){.gz-explorer{padding:18px 12px}.gz-heading h3{font-size:21px}}
+@media(prefers-reduced-motion:reduce){.gz-explorer *{transition:none!important}}
+@media print{.gz-explorer{break-inside:auto}.gz-filters,.gz-reset{display:none}.gz-relation{break-inside:avoid}}
 .ai-workflow-controls{font-size:12px;line-height:1.8;margin:12px 0;min-width:0}.ai-workflow-controls select{max-width:100%;padding:7px}.ai-workflow-controls .btn{margin:3px;font-size:11px;white-space:normal}.ai-workflow-controls pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto;font-size:11px}.ai-evidence-result{border-top:1px solid var(--jade);margin-top:10px;padding-top:8px;font-size:12px;line-height:1.8;overflow-wrap:anywhere}.ai-evidence-label{color:var(--jade);font-weight:700}.ai-evidence-result details p{white-space:pre-wrap}.ai-dimension-retry{font-size:10px!important;margin-top:8px!important}#ai-evidence-errors{color:var(--red);overflow-wrap:anywhere}#ai-workflow-status{color:var(--jade)}
 :root{--bg:#f4f2eb;--bg2:#efede5;--card:#fffefa;--card2:#f8f6f0;--line:#e5e2d8;--ink:#24372f;--ink2:#56645b;--ink3:#778078;--gold:#916b35;--gold2:#75552c;--jade:#285a48;--red:#a64635;--nav:#1f3e33;--nav-ink:#edece1;--shadow:0 7px 26px rgba(37,54,43,.035)}
 body{background:var(--bg);font-family:"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.65}
@@ -11740,6 +11756,83 @@ function showRecordManager(){
   document.body.appendChild(overlay);render();find('search').focus();
 }
 
+/* Source: src/ui/gan-zhi-relations.js */
+/** Presentation only: preserve zhGanZhiMap's rule results and resolve every participant by pillar. */
+const GZ_RELATION_TYPES={he:'合',chong:'冲',sanhe:'三合',xing:'刑',hai:'害',po:'破',anhe:'暗合'};
+function gzRelationModel(zh,relations=zhGanZhiMap(zh)){
+  const pillars=['年','月','日','时'],values=[zh.yearGZ,zh.monthGZ,zh.dayGZ,zh.hourGZ];
+  const nodes=['gan','zhi'].flatMap((lane)=>values.map((value,column)=>({
+    id:lane+'-'+column,lane,column,pillar:pillars[column],char:(lane==='gan'?GAN:ZHI)[value[lane==='gan'?0:1]]
+  })));
+  const rows=relations.map((relation,index)=>{
+    const lane=relation.t.startsWith('天干')?'gan':'zhi',candidates=nodes.filter(n=>n.lane===lane);
+    const explicit=[...(relation.from+'·'+relation.to).matchAll(/([年月日时])([甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥])/g)];
+    // Group rules have no pillar names; include all occurrences, not just the first matching character.
+    const members=candidates.filter(n=>explicit.length?explicit.some(m=>m[1]===n.pillar&&m[2]===n.char):(relation.from+relation.to).includes(n.char));
+    return {...relation,id:String(index),lane,members};
+  });
+  return {nodes,rows};
+}
+function gzRelEscape(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function gzRelationRail(row){
+  const xs=[49.5,148.5,247.5,346.5],members=row.members;
+  let svg=xs.map(x=>`<line class="gz-rail-guide" x1="${x}" x2="${x}" y1="2" y2="58"/>`).join('');
+  for(let i=1;i<members.length;i++){
+    const a=xs[members[i-1].column]+19,b=xs[members[i].column]-19;
+    svg+=`<path class="gz-rail-link" d="M ${a} 30 C ${a+22} 13, ${b-22} 13, ${b} 30"/>`;
+  }
+  svg+=members.map(n=>`<g data-gz-endpoint="${n.id}"><rect class="gz-rail-node" x="${xs[n.column]-18}" y="12" width="36" height="36" rx="10"/><text x="${xs[n.column]}" y="36" text-anchor="middle">${gzRelEscape(n.char)}</text></g>`).join('');
+  return `<svg class="gz-rail" viewBox="0 0 396 60" aria-hidden="true" focusable="false">${svg}</svg>`;
+}
+function renderGanZhiRelations(zh){
+  const {nodes,rows}=gzRelationModel(zh),escape=gzRelEscape;
+  const filters=Object.entries(GZ_RELATION_TYPES).filter(([type])=>rows.some(r=>r.cls===type)).map(([type,label])=>
+    `<button type="button" class="gz-type gz-type-${type}" data-gz-type="${type}" aria-pressed="false"><i aria-hidden="true"></i>${label}<span>${rows.filter(r=>r.cls===type).length}</span></button>`).join('');
+  const lanes=['gan','zhi'].map(lane=>{
+    const laneName=lane==='gan'?'天干':'地支',laneRows=rows.filter(r=>r.lane===lane);
+    const heading=nodes.filter(n=>n.lane===lane).map(n=>`<button type="button" class="gz-pillar" data-gz-node="${n.id}" aria-pressed="false" aria-label="筛选${n.pillar}${laneName==='天干'?'干':'支'}${n.char}参与的关系"><span>${n.pillar}柱</span><b>${n.char}</b></button>`).join('');
+    const items=laneRows.map(row=>{
+      const description=row.t+' · '+row.name+' · '+row.members.map(n=>n.pillar+(lane==='gan'?'干':'支')+n.char).join('、');
+      return `<button type="button" class="gz-relation gz-type-${row.cls}" data-gz-relation="${row.id}" data-gz-kind="${row.cls}" data-gz-members="${row.members.map(n=>n.id).join(',')}" data-gz-description="${escape(description)}" aria-label="${escape(description)}" aria-pressed="false"><span class="gz-relation-caption"><span class="gz-relation-kind">${escape(row.t)}</span><strong>${escape(row.name)}</strong></span>${gzRelationRail(row)}</button>`;
+    }).join('');
+    return `<section class="gz-lane" data-gz-lane="${lane}" aria-label="${laneName}关系"><div class="gz-lane-heading"><div><h4>${laneName}</h4><span data-gz-lane-count>${laneRows.length}组关系</span></div><div class="gz-pillars">${heading}</div></div><div class="gz-lane-rows">${items}</div><p class="gz-lane-empty"${laneRows.length?' hidden':''}>${laneRows.length?'当前筛选下无关系':'本盘未检出'+laneName+'关系'}</p></section>`;
+  }).join('');
+  return `<section class="gz-explorer" aria-label="干支互动"><header class="gz-heading"><div><span class="gz-eyebrow">四柱关系 / CONNECTIONS</span><h3>干支互动 <small>${rows.length}组</small></h3></div><button type="button" class="gz-reset" data-gz-reset>重置筛选</button></header><p class="gz-intro">每行一组关系，连线对齐年、月、日、时。点击干支可筛选，点击关系可高亮。</p><div class="gz-filters" role="group" aria-label="按关系类型筛选"><button type="button" class="gz-type" data-gz-type="all" aria-pressed="true">全部<span>${rows.length}</span></button>${filters}</div><div class="gz-lanes">${lanes}</div><p class="gz-status" role="status" aria-live="polite" data-gz-status>显示全部${rows.length}组关系</p><p class="gz-footnote">三合、相刑按同组连接；重复的字保留各自柱位。<button type="button" class="gz-reset" data-gz-glossary>查阅关系术语</button></p></section>`;
+}
+function mountGanZhiRelations(holder){
+  holder.querySelectorAll('.gz-explorer').forEach(root=>{
+    if(root.dataset.gzMounted)return;root.dataset.gzMounted='true';
+    const rows=[...root.querySelectorAll('[data-gz-relation]')],nodes=[...root.querySelectorAll('[data-gz-node]')],types=[...root.querySelectorAll('[data-gz-type]')],status=root.querySelector('[data-gz-status]');
+    let type='all',node='',selected=null;
+    const members=row=>(row?.dataset.gzMembers||'').split(',');
+    const highlight=row=>{
+      nodes.forEach(n=>n.classList.toggle('is-related',members(row).includes(n.dataset.gzNode)));
+      rows.forEach(r=>r.classList.toggle('is-related',r===row));
+      status.textContent=row?row.dataset.gzDescription:`显示${rows.filter(r=>!r.hidden).length} / ${rows.length}组关系`;
+    };
+    const update=()=>{
+      types.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.gzType===type)));
+      nodes.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.gzNode===node)));
+      rows.forEach(r=>{r.hidden=(type!=='all'&&r.dataset.gzKind!==type)||(!!node&&!members(r).includes(node));});
+      if(selected?.hidden){selected.setAttribute('aria-pressed','false');selected=null;}
+      root.querySelectorAll('[data-gz-lane]').forEach(lane=>{
+        const visible=[...lane.querySelectorAll('[data-gz-relation]')].filter(r=>!r.hidden).length;
+        lane.querySelector('[data-gz-lane-count]').textContent=visible+'组关系';lane.querySelector('.gz-lane-empty').hidden=visible>0;
+      });highlight(selected);
+    };
+    types.forEach(b=>b.addEventListener('click',()=>{type=b.dataset.gzType;update();}));
+    nodes.forEach(b=>b.addEventListener('click',()=>{node=node===b.dataset.gzNode?'':b.dataset.gzNode;update();}));
+    rows.forEach(row=>{
+      row.addEventListener('click',()=>{selected=selected===row?null:row;rows.forEach(r=>r.setAttribute('aria-pressed',String(r===selected)));highlight(selected);});
+      row.addEventListener('mouseenter',()=>highlight(selected||row));row.addEventListener('mouseleave',()=>highlight(selected||(rows.includes(document.activeElement)?document.activeElement:null)));
+      row.addEventListener('focus',()=>highlight(selected||row));row.addEventListener('blur',()=>highlight(selected));
+    });
+    root.querySelector('[data-gz-reset]').addEventListener('click',()=>{type='all';node='';selected=null;rows.forEach(r=>r.setAttribute('aria-pressed','false'));update();});
+    root.querySelector('[data-gz-glossary]').addEventListener('click',()=>showWorkspaceDialog('knowledge'));
+    root.addEventListener('keydown',event=>{if(event.key==='Escape'){selected=null;rows.forEach(r=>r.setAttribute('aria-pressed','false'));highlight(null);}});
+  });
+}
+
 /* Source: src/ui/app.js */
 /* Modules extracted in 5.18 */
 
@@ -13913,131 +14006,6 @@ function zhGanZhiMap(zh){
   }
   return rels;
 }
-// 干支作用 SVG 关系图(字与字直线箭头: 8字两行排布, 按"柱+字"独立定位(重复字不重叠), 有关系的字间画直线+箭头, 标签单字上下交错防重叠, 明细由图下方卡片列表展示)
-function gzRelSvg(zh){
-  try{
-    const rels=typeof zhGanZhiMap==='function'?zhGanZhiMap(zh):[];
-    if(!rels.length) return '';
-    const cols=['年','月','日','时'], xs=[85,205,325,445], yGan=46, yZhi=138;
-    const pos={};
-    const gans=[['年',zh.yearGZ[0]],['月',zh.monthGZ[0]],['日',zh.dayGZ[0]],['时',zh.hourGZ[0]]];
-    const zhis=[['年',zh.yearGZ[1]],['月',zh.monthGZ[1]],['日',zh.dayGZ[1]],['时',zh.hourGZ[1]]];
-    // 按"柱+字"定位: 四柱出现重复字(如两个甲)时各自独立坐标, 不会覆盖少字
-    gans.forEach((p,i)=>{ pos[p[0]+GAN[p[1]]]={x:xs[i],y:yGan}; });
-    zhis.forEach((p,i)=>{ pos[p[0]+ZHI[p[1]]]={x:xs[i],y:yZhi}; });
-    // 按字反查首个位置(用于三合/三刑/自刑等无柱名的多字关系)
-    const findChar=(ch)=>{
-      for(const p of gans){ if(GAN[p[1]]===ch) return {x:xs[cols.indexOf(p[0])],y:yGan}; }
-      for(const p of zhis){ if(ZHI[p[1]]===ch) return {x:xs[cols.indexOf(p[0])],y:yZhi}; }
-      return null;
-    };
-    const clsC={he:'#b08a3e',chong:'#9e2b25',xing:'#c87a2d',hai:'#7a7261',po:'#6a5a8a',anhe:'#3a7a72',sanhe:'#4a7a4a'};
-    const clsL={he:'合',chong:'冲',xing:'刑',hai:'害',po:'破',anhe:'暗',sanhe:'三合'};
-    let s='';
-    Object.keys(clsC).forEach(k=>{
-      s+=`<marker id="arr-${k}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${clsC[k]}"/></marker>`;
-    });
-    // 画8个字(每柱独立圆)
-    gans.forEach(p=>{
-      const P=pos[p[0]+GAN[p[1]]];
-      if(!P) return;
-      s+=`<g><circle cx="${P.x}" cy="${P.y}" r="25" style="fill:var(--card2);stroke:var(--gold2);stroke-width:1.2"/><text x="${P.x}" y="${P.y-4}" text-anchor="middle" font-size="10" style="fill:var(--ink3)">${p[0]}</text><text x="${P.x}" y="${P.y+13}" text-anchor="middle" font-size="16" font-weight="700" style="fill:var(--ink);font-family:'Noto Serif SC',serif">${GAN[p[1]]}</text></g>`;
-    });
-    zhis.forEach(p=>{
-      const P=pos[p[0]+ZHI[p[1]]];
-      if(!P) return;
-      s+=`<g><circle cx="${P.x}" cy="${P.y}" r="25" style="fill:var(--card2);stroke:var(--gold2);stroke-width:1.2"/><text x="${P.x}" y="${P.y-4}" text-anchor="middle" font-size="10" style="fill:var(--ink3)">${p[0]}</text><text x="${P.x}" y="${P.y+13}" text-anchor="middle" font-size="16" font-weight="700" style="fill:var(--ink);font-family:'Noto Serif SC',serif">${ZHI[p[1]]}</text></g>`;
-    });
-    // 折线分层布线: 天干-天干走上通道(y16起递减), 地支-地支走下通道(y166起递增), 跨排走中间通道(y92±10k)
-    // 垂直段只穿起终点自己的圆(先水平微偏再竖直), 水平段全在空白带, 不压任何字
-    let ganN=0, zhN=0, crossN=0;
-    const drawFold=(A,B,r)=>{
-      const c=clsC[r.cls]||'#7a7261';
-      const dash=r.cls==='chong'?'6,4':r.cls==='xing'||r.cls==='hai'||r.cls==='anhe'?'3,3':r.cls==='po'?'1,4':'';
-      let path,midX,midY,tagY;
-      if(A.y===B.y){
-        if(A.y<80){ // 天干-天干: 上方通道(圆顶y=21, 通道≤16)
-          const n=ganN++;
-          const chY=16-8*n;
-          const off=(n%2?1:-1)*4;
-          path=`M${A.x},${A.y} L${A.x+off},${chY} L${B.x-off},${chY} L${B.x},${B.y}`;
-          midX=(A.x+B.x)/2; midY=chY; tagY=chY-6;
-        }else{ // 地支-地支: 下方通道(圆底y=163, 通道≥166)
-          const n=zhN++;
-          const chY=166+8*n;
-          const off=(n%2?1:-1)*4;
-          path=`M${A.x},${A.y} L${A.x+off},${chY} L${B.x-off},${chY} L${B.x},${B.y}`;
-          midX=(A.x+B.x)/2; midY=chY; tagY=chY-6;
-        }
-      }else{ // 跨排: 中间通道(空白带71~113)
-        const n=(crossN++)%5;
-        const chY=92+((n%2?1:-1)*Math.ceil(n/2)*10); // 92,102,82,112,72
-        const off=(n%2?1:-1)*3;
-        path=`M${A.x},${A.y} L${A.x+off},${chY} L${B.x-off},${chY} L${B.x},${B.y}`;
-        midX=(A.x+B.x)/2; midY=chY; tagY=chY-6;
-      }
-      s+=`<path d="${path}" fill="none" stroke="${c}" stroke-width="1.4" stroke-dasharray="${dash}" opacity=".85" marker-end="url(#arr-${r.cls})"/>`;
-      s+=`<text x="${midX.toFixed(1)}" y="${tagY.toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="700" style="fill:${c}">${clsL[r.cls]||''}</text>`;
-    };
-    rels.forEach(r=>{
-      const fc=[...String(r.from)].filter(c=>GAN.includes(c)||ZHI.includes(c));
-      const tc=[...String(r.to)].filter(c=>GAN.includes(c)||ZHI.includes(c));
-      if(r.to&&tc.length){
-        // 二元: from/to 可能是"柱+字"(如 年甲/日己) → 优先直接定位; 否则按字反查
-        const fpts=fc.map(c=>{
-          const m=String(r.from).match(new RegExp('[年月日时]'+c));
-          return m?pos[m[0]]:(findChar(c));
-        }).filter(Boolean);
-        const tpts=tc.map(c=>{
-          const m=String(r.to).match(new RegExp('[年月日时]'+c));
-          return m?pos[m[0]]:(findChar(c));
-        }).filter(Boolean);
-        fpts.forEach(fp=>tpts.forEach(tp=>{
-          if(!fp||!tp||(fp===tp)) return;
-          drawFold(fp,tp,r);
-        }));
-      }else if(fc.length>=2){
-        // 三合/三刑/自刑: 折线环 + 中心标签; 自刑同字(重复) → 按坐标去重后画自环
-        const c=clsC[r.cls]||'#7a7261';
-        const rawPts=fc.map(findChar).filter(Boolean);
-        const pts=rawPts.filter((p,i)=>rawPts.findIndex(q=>q.x===p.x&&q.y===p.y)===i);
-        if(pts.length>=2){
-          for(let i=0;i<pts.length;i++){
-            const A=pts[i],B=pts[(i+1)%pts.length];
-            const dash='4,3';
-            if(A.y===B.y){ // 同排: 折线走通道
-              const n=zhN++;
-              const chY=166+8*n;
-              const off=(n%2?1:-1)*4;
-              s+=`<path d="M${A.x},${A.y} L${A.x+off},${chY} L${B.x-off},${chY} L${B.x},${B.y}" fill="none" stroke="${c}" stroke-width="1.3" stroke-dasharray="${dash}" opacity=".75"/>`;
-            }else{
-              const n=(crossN++)%5;
-              const chY=92+((n%2?1:-1)*Math.ceil(n/2)*10);
-              const off=(n%2?1:-1)*3;
-              s+=`<path d="M${A.x},${A.y} L${A.x+off},${chY} L${B.x-off},${chY} L${B.x},${B.y}" fill="none" stroke="${c}" stroke-width="1.3" stroke-dasharray="${dash}" opacity=".75"/>`;
-            }
-          }
-          const cx=pts.reduce((a,p)=>a+p.x,0)/pts.length, cy=pts.reduce((a,p)=>a+p.y,0)/pts.length;
-          s+=`<text x="${cx.toFixed(1)}" y="${(cy-6).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="700" style="fill:${c}">${clsL[r.cls]||''}</text>`;
-        }else if(pts.length===1){
-          // 自刑同字: 小圆弧自环
-          const P=pts[0];
-          s+=`<path d="M${P.x-20},${P.y+16} a20,20 0 1,0 40,0" fill="none" stroke="${c}" stroke-width="1.3" stroke-dasharray="3,3" opacity=".8" marker-end="url(#arr-${r.cls})"/>`;
-          s+=`<text x="${P.x}" y="${P.y+34}" text-anchor="middle" font-size="9" font-weight="700" style="fill:${c}">${clsL[r.cls]||''}</text>`;
-        }
-      }
-    });
-    // 图例
-    s+=`<g font-size="8.8">`;
-    let lx=30;
-    Object.keys(clsL).forEach(k=>{
-      s+=`<line x1="${lx}" y1="200" x2="${lx+16}" y2="200" stroke="${clsC[k]}" stroke-width="2"/><text x="${lx+20}" y="203" style="fill:${clsC[k]}">${clsL[k]}</text>`;
-      lx+=52;
-    });
-    s+=`</g>`;
-    return `<svg viewBox="0 0 530 212" style="width:100%;max-width:530px;display:block;margin:4px auto 8px">${s}</svg>`;
-  }catch(e){return '';}
-}
 // 五行流通环形图(圆大小=命局数量, 金色实线=相生, 红色虚线=相克)
 function wxFlowSvg(zh){
   try{
@@ -15499,18 +15467,8 @@ function renderZongHe(zh,name){
   });
   html+=`<div style="display:flex;align-items:center;gap:10px;margin:5px 0;padding:6px 10px;background:rgba(107,100,87,.06);border-radius:8px;border-left:3px solid var(--ink2)"><span style="width:36px;font-size:.8rem;font-weight:700;color:var(--ink2)">${tterm('闲神')}</span><span style="font-size:.9rem;font-weight:700;color:var(--ink2)">${ls.xian.map(w=>WUXING[w]).join('、')||'—'}</span><span style="font-size:.72rem;color:var(--ink3)">${ls.xian.map(w=>ls.count(w)+'位').join(' ')}</span><span style="font-size:.72rem;color:var(--ink2);flex:1">${ls.roles.xian} · 大运流年来才见真章</span></div>`;
   html+=`</div></div>`;
-  // 干支合冲刑害图示
-  const gzMap=zhGanZhiMap(d);
-  if(gzMap.length){
-    const clsMap={he:'var(--gold)',chong:'var(--red)',sanhe:'var(--jade)',xing:'#c87a2d',hai:'var(--purple)',po:'#b04a6a',anhe:'#8a5aa8'};
-    const labelMap={he:'合',chong:'冲',sanhe:'三合',xing:'刑',hai:'害',po:'破',anhe:'暗合'};
-    const termMap={he:'六合',chong:'六冲',sanhe:'三合',xing:'三刑',hai:'六害',po:'地支相破',anhe:'地支暗合'};
-    html+=`<div style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:10px"><div style="font-size:.8rem;color:var(--ink2);letter-spacing:.15em;margin-bottom:6px">干支互动（合·冲·刑·害·破·暗合）</div>${typeof gzRelSvg==='function'?gzRelSvg(d):''}<div style="display:flex;flex-wrap:wrap;gap:8px">`;
-    gzMap.forEach(r=>{
-      html+=`<span style="display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid ${clsMap[r.cls]};color:${clsMap[r.cls]};padding:5px 11px;border-radius:14px;font-size:.76rem"><b>${tterm(termMap[r.cls]||labelMap[r.cls])}</b> ${r.name} <span style="color:var(--ink3)">${r.from}${r.to?'·'+r.to:''}</span></span>`;
-    });
-    html+=`</div></div>`;
-  }
+  // Presentation-only relation explorer; calculation results remain in zhGanZhiMap.
+  html+=renderGanZhiRelations(d);
   // v3 命格总断卡 + 五维能量雷达(先总后分: 四柱既定先观命骨, 再展十神能量结构)
   html+=zhMingGeCard(d);
   html+=zhBirthPlace(d);
@@ -15658,6 +15616,7 @@ function renderZongHe(zh,name){
   html+=`</div>`;
   document.getElementById('zh-result').innerHTML=html;
   aiEvidenceMount();
+  mountGanZhiRelations(document.getElementById('zh-result'));
   // 时间轴详情条: 初始显示当前年
   try{ if(typeof tlSelect==='function'&&window._tlData) tlSelect(new Date().getFullYear()); }catch(e){}
 }

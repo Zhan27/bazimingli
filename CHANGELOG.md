@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.22.0 — 2026-10-22
+- Replaced the clipped, overlapping Gan-Zhi diagram with separate stem/branch sections and one smooth connection rail per relation. Labels, guide columns and solid/dashed styles keep dense relationships readable without arrows over characters or a crowded legend.
+- Added relationship-type and individual-pillar filters, pinned/keyboard highlights, reset, accessible descriptions and the offline glossary. Responsive rails fit mobile screens and all three themes.
+- Fixed presentation endpoint resolution for repeated branches: self-punishment connects each named pillar, while three-member groups include every matching occurrence without drawing duplicate closed loops.
+- Kept relationship calculation results and calculation rule version5.20.0 unchanged. Added endpoint/filter regressions and desktop/mobile/dark/repeated-branch screenshots using synthetic fixtures.
+
 ## 5.21.0 — 2026-10-22
 - Added a unified five-category record manager with search, module filters, deterministic sorting, bounded notes, reload, selected export and batch deletion/clear. Recalculation preserves notes; category+ID identity prevents cross-module collisions.
 - Added v6-selection merge backups so selected exports preserve unselected records on import. Earlier versions reject this format; full v4/v5 backup behavior remains compatible. Multi-category failures attempt rollback and disclose rollback failures.
