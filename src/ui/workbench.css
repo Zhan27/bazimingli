@@ -63,3 +63,5 @@ body[data-theme="xuanmo"] .btn-primary{background:#a9c1a0;color:#17291c;border-c
 .advanced-grid input[type=checkbox]{min-height:0;width:auto}
 #panel-zonghe .entry-column .form-card{overflow:hidden}
 @media(max-width:760px){.workspace-heading p{font-size:11px}.workspace-flow{padding-bottom:18px}.field label{font-size:11px}}
+
+.workspace-dialog-card.records-manager-card{width:min(940px,94vw)}.record-manager-filters,.record-manager-actions,.record-manager-row-heading{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.record-manager-filters>*{flex:1;min-width:140px;padding:8px}.record-manager-row{padding:12px 0;border-top:1px solid var(--line);overflow-wrap:anywhere}.record-manager-row-heading{justify-content:space-between}.record-manager-row textarea{width:100%;padding:8px;box-sizing:border-box;background:var(--bg2);color:var(--ink);border:1px solid var(--line)}.record-manager-actions{margin:12px 0}.records-manager-card button{font-size:11px}.records-manager-card input[type=checkbox]{margin-right:6px}

@@ -1128,9 +1128,9 @@ function saveRecord(zh,name){
   const lunarText=zh.lunar.year+'年'+(zh.lunar.isLeap?'闰':'')+lunarMonthName(zh.lunar.month,zh.lunar.isLeap)+lunarDayName(zh.lunar.day);
   const dateStr=fmtLocalDate(zh.inputDate||zh.date);
   // 相同姓名+日期+时辰则更新
-  const idx=recs.findIndex(r=>r.name===name&&r.dateStr===dateStr&&r.hourIdx===hourIndexAt(zh.inputDate||zh.date)&&r.time===(zh.time||'')&&r.dayBoundary===(zh.temporal?.dayBoundary||'zi-chu'));
+  const idx=recs.findIndex(r=>r.name===name&&r.dateStr===dateStr&&r.hourIdx===hourIndexAt(zh.inputDate||zh.date)&&(r.time||'')===(zh.time||'')&&(r.dayBoundary||'zi-chu')===(zh.temporal?.dayBoundary||'zi-chu'));
   const rec={id:idx>=0?recs[idx].id:(Date.now()+''+Math.floor(Math.random()*1000)),name,gender:zh.gender,dateStr,hourIdx:hourIndexAt(zh.inputDate||zh.date),bazi,lunarText,ts:Date.now(),time:zh.time||'',minute:zh.minute||0,place:zh.place||'',trueSun:!!zh.trueSun,unknowHour:!!zh.unknowHour,genderUnspecified:!!zh.genderUnspecified,dayBoundary:zh.temporal?.dayBoundary||'zi-chu',school2:lastSchool,utcOffsetMinutes:zh.temporal.utcOffsetMinutes,dstMinutes:zh.temporal.dstMinutes,wxMode:zh.wxStatistics.mode};
-  if(idx>=0) recs[idx]=rec; else recs.unshift(rec);
+  if(idx>=0){if(recs[idx].note!==undefined)rec.note=recs[idx].note;recs[idx]=rec;}else recs.unshift(rec);
   if(recs.length>50) recs=recs.slice(0,50);
   try{ localStorage.setItem(REC_KEY,JSON.stringify(recs)); }catch(e){}
   renderRecords();
@@ -1200,7 +1200,7 @@ function saveModRecord(mod,rec){
   const key=mod+'|'+rec.dateStr+'|'+rec.hourIdx;
   const idx=recs.findIndex(r=>r.key===key);
   const id=idx>=0?recs[idx].id:(Date.now()+''+Math.floor(Math.random()*1000));
-  rec=Object.assign({},rec,{id,key,ts:Date.now()});
+  rec=Object.assign({},idx>=0?recs[idx]:{},rec,{id,key,ts:Date.now()});
   if(idx>=0) recs[idx]=rec; else recs.unshift(rec);
   if(recs.length>50) recs=recs.slice(0,50);
   try{ localStorage.setItem(MOD_REC_KEYS[mod],JSON.stringify(recs)); }catch(e){}
@@ -4361,6 +4361,7 @@ function exportRecords(){
   try{
     const data=createRecordBackup();
     const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    if(blob.size>BACKUP_MAX_BYTES)throw new Error('备份超过2MB，请使用统一记录管理分批导出');
     const a=document.createElement('a');
     a.download='命理排盘备份_'+fmtLocalDate(new Date())+'.json';
     a.href=URL.createObjectURL(blob);
@@ -4375,7 +4376,7 @@ function importRecords(input){
   const rd=new FileReader();
   rd.onload=()=>{
     try{
-      const n=restoreRecordBackup(JSON.parse(rd.result));
+      const data=JSON.parse(rd.result),n=restoreRecordBackup(data);
       renderRecords();['zw','bz','qm','ly'].forEach(renderModRecords);
       alert('✅ 备份导入成功（'+n+'类记录），已恢复到当前版本');
     }catch(e){alert('导入失败：'+e.message);}

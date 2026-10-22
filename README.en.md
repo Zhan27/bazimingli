@@ -42,6 +42,8 @@ Choosing an unknown birth time displays candidate intervals and stable/changing 
 
 ## Privacy, records and optional AI
 
+The footer's **统一记录管理** opens one manager for the five existing stores (main Bazi, the Bazi module, Ziwei, Qimen and Liuyao). Search, category filters, sorting and notes are available. Selected backups use `v6-selection` and merge into the corresponding stores, preserving unselected IDs; older versions reject that format. Full v4/v5 backups retain replacement semantics for included categories. AI cards support collapse/copy/single-card JSON export. See [record/backup semantics](docs/RECORDS.md).
+
 Calculations run on your device. Online hosting still receives normal webpage access information. The project has no added analytics or automatic chart upload feature. Names, birth dates, locations and saved records may be personal information; avoid real names when unnecessary.
 
 API keys default to tab-session storage. Browser session restoration can retain session storage. Long-term storage requires explicitly clearing the session-only checkbox; previously explicit persistence choices are preserved. Browser storage is not encrypted. If storage is unavailable, the key stays in the current page's memory. Use **清除 Key** in AI settings when finished.

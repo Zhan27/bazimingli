@@ -1,0 +1,22 @@
+name: 功能建议
+description: 提出学习、排盘或操作体验的改进
+title: "[功能] "
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: 希望完成什么事情？
+      description: 描述使用场景，以及当前哪里不方便。
+    validations:
+      required: true
+  - type: textarea
+    id: experience
+    attributes:
+      label: 希望怎样使用这个功能？
+      description: 可以提供操作示例或开源参考，不需要先设计代码。
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 已尝试的办法或相关链接（可选）

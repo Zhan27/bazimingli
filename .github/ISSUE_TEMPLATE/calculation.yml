@@ -1,0 +1,34 @@
+name: 算法或排盘差异
+description: 历法、四柱、节气、时区或规则结果与参考资料不同
+title: "[算法差异] "
+body:
+  - type: markdown
+    attributes:
+      value: 请区分计算事实、流派约定与传统解释。使用合成或经授权的去身份输入；不要上传真实个人资料或密钥。
+  - type: input
+    id: version
+    attributes:
+      label: 应用版本与所选流派
+    validations:
+      required: true
+  - type: textarea
+    id: input
+    attributes:
+      label: 可复现输入与时间规则
+      description: 日期、时分、标准UTC偏移、手动夏令时、经度、真太阳时及子初/子正设置；若未知请明确写出。
+    validations:
+      required: true
+  - type: textarea
+    id: comparison
+    attributes:
+      label: 应用结果与对照结果
+      description: 精确指出有差异的字段、边界时刻和精度。
+    validations:
+      required: true
+  - type: textarea
+    id: reference
+    attributes:
+      label: 对照来源与版本
+      description: 提供可核对的资料链接、历表/算法版本或书籍版次和页码；没有来源也请注明。
+    validations:
+      required: true

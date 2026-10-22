@@ -2,7 +2,7 @@
 
 Each publishable segment gets a package version and changelog entry. Never point a new release at an old EXE. Keep previous releases available for rollback.
 
-1. Update version, rule version and changelog; build both HTML files.
+1. Update package version and changelog; build both HTML files. Update `RULE_VERSION` only when calculation rules/data/conventions change, and explain that change. UI/storage-only releases keep the rule version so chart identities and compatible AI drafts remain stable.
 2. Run `npm run verify` (Node.js22+ and Python3.12+), inspect changes, commit and push main. This includes real loopback HTTP/port/lifecycle tests; mocked window failures do not claim full native GUI interaction coverage.
 3. Create `v<package-version>` at that exact clean commit and push that tag.
 4. `release.yml` reruns verification on Windows, builds the desktop binary with pinned tools/Python3.12, runs its `--self-test`, generates checksums and only then publishes the GitHub Release.

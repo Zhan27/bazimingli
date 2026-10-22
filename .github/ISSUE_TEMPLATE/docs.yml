@@ -1,0 +1,23 @@
+name: 文档与术语问题
+description: 使用说明、翻译、术语或资料出处需要更正
+title: "[文档] "
+body:
+  - type: input
+    id: location
+    attributes:
+      label: 页面链接、文件位置或术语
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: 当前内容与问题
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: 建议修改与依据
+      description: 引文核对请提供来源、版次和章节/页码；未核验的内容可明确标注待核验。
+    validations:
+      required: true

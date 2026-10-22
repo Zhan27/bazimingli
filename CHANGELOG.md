@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.21.0 — 2026-10-22
+- Added a unified five-category record manager with search, module filters, deterministic sorting, bounded notes, reload, selected export and batch deletion/clear. Recalculation preserves notes; category+ID identity prevents cross-module collisions.
+- Added v6-selection merge backups so selected exports preserve unselected records on import. Earlier versions reject this format; full v4/v5 backup behavior remains compatible. Multi-category failures attempt rollback and disclose rollback failures.
+- Completed individual AI-card collapse, copy and JSON export with fact/source references and validation status, excluding full birth inputs/API settings.
+- Added separate GitHub issue forms for bugs, calculation differences, features and documentation. No issues or third-party messages were posted.
+- Kept calculation rule version5.20.0 for this UI/storage release, preserving compatible chart identities and AI drafts; application version advances independently.
+- Embedded the package version in the built HTML and footer independently of the calculation-rule version, making issue reports and downloaded artifacts identifiable.
+
 ## 5.20.0 — 2026-10-22
 - Integrated JSON-first18-dimension AI cards with optional provider JSON Schema and explicitly unverified Markdown compatibility. Displays conclusions, computed fact references, source status, uncertainty, alternatives and requested-model/prompt/rule/time metadata.
 - Added explicit cancellation, a bounded recent-chart tab-session draft, local restore/revalidation, per-card regeneration and missing-dimension retries. Invalid replies preserve accepted cards; chart changes stop old work and stale responses cannot fill a new chart. No automatic paid retries.

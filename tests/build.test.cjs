@@ -9,11 +9,13 @@ test('release check detects stale artifacts; secret/syntax failures do not overw
   const temp=fs.mkdtempSync(path.join(os.tmpdir(),'bazimingli-build-'));
   try{
     for(const folder of ['src','data','vendor','scripts'])fs.cpSync(path.join(root,folder),path.join(temp,folder),{recursive:true});
+    fs.copyFileSync(path.join(root,'package.json'),path.join(temp,'package.json'));
     const build=()=>spawnSync(process.execPath,['scripts/build.mjs'],{cwd:temp,encoding:'utf8'});
     let result=build();assert.equal(result.status,0,result.stderr);
     const original=fs.readFileSync(path.join(temp,'命理排盘.html'),'utf8');
     assert.equal(original,fs.readFileSync(path.join(temp,'docs/index.html'),'utf8'));
     assert.ok(original.includes('Copyright (c) 2018 6tail'));
+    assert.ok(original.includes('<meta name="application-version" content="'+require('../package.json').version+'">'));
     fs.appendFileSync(path.join(temp,'docs/index.html'),'stale');
     assert.notEqual(spawnSync(process.execPath,['scripts/build.mjs','--check'],{cwd:temp}).status,0);
     const source=path.join(temp,'src/ui/app.js'),saved=fs.readFileSync(source,'utf8');

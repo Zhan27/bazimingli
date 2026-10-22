@@ -19,12 +19,23 @@ function aiEvidenceMissing(){return aiEvidenceSession?missingAiDimensions(aiEvid
 function aiEvidenceSummary(){
   return Object.entries(aiEvidenceSession?.accepted||{}).map(([id,item])=>'【'+id+'】'+(item.format==='json'?JSON.stringify(item.dimension):item.text)).join('\n');
 }
+function aiEvidenceCardData(id){
+  aiDimensionIds([id]);const item=aiEvidenceSession?.accepted[id];if(!item||aiEvidenceSession.chartId!==chartFactId(aiEvidenceChart()))throw new TypeError('本维尚无可复制或导出的AI内容');
+  const facts=aiFacts(aiEvidenceChart());return {schemaVersion:1,kind:'ai-dimension',chartId:aiEvidenceSession.chartId,dimensionId:id,validation:item.format==='json'?'structure-and-reference-only':'unverified-markdown',referencedFacts:item.format==='json'?Object.fromEntries(item.dimension.facts.map(f=>[f,facts[f]])):{},sources:item.format==='json'?item.dimension.rules.map(knowledgeCitation):[],...JSON.parse(JSON.stringify(item))};
+}
+async function aiEvidenceCopyCard(id){
+  try{const text=JSON.stringify(aiEvidenceCardData(id),null,2);if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(text);else{shareFallback2(text,'单卡内容已复制（含校验状态与依据）');return;}workbenchToast('单卡内容已复制（含校验状态与依据）');}catch(e){workbenchToast('复制失败：'+e.message);}
+}
+function aiEvidenceExportCard(id){
+  try{const data=aiEvidenceCardData(id),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='AI维度_'+id+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){workbenchToast(e.message);}
+}
 function aiEvidencePaint(){
   const session=aiEvidenceSession;if(!session||!lastZh||session.chartId!==chartFactId(aiEvidenceChart()))return;
   const active=!!(aiEvidenceActive||aiFollowActive);
   for(const id of ['ai-deep-btn','ai-retry-missing','ai-restore-draft','ai-clear-draft','ai-output-format']){const el=document.getElementById(id);if(el)el.disabled=active;}
   const cancel=document.getElementById('ai-cancel');if(cancel)cancel.disabled=!active;
   document.querySelectorAll('[data-ai-retry]').forEach(b=>{b.disabled=active;});
+  document.querySelectorAll('[data-ai-card-action]').forEach(b=>{b.disabled=!session.accepted[b.dataset.dimensionId];});
   const preview=document.getElementById('ai-draft-text');if(preview)preview.textContent=session.attempt?.text||'尚无回复文本。';
   const errors=document.getElementById('ai-evidence-errors');if(errors){errors.replaceChildren();for(const e of (session.attempt?.errors||[]).slice(0,30)){const li=document.createElement('li');li.textContent=e.type+' · '+e.path+'：'+e.message;errors.appendChild(li);}}
   const status={running:'正在接收；完整JSON结束后校验',complete:'请求维度已收到',incomplete:'部分维度待修复',canceled:'已取消，草稿已保留',failed:'请求中断，草稿已保留',interrupted:'上次请求已中断，可校验草稿或手动重试'}[session.attempt?.status]||'等待生成或回填';
@@ -32,7 +43,7 @@ function aiEvidencePaint(){
   const facts=aiFacts(aiEvidenceChart());
   for(const [id,item] of Object.entries(session.accepted)){
     const card=document.getElementById('ai-dim-'+(Number(id)-1));if(!card)continue;
-    let target=card.querySelector('.ai-evidence-result');if(!target){target=document.createElement('div');target.className='ai-evidence-result';card.appendChild(target);}target.replaceChildren();
+    let target=card.querySelector('.ai-evidence-result');if(!target){target=document.createElement('div');target.className='ai-evidence-result';card.appendChild(target);}target.replaceChildren();target.hidden=card.dataset.aiCollapsed==='1';
     const label=document.createElement('p');label.className='ai-evidence-label';label.textContent=item.format==='json'?'JSON结构与引用检查通过 · 断语正确性未验证':'Markdown兼容内容 · 事实与引用未校验';target.appendChild(label);
     const field=(name,value)=>{const p=document.createElement('p'),b=document.createElement('b');b.textContent=name+'：';p.append(b,document.createTextNode(value));target.appendChild(p);};
     if(item.format==='json'){
@@ -51,7 +62,8 @@ function aiEvidenceMount(){
   document.getElementById('ai-restore-draft').onclick=aiEvidenceRestore;
   document.getElementById('ai-clear-draft').onclick=aiEvidenceClear;
   document.getElementById('ai-validate-draft').onclick=()=>{if(aiEvidenceSession.attempt&&!aiEvidenceActive&&!aiFollowActive){aiEvidenceSession=finishAiAttempt(aiEvidenceSession,aiEvidenceChart(),aiEvidenceSession.attempt.text);aiEvidenceSave(true);lastAIReply=aiEvidenceSummary();aiEvidencePaint();}};
-  for(const {id} of AI_DIM_CONTRACTS){const card=document.getElementById('ai-dim-'+(id-1));if(card){const b=document.createElement('button');b.type='button';b.className='btn btn-ghost ai-dimension-retry';b.dataset.aiRetry=String(id);b.textContent='重生成本维（调用API）';b.onclick=()=>aiEvidenceStart([id]);card.appendChild(b);}}
+  for(const {id} of AI_DIM_CONTRACTS){const card=document.getElementById('ai-dim-'+(id-1));if(card){const actions=document.createElement('div');actions.className='ai-card-actions';const b=document.createElement('button');b.type='button';b.className='btn btn-ghost ai-dimension-retry';b.dataset.aiRetry=String(id);b.textContent='重生成本维（调用API）';b.onclick=()=>aiEvidenceStart([id]);actions.appendChild(b);
+    for(const [action,title] of [['collapse','折叠AI内容'],['copy','复制单卡'],['export','导出单卡']]){const button=document.createElement('button');button.type='button';button.className='btn btn-ghost ai-dimension-retry';button.dataset.aiCardAction=action;button.dataset.dimensionId=String(id);button.textContent=title;button.onclick=()=>{if(action==='copy')aiEvidenceCopyCard(id);else if(action==='export')aiEvidenceExportCard(id);else{const target=card.querySelector('.ai-evidence-result');if(target){target.hidden=!target.hidden;card.dataset.aiCollapsed=target.hidden?'1':'0';button.textContent=target.hidden?'展开AI内容':'折叠AI内容';button.setAttribute('aria-expanded',String(!target.hidden));}}};if(action==='collapse')button.setAttribute('aria-expanded','true');actions.appendChild(button);}card.appendChild(actions);}}
   try{const raw=sessionStorage.getItem(AI_DRAFT_NS);if(raw){const saved=JSON.parse(raw);if(saved.chartId===chartFactId(chart))aiEvidenceSession=restoreAiSession(raw,chart);}}catch(e){aiDraftWarning='已有草稿无法校验；可清除或使用原始备份。';}
   lastAIReply=aiEvidenceSummary();aiEvidencePaint();
 }

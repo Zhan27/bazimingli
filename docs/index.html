@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta name="application-version" content="5.21.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="description" content="玄机命理排盘：八字四柱、紫微斗数、奇门遁甲、六爻卜筮在线排盘工具，支持 AI 深度解读与多流派分析。">
 <meta name="keywords" content="八字排盘,紫微斗数,奇门遁甲,六爻,合婚,真太阳时,命理排盘,AI命理解读">
@@ -345,6 +346,8 @@ body[data-theme="xuanmo"] .btn-primary{background:#a9c1a0;color:#17291c;border-c
 .advanced-grid input[type=checkbox]{min-height:0;width:auto}
 #panel-zonghe .entry-column .form-card{overflow:hidden}
 @media(max-width:760px){.workspace-heading p{font-size:11px}.workspace-flow{padding-bottom:18px}.field label{font-size:11px}}
+
+.workspace-dialog-card.records-manager-card{width:min(940px,94vw)}.record-manager-filters,.record-manager-actions,.record-manager-row-heading{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.record-manager-filters>*{flex:1;min-width:140px;padding:8px}.record-manager-row{padding:12px 0;border-top:1px solid var(--line);overflow-wrap:anywhere}.record-manager-row-heading{justify-content:space-between}.record-manager-row textarea{width:100%;padding:8px;box-sizing:border-box;background:var(--bg2);color:var(--ink);border:1px solid var(--line)}.record-manager-actions{margin:12px 0}.records-manager-card button{font-size:11px}.records-manager-card input[type=checkbox]{margin-right:6px}
 
 </style>
 </head>
@@ -11084,7 +11087,7 @@ const BACKUP_MAX_BYTES=2*1024*1024;
 function cleanRecord(record){
   if(!record||typeof record!=='object'||Array.isArray(record)) throw new Error('记录必须是对象');
   const r={};
-  for(const [field,max] of Object.entries({id:80,key:500,name:100,dateStr:10,bazi:500,pillars:500,lunarText:200,title:500,nums:100,place:200,time:5,dayBoundary:20,wxMode:40})){
+  for(const [field,max] of Object.entries({id:80,key:500,name:100,note:1000,dateStr:10,bazi:500,pillars:500,lunarText:200,title:500,nums:100,place:200,time:5,dayBoundary:20,wxMode:40})){
     if(record[field]===undefined) continue;
     let value=record[field];
     if(field==='id'&&Number.isSafeInteger(value)) value=String(value);
@@ -11139,7 +11142,7 @@ function createRecordBackup(storage=localStorage){
 }
 function parseRecordBackup(data){
   if(!data||typeof data!=='object'||Array.isArray(data)) throw new Error('备份必须是JSON对象');
-  if(!['v4','v5'].includes(data.version)) throw new Error('不支持该备份版本（支持v4/v5）');
+  if(!['v4','v5','v6-selection'].includes(data.version)) throw new Error('不支持该备份版本（支持v4/v5/v6-selection）');
   const result={};
   RECORD_KEYS.forEach(k=>{if(Object.hasOwn(data,k)) result[k]=cleanRecordList(data[k]);});
   if(Object.hasOwn(data,'mingli_records')) result[REC_KEY]=mergeLegacyRecords(result[REC_KEY]||[],cleanRecordList(data.mingli_records));
@@ -11148,6 +11151,10 @@ function parseRecordBackup(data){
 }
 function restoreRecordBackup(data,storage=localStorage){
   const records=parseRecordBackup(data), before={};
+  if(data.version==='v6-selection')for(const key of Object.keys(records)){
+    const existing=key===REC_KEY?mergeLegacyRecords(readStoredRecords(key,storage),readStoredRecords('mingli_records',storage)):readStoredRecords(key,storage);
+    const ids=new Set(records[key].map(r=>r.id));records[key]=cleanRecordList([...records[key],...existing.filter(r=>!ids.has(r.id))]);
+  }
   Object.keys(records).forEach(k=>{before[k]=storage.getItem(k);});
   // Remove the migrated legacy key so clear/reload cannot resurrect old records.
   before.mingli_records=storage.getItem('mingli_records');
@@ -11161,6 +11168,46 @@ function restoreRecordBackup(data,storage=localStorage){
     throw new Error('存储空间不足或不可用，导入未完成，已还原原记录');
   }
   return Object.keys(records).length;
+}
+/** Known categories only; the manager never enumerates browser/API settings. */
+const RECORD_LABELS=Object.freeze({ml_records:'综合八字',bz_records:'八字页',zw_records:'紫微斗数',qm_records:'奇门遁甲',ly_records:'六爻'});
+function listRecordEntries({query='',category='all',sort='updated-desc'}={},storage=localStorage){
+  if(typeof query!=='string'||query.length>200||!['all',...RECORD_KEYS].includes(category)||!['updated-desc','updated-asc','date-desc','date-asc','name'].includes(sort))throw new TypeError('记录筛选条件无效');
+  migrateLegacyRecords(storage);const q=query.toLowerCase();
+  const rows=RECORD_KEYS.flatMap(key=>readStoredRecords(key,storage).map(record=>({key,record})));
+  const selected=rows.filter(({key,record:r})=>(category==='all'||category===key)&&(!q||[r.name,r.dateStr,r.place,r.note,r.bazi,r.title,r.lunarText,RECORD_LABELS[key]].join(' ').toLowerCase().includes(q)));
+  const direction=sort.endsWith('asc')?1:-1;
+  return selected.sort((a,b)=>{
+    let delta=sort==='name'?(a.record.name||'').localeCompare(b.record.name||'','zh-CN'):sort.startsWith('date')?a.record.dateStr.localeCompare(b.record.dateStr)*direction:((a.record.ts||0)-(b.record.ts||0))*direction;
+    return delta||(a.key+'/'+a.record.id).localeCompare(b.key+'/'+b.record.id);
+  });
+}
+function selectedRecordEntries(selection,storage){
+  if(!Array.isArray(selection)||!selection.length||selection.length>250)throw new RangeError('请选择1至250条记录');
+  const seen=new Set(),groups={};
+  for(const item of selection){
+    if(!item||!RECORD_KEYS.includes(item.key)||typeof item.id!=='string'||!/^[-\w]{1,80}$/.test(item.id))throw new TypeError('记录选择无效');
+    const token=item.key+'/'+item.id;if(seen.has(token))throw new TypeError('存在重复选择');seen.add(token);
+  }
+  migrateLegacyRecords(storage);
+  for(const item of selection){if(!groups[item.key])groups[item.key]=readStoredRecords(item.key,storage);if(!groups[item.key].some(r=>r.id===item.id))throw new RangeError('记录已变化，请刷新后重试');}
+  return {groups,seen};
+}
+function createSelectedRecordBackup(selection,storage=localStorage){
+  const {groups,seen}=selectedRecordEntries(selection,storage),out={version:'v6-selection',exported:new Date().toISOString()};
+  for(const [key,rows] of Object.entries(groups))out[key]=rows.filter(r=>seen.has(key+'/'+r.id));return out;
+}
+function deleteRecordEntries(selection,storage=localStorage){
+  const {groups,seen}=selectedRecordEntries(selection,storage),data={version:'v5'};
+  for(const [key,rows] of Object.entries(groups))data[key]=rows.filter(r=>!seen.has(key+'/'+r.id));
+  restoreRecordBackup(data,storage);return selection.length;
+}
+function updateRecordNote(key,id,note,storage=localStorage){
+  if(typeof note!=='string'||note.length>1000)throw new TypeError('备注最多1000字');selectedRecordEntries([{key,id}],storage);
+  const rows=readStoredRecords(key,storage).map(r=>r.id===id?{...r,note,ts:Date.now()}:r);restoreRecordBackup({version:'v5',[key]:rows},storage);
+}
+function clearAllRecordEntries(storage=localStorage){
+  restoreRecordBackup({version:'v5',...Object.fromEntries(RECORD_KEYS.map(k=>[k,[]]))},storage);
 }
 
 /* Source: src/ai/dimensions.js */
@@ -11523,6 +11570,8 @@ function initializeWorkbench(){
   document.querySelectorAll('.field').forEach(field=>{const label=field.querySelector('label'),control=field.querySelector('input,select,textarea');if(label&&control?.id&&!label.querySelector('input'))label.htmlFor=control.id;});
   const footer=document.createElement('footer');footer.className='app-footer';footer.innerHTML='传统文化学习与参考 · 计算事实与传统解释请分别理解<br>由 <a href="https://github.com/Zhan27/bazimingli" target="_blank" rel="noopener">Zhan27</a> 维护，主要借助 OpenAI Codex 开发 · <button class="btn btn-ghost" type="button" id="footer-knowledge" style="font-size:10px;padding:2px 6px;min-height:0">查阅术语</button>';wrap.appendChild(footer);document.getElementById('footer-knowledge').addEventListener('click',()=>showWorkspaceDialog('knowledge'));
   const privacy=document.createElement('button');privacy.className='btn btn-ghost';privacy.type='button';privacy.id='footer-privacy';privacy.textContent='隐私与数据';privacy.style.cssText='font-size:10px;padding:2px 6px;min-height:0';privacy.addEventListener('click',()=>showWorkspaceDialog('privacy'));footer.appendChild(privacy);
+  const recordManager=document.createElement('button');recordManager.type='button';recordManager.id='record-manager-open';recordManager.className='btn btn-ghost';recordManager.textContent='统一记录管理';recordManager.addEventListener('click',showRecordManager);footer.appendChild(recordManager);
+  const version=document.createElement('span');version.className='app-version';version.textContent=' · 应用v'+(document.querySelector('meta[name="application-version"]')?.content||'开发版')+' · 规则v'+RULE_VERSION;footer.appendChild(version);
   setWorkbenchMode(workbenchMode());enhanceWorkbenchChart();new MutationObserver(enhanceWorkbenchChart).observe(document.getElementById('zh-result'),{childList:true});
 }
 
@@ -11548,12 +11597,23 @@ function aiEvidenceMissing(){return aiEvidenceSession?missingAiDimensions(aiEvid
 function aiEvidenceSummary(){
   return Object.entries(aiEvidenceSession?.accepted||{}).map(([id,item])=>'【'+id+'】'+(item.format==='json'?JSON.stringify(item.dimension):item.text)).join('\n');
 }
+function aiEvidenceCardData(id){
+  aiDimensionIds([id]);const item=aiEvidenceSession?.accepted[id];if(!item||aiEvidenceSession.chartId!==chartFactId(aiEvidenceChart()))throw new TypeError('本维尚无可复制或导出的AI内容');
+  const facts=aiFacts(aiEvidenceChart());return {schemaVersion:1,kind:'ai-dimension',chartId:aiEvidenceSession.chartId,dimensionId:id,validation:item.format==='json'?'structure-and-reference-only':'unverified-markdown',referencedFacts:item.format==='json'?Object.fromEntries(item.dimension.facts.map(f=>[f,facts[f]])):{},sources:item.format==='json'?item.dimension.rules.map(knowledgeCitation):[],...JSON.parse(JSON.stringify(item))};
+}
+async function aiEvidenceCopyCard(id){
+  try{const text=JSON.stringify(aiEvidenceCardData(id),null,2);if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(text);else{shareFallback2(text,'单卡内容已复制（含校验状态与依据）');return;}workbenchToast('单卡内容已复制（含校验状态与依据）');}catch(e){workbenchToast('复制失败：'+e.message);}
+}
+function aiEvidenceExportCard(id){
+  try{const data=aiEvidenceCardData(id),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='AI维度_'+id+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){workbenchToast(e.message);}
+}
 function aiEvidencePaint(){
   const session=aiEvidenceSession;if(!session||!lastZh||session.chartId!==chartFactId(aiEvidenceChart()))return;
   const active=!!(aiEvidenceActive||aiFollowActive);
   for(const id of ['ai-deep-btn','ai-retry-missing','ai-restore-draft','ai-clear-draft','ai-output-format']){const el=document.getElementById(id);if(el)el.disabled=active;}
   const cancel=document.getElementById('ai-cancel');if(cancel)cancel.disabled=!active;
   document.querySelectorAll('[data-ai-retry]').forEach(b=>{b.disabled=active;});
+  document.querySelectorAll('[data-ai-card-action]').forEach(b=>{b.disabled=!session.accepted[b.dataset.dimensionId];});
   const preview=document.getElementById('ai-draft-text');if(preview)preview.textContent=session.attempt?.text||'尚无回复文本。';
   const errors=document.getElementById('ai-evidence-errors');if(errors){errors.replaceChildren();for(const e of (session.attempt?.errors||[]).slice(0,30)){const li=document.createElement('li');li.textContent=e.type+' · '+e.path+'：'+e.message;errors.appendChild(li);}}
   const status={running:'正在接收；完整JSON结束后校验',complete:'请求维度已收到',incomplete:'部分维度待修复',canceled:'已取消，草稿已保留',failed:'请求中断，草稿已保留',interrupted:'上次请求已中断，可校验草稿或手动重试'}[session.attempt?.status]||'等待生成或回填';
@@ -11561,7 +11621,7 @@ function aiEvidencePaint(){
   const facts=aiFacts(aiEvidenceChart());
   for(const [id,item] of Object.entries(session.accepted)){
     const card=document.getElementById('ai-dim-'+(Number(id)-1));if(!card)continue;
-    let target=card.querySelector('.ai-evidence-result');if(!target){target=document.createElement('div');target.className='ai-evidence-result';card.appendChild(target);}target.replaceChildren();
+    let target=card.querySelector('.ai-evidence-result');if(!target){target=document.createElement('div');target.className='ai-evidence-result';card.appendChild(target);}target.replaceChildren();target.hidden=card.dataset.aiCollapsed==='1';
     const label=document.createElement('p');label.className='ai-evidence-label';label.textContent=item.format==='json'?'JSON结构与引用检查通过 · 断语正确性未验证':'Markdown兼容内容 · 事实与引用未校验';target.appendChild(label);
     const field=(name,value)=>{const p=document.createElement('p'),b=document.createElement('b');b.textContent=name+'：';p.append(b,document.createTextNode(value));target.appendChild(p);};
     if(item.format==='json'){
@@ -11580,7 +11640,8 @@ function aiEvidenceMount(){
   document.getElementById('ai-restore-draft').onclick=aiEvidenceRestore;
   document.getElementById('ai-clear-draft').onclick=aiEvidenceClear;
   document.getElementById('ai-validate-draft').onclick=()=>{if(aiEvidenceSession.attempt&&!aiEvidenceActive&&!aiFollowActive){aiEvidenceSession=finishAiAttempt(aiEvidenceSession,aiEvidenceChart(),aiEvidenceSession.attempt.text);aiEvidenceSave(true);lastAIReply=aiEvidenceSummary();aiEvidencePaint();}};
-  for(const {id} of AI_DIM_CONTRACTS){const card=document.getElementById('ai-dim-'+(id-1));if(card){const b=document.createElement('button');b.type='button';b.className='btn btn-ghost ai-dimension-retry';b.dataset.aiRetry=String(id);b.textContent='重生成本维（调用API）';b.onclick=()=>aiEvidenceStart([id]);card.appendChild(b);}}
+  for(const {id} of AI_DIM_CONTRACTS){const card=document.getElementById('ai-dim-'+(id-1));if(card){const actions=document.createElement('div');actions.className='ai-card-actions';const b=document.createElement('button');b.type='button';b.className='btn btn-ghost ai-dimension-retry';b.dataset.aiRetry=String(id);b.textContent='重生成本维（调用API）';b.onclick=()=>aiEvidenceStart([id]);actions.appendChild(b);
+    for(const [action,title] of [['collapse','折叠AI内容'],['copy','复制单卡'],['export','导出单卡']]){const button=document.createElement('button');button.type='button';button.className='btn btn-ghost ai-dimension-retry';button.dataset.aiCardAction=action;button.dataset.dimensionId=String(id);button.textContent=title;button.onclick=()=>{if(action==='copy')aiEvidenceCopyCard(id);else if(action==='export')aiEvidenceExportCard(id);else{const target=card.querySelector('.ai-evidence-result');if(target){target.hidden=!target.hidden;card.dataset.aiCollapsed=target.hidden?'1':'0';button.textContent=target.hidden?'展开AI内容':'折叠AI内容';button.setAttribute('aria-expanded',String(!target.hidden));}}};if(action==='collapse')button.setAttribute('aria-expanded','true');actions.appendChild(button);}card.appendChild(actions);}}
   try{const raw=sessionStorage.getItem(AI_DRAFT_NS);if(raw){const saved=JSON.parse(raw);if(saved.chartId===chartFactId(chart))aiEvidenceSession=restoreAiSession(raw,chart);}}catch(e){aiDraftWarning='已有草稿无法校验；可清除或使用原始备份。';}
   lastAIReply=aiEvidenceSummary();aiEvidencePaint();
 }
@@ -11633,6 +11694,50 @@ function aiEvidenceStart(ids=AI_DIM_CONTRACTS.map(d=>d.id)){
       onError:error=>{if(!current())return;aiEvidenceSession=updateAiAttempt(aiEvidenceSession,aiEvidenceSession.attempt.text,error.code==='CANCELED'?'canceled':'failed');aiEvidenceActive=null;aiEvidenceSave(true);aiEvidencePaint();aiEvidenceNotice((error.code==='CANCELED'?'已取消':'请求失败，请检查接口/格式后手动重试')+'；已收到文本和已有维度保留。'+(aiDraftWarning?' '+aiDraftWarning:''));}
     });
   }catch(e){aiEvidenceActive=null;aiEvidenceNotice('无法生成：'+e.message);}
+}
+
+/* Source: src/ui/records-manager.js */
+/** One view over the five existing record stores; all user text is rendered as text. */
+function downloadRecordSelection(data){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});if(blob.size>BACKUP_MAX_BYTES)throw new RangeError('备份超过2MB，请减少选中数量');
+  const a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download='命理选中记录_'+fmtLocalDate(new Date())+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function refreshRecordViews(){
+  renderRecords();['zw','bz','qm','ly'].forEach(renderModRecords);document.querySelector('[aria-label="搜索本地排盘记录"]')?.dispatchEvent(new Event('input'));
+}
+function showRecordManager(){
+  if(document.querySelector('.records-manager-overlay'))return;
+  const previous=document.activeElement,overlay=document.createElement('div'),card=document.createElement('div');overlay.className='workspace-dialog records-manager-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-labelledby','record-manager-title');card.className='workspace-dialog-card records-manager-card';overlay.appendChild(card);
+  card.innerHTML='<h2 id="record-manager-title">统一记录管理</h2><p>管理已有五类记录。备注随备份保存；API设置和AI草稿单独管理。选中备份使用v6-selection格式，仅新版支持合并导入，旧版会拒绝；完整v4/v5备份仍按原规则恢复。</p><div class="record-manager-filters"><input id="record-manager-search" type="search" maxlength="200" aria-label="搜索全部排盘记录" placeholder="姓名、日期、地点、备注"><select id="record-manager-category" aria-label="筛选记录模块"><option value="all">全部五类</option></select><select id="record-manager-sort" aria-label="记录排序"><option value="updated-desc">最近更新</option><option value="updated-asc">最早更新</option><option value="date-desc">出生日期从晚到早</option><option value="date-asc">出生日期从早到晚</option><option value="name">姓名</option></select></div><div class="record-manager-actions"><label><input id="record-manager-select-visible" type="checkbox">选择当前结果</label><button type="button" id="record-manager-export" class="btn btn-ghost">导出选中</button><button type="button" id="record-manager-delete" class="btn btn-ghost">删除选中</button><button type="button" id="record-manager-clear" class="btn btn-ghost">清空五类记录</button></div><p id="record-manager-status" role="status" aria-live="polite"></p><div id="record-manager-list"></div><button type="button" id="record-manager-close" class="btn btn-primary">关闭记录管理</button>';
+  const find=id=>card.querySelector('#record-manager-'+id),selected=new Map();let visible=[];
+  const close=()=>{overlay.remove();previous?.focus();};
+  const status=text=>{find('status').textContent=text;};
+  const selection=()=>[...selected.values()];
+  const updateSelection=()=>{const n=selected.size;find('export').disabled=!n;find('delete').disabled=!n;find('select-visible').checked=!!visible.length&&visible.every(({key,record})=>selected.has(key+'/'+record.id));find('select-visible').indeterminate=visible.some(({key,record})=>selected.has(key+'/'+record.id))&&!find('select-visible').checked;find('select-visible').disabled=!visible.length;status('当前 '+visible.length+' 条；已选 '+n+' 条（选中项可包含当前筛选外的记录）');};
+  const render=()=>{
+    const list=find('list');list.replaceChildren();
+    try{
+      visible=listRecordEntries({query:find('search').value,category:find('category').value,sort:find('sort').value});
+      for(const {key,record:r} of visible){
+        const row=document.createElement('article');row.className='record-manager-row';row.dataset.recordKey=key;row.dataset.recordId=r.id;
+        const top=document.createElement('div'),label=document.createElement('label'),check=document.createElement('input');top.className='record-manager-row-heading';check.type='checkbox';check.checked=selected.has(key+'/'+r.id);check.setAttribute('aria-label','选择'+RECORD_LABELS[key]+'记录'+(r.name||r.dateStr));label.append(check,document.createTextNode(RECORD_LABELS[key]+' · '+(r.name||'未命名')+' · '+r.dateStr));check.onchange=()=>{if(check.checked)selected.set(key+'/'+r.id,{key,id:r.id});else selected.delete(key+'/'+r.id);updateSelection();};top.appendChild(label);
+        const load=document.createElement('button');load.type='button';load.className='btn btn-ghost';load.textContent='重新排盘';load.onclick=()=>{const tab={ml_records:'zonghe',bz_records:'bazi',zw_records:'ziwei',qm_records:'qimen',ly_records:'liuyao'}[key];document.querySelector('.tab[data-tab="'+tab+'"]').click();close();if(key===REC_KEY)recordReload(r.id);else modRecordReload(Object.keys(MOD_REC_KEYS).find(k=>MOD_REC_KEYS[k]===key),r.id);};top.appendChild(load);
+        const detail=document.createElement('p');detail.textContent=[r.time||HOUR_NAMES[r.hourIdx],r.place,r.bazi||r.title||r.pillars].filter(Boolean).join(' · ');
+        const note=document.createElement('textarea');note.maxLength=1000;note.rows=2;note.value=r.note||'';note.setAttribute('aria-label','备注 '+RECORD_LABELS[key]+' '+(r.name||r.dateStr));note.placeholder='备注（最多1000字，可能包含个人信息）';
+        const save=document.createElement('button');save.type='button';save.className='btn btn-ghost';save.textContent='保存备注';save.onclick=()=>{try{updateRecordNote(key,r.id,note.value);refreshRecordViews();render();status('备注已保存。');}catch(e){status(e.message);}};
+        row.append(top,detail,note,save);list.appendChild(row);
+      }
+      if(!visible.length)list.textContent='没有符合条件的记录。';updateSelection();
+    }catch(e){status('记录读取失败：'+e.message);}
+  };
+  for(const key of RECORD_KEYS){const option=document.createElement('option');option.value=key;option.textContent=RECORD_LABELS[key];find('category').appendChild(option);}
+  for(const id of ['search','category','sort'])find(id).addEventListener(id==='search'?'input':'change',render);
+  find('select-visible').onchange=()=>{for(const {key,record} of visible){const token=key+'/'+record.id;if(find('select-visible').checked)selected.set(token,{key,id:record.id});else selected.delete(token);}updateSelection();};
+  find('export').onclick=()=>{try{downloadRecordSelection(createSelectedRecordBackup(selection()));status('选中备份已导出；在5.21及以上合并导入，旧版拒绝该格式。');}catch(e){status('导出失败：'+e.message);}};
+  find('delete').onclick=()=>{const items=selection();if(!items.length||!confirm('删除已选的'+items.length+'条记录（可能包含筛选外的记录）？请先导出需要保留的内容。'))return;try{deleteRecordEntries(items);selected.clear();refreshRecordViews();render();status('已删除'+items.length+'条；API设置和AI草稿不受影响。');}catch(e){status(e.message);}};
+  find('clear').onclick=()=>{if(!confirm('清空全部五类排盘记录及旧版主记录？API设置、AI草稿和已导出的文件单独管理；此操作无法撤销。'))return;try{clearAllRecordEntries();selected.clear();refreshRecordViews();render();status('五类排盘记录已清空。');}catch(e){status(e.message);}};
+  find('close').onclick=close;overlay.onclick=e=>{if(e.target===overlay)close();};overlay.onkeydown=e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close();}if(e.key==='Tab'){const controls=[...card.querySelectorAll('input,select,textarea,button')].filter(x=>!x.disabled),first=controls[0],last=controls.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}};
+  document.body.appendChild(overlay);render();find('search').focus();
 }
 
 /* Source: src/ui/app.js */
@@ -12766,9 +12871,9 @@ function saveRecord(zh,name){
   const lunarText=zh.lunar.year+'年'+(zh.lunar.isLeap?'闰':'')+lunarMonthName(zh.lunar.month,zh.lunar.isLeap)+lunarDayName(zh.lunar.day);
   const dateStr=fmtLocalDate(zh.inputDate||zh.date);
   // 相同姓名+日期+时辰则更新
-  const idx=recs.findIndex(r=>r.name===name&&r.dateStr===dateStr&&r.hourIdx===hourIndexAt(zh.inputDate||zh.date)&&r.time===(zh.time||'')&&r.dayBoundary===(zh.temporal?.dayBoundary||'zi-chu'));
+  const idx=recs.findIndex(r=>r.name===name&&r.dateStr===dateStr&&r.hourIdx===hourIndexAt(zh.inputDate||zh.date)&&(r.time||'')===(zh.time||'')&&(r.dayBoundary||'zi-chu')===(zh.temporal?.dayBoundary||'zi-chu'));
   const rec={id:idx>=0?recs[idx].id:(Date.now()+''+Math.floor(Math.random()*1000)),name,gender:zh.gender,dateStr,hourIdx:hourIndexAt(zh.inputDate||zh.date),bazi,lunarText,ts:Date.now(),time:zh.time||'',minute:zh.minute||0,place:zh.place||'',trueSun:!!zh.trueSun,unknowHour:!!zh.unknowHour,genderUnspecified:!!zh.genderUnspecified,dayBoundary:zh.temporal?.dayBoundary||'zi-chu',school2:lastSchool,utcOffsetMinutes:zh.temporal.utcOffsetMinutes,dstMinutes:zh.temporal.dstMinutes,wxMode:zh.wxStatistics.mode};
-  if(idx>=0) recs[idx]=rec; else recs.unshift(rec);
+  if(idx>=0){if(recs[idx].note!==undefined)rec.note=recs[idx].note;recs[idx]=rec;}else recs.unshift(rec);
   if(recs.length>50) recs=recs.slice(0,50);
   try{ localStorage.setItem(REC_KEY,JSON.stringify(recs)); }catch(e){}
   renderRecords();
@@ -12838,7 +12943,7 @@ function saveModRecord(mod,rec){
   const key=mod+'|'+rec.dateStr+'|'+rec.hourIdx;
   const idx=recs.findIndex(r=>r.key===key);
   const id=idx>=0?recs[idx].id:(Date.now()+''+Math.floor(Math.random()*1000));
-  rec=Object.assign({},rec,{id,key,ts:Date.now()});
+  rec=Object.assign({},idx>=0?recs[idx]:{},rec,{id,key,ts:Date.now()});
   if(idx>=0) recs[idx]=rec; else recs.unshift(rec);
   if(recs.length>50) recs=recs.slice(0,50);
   try{ localStorage.setItem(MOD_REC_KEYS[mod],JSON.stringify(recs)); }catch(e){}
@@ -15999,6 +16104,7 @@ function exportRecords(){
   try{
     const data=createRecordBackup();
     const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    if(blob.size>BACKUP_MAX_BYTES)throw new Error('备份超过2MB，请使用统一记录管理分批导出');
     const a=document.createElement('a');
     a.download='命理排盘备份_'+fmtLocalDate(new Date())+'.json';
     a.href=URL.createObjectURL(blob);
@@ -16013,7 +16119,7 @@ function importRecords(input){
   const rd=new FileReader();
   rd.onload=()=>{
     try{
-      const n=restoreRecordBackup(JSON.parse(rd.result));
+      const data=JSON.parse(rd.result),n=restoreRecordBackup(data);
       renderRecords();['zw','bz','qm','ly'].forEach(renderModRecords);
       alert('✅ 备份导入成功（'+n+'类记录），已恢复到当前版本');
     }catch(e){alert('导入失败：'+e.message);}

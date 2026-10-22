@@ -1,0 +1,32 @@
+name: Bug 报告
+description: 网页、桌面启动器或数据功能出现错误
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: 请使用合成或经授权且已去身份的信息复现。不要提交 API Key、访问码或包含真实个人资料的浏览器备份。
+  - type: input
+    id: version
+    attributes:
+      label: 版本与运行方式
+      placeholder: 例如 v5.21.0，Windows EXE / 单HTML / 在线页面
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: 输入什么、点击什么、何时出现问题？如有必要请附合成样例。
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: 期望行为与实际行为
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: 系统、浏览器与错误提示
+      description: 日志或截图请先移除个人资料和凭据。
