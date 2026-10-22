@@ -1,19 +1,5 @@
 /** Presentation only: preserve zhGanZhiMap's rule results and resolve every participant by pillar. */
 const GZ_RELATION_TYPES={he:'合',chong:'冲',sanhe:'三合',xing:'刑',hai:'害',po:'破',anhe:'暗合'};
-function gzRelationModel(zh,relations=zhGanZhiMap(zh)){
-  const pillars=['年','月','日','时'],values=[zh.yearGZ,zh.monthGZ,zh.dayGZ,zh.hourGZ];
-  const nodes=['gan','zhi'].flatMap((lane)=>values.map((value,column)=>({
-    id:lane+'-'+column,lane,column,pillar:pillars[column],char:(lane==='gan'?GAN:ZHI)[value[lane==='gan'?0:1]]
-  })));
-  const rows=relations.map((relation,index)=>{
-    const lane=relation.t.startsWith('天干')?'gan':'zhi',candidates=nodes.filter(n=>n.lane===lane);
-    const explicit=[...(relation.from+'·'+relation.to).matchAll(/([年月日时])([甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥])/g)];
-    // Group rules have no pillar names; include all occurrences, not just the first matching character.
-    const members=candidates.filter(n=>explicit.length?explicit.some(m=>m[1]===n.pillar&&m[2]===n.char):(relation.from+relation.to).includes(n.char));
-    return {...relation,id:String(index),lane,members};
-  });
-  return {nodes,rows};
-}
 function gzRelEscape(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function gzRelationRail(row){
   const xs=[49.5,148.5,247.5,346.5],members=row.members;

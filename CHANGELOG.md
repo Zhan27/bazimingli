@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.22.1 — 2026-10-22
+- Added independent, DOM-free study facts, per-pillar natal day-xun void flags, position-aware relationships, ten annual entries per DaYun period and exact Beijing-clock Jie-month intervals. Existing calculation rules, chart schema and AI identity remain unchanged.
+- Added bounded offline JSON comparison adapters and a non-overwriting CLI. Keeps missing fields, explicit name aliases, unspecified time conventions and unequal DaYun coverage visible; no third-party service calls.
+- Documented how the user-supplied reference archive informed feature selection. Included only a derived single-sample comparison report; no captured third-party code, assets, credentials or probe tools.
+
 ## 5.22.0 — 2026-10-22
 - Replaced the clipped, overlapping Gan-Zhi diagram with separate stem/branch sections and one smooth connection rail per relation. Labels, guide columns and solid/dashed styles keep dense relationships readable without arrows over characters or a crowded legend.
 - Added relationship-type and individual-pillar filters, pinned/keyboard highlights, reset, accessible descriptions and the offline glossary. Responsive rails fit mobile screens and all three themes.

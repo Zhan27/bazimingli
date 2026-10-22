@@ -27,3 +27,9 @@ Output includes `schemaVersion`, untouched input facts, versioned rules, actual 
 `validateRulePack({id:'custom-example',version:'1',strength:{...}})` accepts only finite bounded month/root/momentum weights and strictly increasing thresholds with the documented `STRENGTH_RULES` shape. Pass as `calculateChart(input,{rulePack})`. The pack is copied and frozen, does not execute code, does not change shared defaults, and the result records the pack's id/version. These are custom **scoring** packages; arbitrary astronomy or executable plugins are not supported.
 
 Errors use TypeError/RangeError with explanations. Supported Gregorian range remains1900-01-31..2099-12-31 after time correction. No API needs DOM, localStorage or a network connection.
+
+## Additive study and offline comparison views
+
+`chartStudyFacts(chart)` returns detailed pillars, natal day-xun void flags, position-aware relations and eight DaYun periods with ten annual entries each. `chartStudyMonths(chart, year)` returns twelve Jie-month intervals with exact Beijing clock boundaries for1900..2099, including the final interval ending at next year's LiChun. These views do not change the original chart JSON or AI identity. Main qi is marked; secondary qi categories/weights are not inferred from array order.
+
+`createStudySnapshot(chart)` wraps the original chart and study facts as `format: 'bazimingli-study', formatVersion: 1`. `compareReferenceChart(chart, savedJSON)` compares supported provided fields, keeps missing fields and spelling-alias markers, and discloses unspecified clock conventions and unequal DaYun coverage. It performs no network requests. See [reference materials and comparison limits](REFERENCE-MATERIALS.md) for CLI usage, supported shapes and the single supplied sample's bounded result.

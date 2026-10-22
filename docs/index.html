@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="application-version" content="5.22.0">
+<meta name="application-version" content="5.22.1">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="description" content="玄机命理排盘：八字四柱、紫微斗数、奇门遁甲、六爻卜筮在线排盘工具，支持 AI 深度解读与多流派分析。">
 <meta name="keywords" content="八字排盘,紫微斗数,奇门遁甲,六爻,合婚,真太阳时,命理排盘,AI命理解读">
@@ -10934,6 +10934,98 @@ function calculateBirth(date,hourIdx,place='',options={}){
   return {...normalized,civilDate,effectiveDate,dayDate,hourIdx:h,yearGZ,monthGZ,dayGZ,hourGZ,dayBoundary,correction,preciseTime:!!options.preciseTime};
 }
 
+/* Source: src/bazi/relations.js */
+/** Existing relation rules and pillar-aware presentation data; no network or DOM. */
+// 干支合冲刑害图示
+function zhGanZhiMap(zh){
+  const gans=[['年',zh.yearGZ[0]],['月',zh.monthGZ[0]],['日',zh.dayGZ[0]],['时',zh.hourGZ[0]]];
+  const zhis=[['年',zh.yearGZ[1]],['月',zh.monthGZ[1]],['日',zh.dayGZ[1]],['时',zh.hourGZ[1]]];
+  const rels=[];
+  const hePairs=[[0,5],[1,6],[2,7],[3,8],[4,9]];
+  const heName={0:'甲己合土',1:'乙庚合金',2:'丙辛合水',3:'丁壬合木',4:'戊癸合火'};
+  for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){
+    const a=gans[i][1],b=gans[j][1];
+    const p=hePairs.find(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
+    if(p) rels.push({t:'天干五合',name:heName[p[0]],from:gans[i][0]+GAN[a],to:gans[j][0]+GAN[b],cls:'he'});
+  }
+  // 天干四冲
+  const ganChong=[[0,6],[1,7],[2,8],[3,9]];
+  const ganChongName=[[0,'甲庚相冲'],[1,'乙辛相冲'],[2,'丙壬相冲'],[3,'丁癸相冲']];
+  for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){
+    const a=gans[i][1],b=gans[j][1];
+    const p=ganChong.find(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
+    if(p) rels.push({t:'天干相冲',name:ganChongName[ganChong.indexOf(p)][1],from:gans[i][0]+GAN[a],to:gans[j][0]+GAN[b],cls:'chong'});
+  }
+  const zhiHe=[[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
+  const zhiHeName=['子丑合土','寅亥合木','卯戌合火','辰酉合金','巳申合水','午未合土'];
+  for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){
+    const a=zhis[i][1],b=zhis[j][1];
+    const p=zhiHe.findIndex(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
+    if(p>=0) rels.push({t:'地支六合',name:zhiHeName[p],from:zhis[i][0]+ZHI[a],to:zhis[j][0]+ZHI[b],cls:'he'});
+  }
+  const zhiChong=[[0,6],[1,7],[2,8],[3,9],[4,10],[5,11]];
+  const zhiChongName=['子午相冲','丑未相冲','寅申相冲','卯酉相冲','辰戌相冲','巳亥相冲'];
+  for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){
+    const a=zhis[i][1],b=zhis[j][1];
+    const p=zhiChong.findIndex(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
+    if(p>=0) rels.push({t:'地支六冲',name:zhiChongName[p],from:zhis[i][0]+ZHI[a],to:zhis[j][0]+ZHI[b],cls:'chong'});
+  }
+  const zhiSanHe=[[[8,0,4],'申子辰合水'],[[11,3,7],'亥卯未合木'],[[2,6,10],'寅午戌合火'],[[5,9,1],'巳酉丑合金']];
+  zhiSanHe.forEach(([set,name])=>{
+    const present=set.filter(z=>zhis.some(x=>x[1]===z));
+    if(present.length>=2) rels.push({t:'地支三合',name:name+(present.length===3?'（三合全）':'（半合）'),from:present.map(z=>ZHI[z]).join(''),to:'',cls:'sanhe'});
+  });
+  const xings=[[[2,5,8],'寅巳申三刑'],[[1,10,7],'丑戌未三刑'],[[0,3],'子卯相刑']];
+  xings.forEach(([set,name])=>{
+    const present=set.filter(z=>zhis.some(x=>x[1]===z));
+    if(present.length>=2) rels.push({t:'地支相刑',name:name,from:present.map(z=>ZHI[z]).join(''),to:'',cls:'xing'});
+  });
+  // 自刑(辰辰/午午/酉酉/亥亥 需同支双见)
+  const ziXingZhi=[4,6,9,11];
+  ziXingZhi.forEach(z=>{
+    const hit=zhis.filter(x=>x[1]===z);
+    if(hit.length>=2) rels.push({t:'地支自刑',name:ZHI[z]+ZHI[z]+'自刑',from:hit.map(x=>x[0]+ZHI[z]).join('·'),to:'',cls:'xing'});
+  });
+  const zhiHai=[[0,7],[1,6],[2,5],[3,4],[8,11],[9,10]];
+  const zhiHaiName=['子未相害','丑午相害','寅巳相害','卯辰相害','申亥相害','酉戌相害'];
+  for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){
+    const a=zhis[i][1],b=zhis[j][1];
+    const p=zhiHai.findIndex(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
+    if(p>=0) rels.push({t:'地支六害',name:zhiHaiName[p],from:zhis[i][0]+ZHI[a],to:zhis[j][0]+ZHI[b],cls:'hai'});
+  }
+  const zhiPo=[[0,9],[6,3],[2,11],[5,8],[4,1],[10,7]];
+  const zhiPoName=['子酉相破','午卯相破','寅亥相破','巳申相破','辰丑相破','戌未相破'];
+  for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){
+    const a=zhis[i][1],b=zhis[j][1];
+    const p=zhiPo.findIndex(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
+    if(p>=0) rels.push({t:'地支六破',name:zhiPoName[p],from:zhis[i][0]+ZHI[a],to:zhis[j][0]+ZHI[b],cls:'po'});
+  }
+  // 地支暗合(藏干五合,非六合本气合)
+  const anHe=[[0,10],[1,2],[3,8],[5,8],[6,11]];
+  const anHeName={0:'子戌暗合(癸戊合)',1:'丑寅暗合(己甲合)',2:'卯申暗合(乙庚合)',3:'巳申暗合(丙辛合)',4:'午亥暗合(丁壬合)'};
+  for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){
+    const a=zhis[i][1],b=zhis[j][1];
+    const p=anHe.findIndex(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
+    if(p>=0) rels.push({t:'地支暗合',name:anHeName[p],from:zhis[i][0]+ZHI[a],to:zhis[j][0]+ZHI[b],cls:'anhe'});
+  }
+  return rels;
+}
+
+function gzRelationModel(zh,relations=zhGanZhiMap(zh)){
+  const pillars=['年','月','日','时'],values=[zh.yearGZ,zh.monthGZ,zh.dayGZ,zh.hourGZ];
+  const nodes=['gan','zhi'].flatMap((lane)=>values.map((value,column)=>({
+    id:lane+'-'+column,lane,column,pillar:pillars[column],char:(lane==='gan'?GAN:ZHI)[value[lane==='gan'?0:1]]
+  })));
+  const rows=relations.map((relation,index)=>{
+    const lane=relation.t.startsWith('天干')?'gan':'zhi',candidates=nodes.filter(n=>n.lane===lane);
+    const explicit=[...(relation.from+'·'+relation.to).matchAll(/([年月日时])([甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥])/g)];
+    // Group rules have no pillar names; include all occurrences, not just the first matching character.
+    const members=candidates.filter(n=>explicit.length?explicit.some(m=>m[1]===n.pillar&&m[2]===n.char):(relation.from+relation.to).includes(n.char));
+    return {...relation,id:String(index),lane,members};
+  });
+  return {nodes,rows};
+}
+
 /* Source: src/calendar/candidates.js */
 /* Partition an unknown birth day at every actual calculation boundary, rather
  * than pretending a single default hour is known. Intervals are [from,to).
@@ -11077,6 +11169,105 @@ function calculateModule(module,input){
 function comparePair(a,b,referenceYear){
   const raw=i=>{const x=validateChartInput(i),d=withBirthTime(parseCivilDate(x.date),x.hourIdx,x.time);return zhCompute(d,hourIndexAt(d),x.gender,x.place,x.options);};
   return {left:calculateChart(a),right:calculateChart(b),comparison:heHunCompute(raw(a),raw(b),'甲方','乙方',referenceYear),scoreMeaning:'传统规则的主观分档，未经现实关系预测校准'};
+}
+
+/* Source: src/api/study.js */
+/** Additive learning views; the original chart schema, rule version and AI identity stay unchanged. */
+const STUDY_SCHEMA_VERSION='1.0.0';
+function assertStudyChart(chart){
+  if(chart?.kind!=='chart'||!Array.isArray(chart.pillars)||chart.pillars.length!==4)throw new TypeError('请先选择具体时辰并排出完整四柱');
+  chart.pillars.forEach((p,i)=>{if(p.id!==['year','month','day','hour'][i]||!Number.isInteger(p.ganIndex)||!Number.isInteger(p.zhiIndex)||p.ganIndex<0||p.ganIndex>9||p.zhiIndex<0||p.zhiIndex>11||p.ganIndex%2!==p.zhiIndex%2||p.text!==GAN[p.ganIndex]+ZHI[p.zhiIndex])throw new TypeError('四柱字段不一致');});
+}
+function studyPillar(g,z,dayGan,kong){
+  return {text:GAN[g]+ZHI[z],gan:GAN[g],zhi:ZHI[z],tenGod:SHISHEN_NAME[tenGod(dayGan,g)],branchTenGod:SHISHEN_NAME[tenGod(dayGan,ZHI_HIDDEN[z][0])],
+    hidden:ZHI_HIDDEN[z].map((h,i)=>({gan:GAN[h],tenGod:SHISHEN_NAME[tenGod(dayGan,h)],isMainQi:i===0})),nayin:nayinOf(g,z),diShi:getChangSheng(dayGan,z),isKong:kong.includes(z)};
+}
+function chartStudyFacts(chart){
+  assertStudyChart(chart);
+  const day=chart.pillars[2],kong=kongwang([day.ganIndex,day.zhiIndex]),xun=indexToGZ(Math.floor(gzIndex(day.ganIndex,day.zhiIndex)/10)*10);
+  const pillars=chart.pillars.map(p=>({id:p.id,...studyPillar(p.ganIndex,p.zhiIndex,day.ganIndex,kong)}));
+  const raw=Object.fromEntries(chart.pillars.map(p=>[p.id+'GZ',[p.ganIndex,p.zhiIndex]]));
+  const relations=gzRelationModel(raw).rows.map(r=>({id:'relation.'+r.id,type:r.t,name:r.name,kind:r.cls,lane:r.lane,positions:r.members.map(n=>({pillar:['year','month','day','hour'][n.column],char:n.char}))}));
+  const birthYear=Number(chart.time.effectiveClock.slice(0,4));
+  const periods=chart.dayun.dyList.map((d,index)=>({index,...studyPillar(d.g,d.z,day.ganIndex,kong),startAge:d.age,endAge:d.endAge,
+    years:Array.from({length:d.endAge-d.age+1},(_,i)=>{
+      const year=birthYear+d.age+i,[g,z]=indexToGZ(year-4);
+      return {year,age:d.age+i,...studyPillar(g,z,day.ganIndex,kong)};
+    })}));
+  return {schemaVersion:STUDY_SCHEMA_VERSION,pillars,kongWang:{basis:'day-pillar-xun',xun:GAN[xun[0]]+ZHI[xun[1]]+'旬',branches:kong.map(z=>ZHI[z])},relations,
+    dayun:{startAge:chart.dayun.startAge,startYears:chart.dayun.startYears,startMonths:chart.dayun.startMonths,forward:chart.dayun.forward,periods},
+    timeOptions:{utcOffsetMinutes:Number(chart.input.options?.utcOffsetMinutes??480),dstMinutes:Number(chart.input.options?.dstMinutes??0),dayBoundary:chart.rules.dayBoundary,trueSolar:!!chart.time.correction},
+    conventions:{hiddenStems:'Existing table order; only the first stem is marked main qi. Secondary qi labels and weights are not inferred from ordering.',age:'year minus effective birth year; same convention as the existing timeline',annualPillar:'The year label represents the pillar after LiChun, not every instant of that Gregorian year.',void:'All per-pillar and transit flags refer to the natal day-pillar xun.',scope:'Traditional table annotations; no predictive validity claim'},rules:{...chart.rules}};
+}
+function chartStudyMonths(chart,year){
+  assertStudyChart(chart);
+  if(!Number.isInteger(year)||year<1900||year>2099)throw new RangeError('流月年份支持1900至2099');
+  const day=chart.pillars[2],kong=kongwang([day.ganIndex,day.zhiIndex]);
+  const boundaries=Array.from({length:13},(_,i)=>{const n=(i+1)*2;return {term:TERM_NAMES[n%24],ms:solarTerms(year+Math.floor(n/24))[n%24]};});
+  const months=getLiuYue(indexToGZ(year-4)[0],12).map((m,i)=>({number:i+1,jieQi:boundaries[i].term,startClock:unknownClock(boundaries[i].ms),endClock:unknownClock(boundaries[i+1].ms),...studyPillar(m.g,m.z,day.ganIndex,kong)}));
+  return {schemaVersion:STUDY_SCHEMA_VERSION,year,clockBasis:'Asia/Shanghai (UTC+08:00), half-open [startClock,endClock)',months};
+}
+function createStudySnapshot(chart){
+  assertStudyChart(chart);
+  return {format:'bazimingli-study',formatVersion:1,chart:JSON.parse(JSON.stringify(chart)),facts:chartStudyFacts(chart)};
+}
+
+/* Source: src/api/reference.js */
+/** Offline adapters written for documented JSON shapes. No service URLs, credentials or remote requests. */
+function normalizeReferenceChart(value){
+  if(!value||typeof value!=='object'||Array.isArray(value))throw new TypeError('对照文件须为JSON对象');
+  let data=value,input;
+  if(value.format==='bazimingli-study'){
+    if(value.formatVersion!==1)throw new TypeError('不支持此学习快照版本');
+    assertStudyChart(value.chart);input={...value.chart.input,options:chartStudyFacts(value.chart).timeOptions};data=value.facts;
+    if(!data||JSON.stringify(data.pillars?.map(p=>p.text))!==JSON.stringify(value.chart.pillars.map(p=>p.text)))throw new TypeError('快照盘面与四柱不一致');
+  }else if(value.action==='chart'&&value.data&&typeof value.data==='object')data=value.data;
+  input=input||data.input||{};
+  const ids=['year','month','day','hour'],source=data.pillars;
+  if(!source||typeof source!=='object')throw new TypeError('未找到四柱字段pillars');
+  const small=value=>typeof value==='string'&&value.length<=60?value:undefined;
+  const pillars=ids.map((id,i)=>{
+    const p=Array.isArray(source)?source[i]:source[id],text=small(typeof p==='string'?p:p?.text??p?.ganZhi);
+    if(!text||text.length!==2||!GAN.includes(text[0])||!ZHI.includes(text[1])||GAN.indexOf(text[0])%2!==ZHI.indexOf(text[1])%2)throw new TypeError('四柱干支缺失或格式无效：'+id);
+    const hidden=typeof p==='object'?(p.hidden??p.hiddenStems):undefined;
+    if(hidden!==undefined&&(!Array.isArray(hidden)||hidden.length>3||hidden.some(h=>!GAN.includes(h?.gan??h?.stem))))throw new TypeError('藏干字段无效：'+id);
+    return {id,text,hidden:hidden?.map(h=>h.gan??h.stem).sort(),tenGod:small(p?.tenGod),branchTenGod:small(p?.branchTenGod),nayin:small(p?.nayin??p?.naYin),diShi:small(p?.diShi),isKong:typeof p?.isKong==='boolean'?p.isKong:undefined};
+  });
+  const periodSource=data.dayun?.periods??data.dayun?.dyList??data.dayun?.list;
+  if(periodSource!==undefined&&(!Array.isArray(periodSource)||periodSource.length>20))throw new TypeError('大运列表无效');
+  const dayun=periodSource?.map(p=>{
+    const text=small(p.text??p.ganZhi)??(Number.isInteger(p.g)&&Number.isInteger(p.z)?GAN[p.g]+ZHI[p.z]:undefined);
+    if(!text||text.length!==2||!GAN.includes(text[0])||!ZHI.includes(text[1])||GAN.indexOf(text[0])%2!==ZHI.indexOf(text[1])%2)throw new TypeError('大运干支无效');return text;
+  });
+  const date=small(input.date)??((!input.calendarType||input.calendarType==='solar')&&[input.birthYear,input.birthMonth,input.birthDay].every(Number.isInteger)?String(input.birthYear)+'-'+String(input.birthMonth).padStart(2,'0')+'-'+String(input.birthDay).padStart(2,'0'):undefined);
+  const time=small(input.time)??([input.birthHour,input.birthMinute].every(Number.isInteger)?String(input.birthHour).padStart(2,'0')+':'+String(input.birthMinute).padStart(2,'0'):undefined);
+  return {pillars,dayun,startAge:Number.isFinite(data.dayun?.startAge)?data.dayun.startAge:undefined,input:{date,time,gender:input.gender==='male'?1:input.gender==='female'?0:[0,1].includes(input.gender)?input.gender:undefined},
+    conventions:Object.fromEntries(['utcOffsetMinutes','dstMinutes','dayBoundary','trueSolar'].map(k=>[k,input.options?.[k]]))};
+}
+function compareReferenceChart(chart,reference){
+  const local=normalizeReferenceChart(createStudySnapshot(chart)),other=normalizeReferenceChart(reference),fields=[],warnings=[];
+  const aliases={'泉中水':'井泉水','城头土':'城墙土','砂中金':'沙中金','砂中土':'沙中土','佛灯火':'覆灯火'};
+  const add=(path,label,a,b,normalize=x=>x)=>{
+    const status=a===undefined||b===undefined?'not-provided':JSON.stringify(normalize(a))===JSON.stringify(normalize(b))?'same':'different';
+    fields.push({path,label,status,local:a??null,reference:b??null,normalizedAlias:status==='same'&&JSON.stringify(a)!==JSON.stringify(b)});
+  };
+  for(const key of ['date','time','gender'])add('input.'+key,{date:'出生日期',time:'钟表时分',gender:'性别参数'}[key],local.input[key],other.input[key]);
+  for(const key of ['utcOffsetMinutes','dstMinutes','dayBoundary','trueSolar']){
+    const a=local.conventions[key],b=other.conventions[key];
+    if(a===undefined||b===undefined)warnings.push('口径尚未同时提供：'+key);else if(a!==b)warnings.push('口径不同：'+key);
+  }
+  for(let i=0;i<4;i++)for(const key of ['text','hidden','tenGod','branchTenGod','nayin','diShi','isKong']){
+    add('pillars.'+local.pillars[i].id+'.'+key,['年','月','日','时'][i]+'柱 · '+({text:'干支',hidden:'藏干集合',tenGod:'干十神',branchTenGod:'支本气十神',nayin:'纳音',diShi:'十二长生',isKong:'日旬空亡'}[key]),local.pillars[i][key],other.pillars[i][key],key==='nayin'?x=>aliases[x]||x:x=>x);
+  }
+  if(other.dayun){
+    const n=Math.min(local.dayun.length,other.dayun.length);
+    for(let i=0;i<n;i++)add('dayun.'+i,'第'+(i+1)+'步大运',local.dayun[i],other.dayun[i]);
+    if(local.dayun.length!==other.dayun.length)warnings.push('大运步数不同：仅比较共有的'+n+'步（本盘'+local.dayun.length+'步，对照'+other.dayun.length+'步）');
+  }else add('dayun','大运序列',local.dayun,undefined);
+  if(other.startAge!==undefined&&local.startAge!==other.startAge)warnings.push('起运年龄不同：本盘'+local.startAge+'，对照'+other.startAge+'；先核对周岁/虚岁、交运时刻与舍入口径');
+  const summary=Object.fromEntries(['same','different','not-provided'].map(s=>[s,fields.filter(f=>f.status===s).length]));
+  return {schemaVersion:'1.0.0',verdict:summary.different?'differences':warnings.length||summary['not-provided']?'aligned-with-gaps':'aligned',summary,fields,warnings,
+    scope:'仅比较已提供的计算/传统表项，不认定任一实现为标准答案。藏干仅比较集合；空亡依据日柱旬。',excluded:['强弱分数与分档','喜忌用神','格局','神煞集合','AI解释','藏干中气/余气次序和权重'],rules:{...chart.rules}};
 }
 
 /* Source: src/knowledge/catalog.js */
@@ -11759,20 +11950,6 @@ function showRecordManager(){
 /* Source: src/ui/gan-zhi-relations.js */
 /** Presentation only: preserve zhGanZhiMap's rule results and resolve every participant by pillar. */
 const GZ_RELATION_TYPES={he:'合',chong:'冲',sanhe:'三合',xing:'刑',hai:'害',po:'破',anhe:'暗合'};
-function gzRelationModel(zh,relations=zhGanZhiMap(zh)){
-  const pillars=['年','月','日','时'],values=[zh.yearGZ,zh.monthGZ,zh.dayGZ,zh.hourGZ];
-  const nodes=['gan','zhi'].flatMap((lane)=>values.map((value,column)=>({
-    id:lane+'-'+column,lane,column,pillar:pillars[column],char:(lane==='gan'?GAN:ZHI)[value[lane==='gan'?0:1]]
-  })));
-  const rows=relations.map((relation,index)=>{
-    const lane=relation.t.startsWith('天干')?'gan':'zhi',candidates=nodes.filter(n=>n.lane===lane);
-    const explicit=[...(relation.from+'·'+relation.to).matchAll(/([年月日时])([甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥])/g)];
-    // Group rules have no pillar names; include all occurrences, not just the first matching character.
-    const members=candidates.filter(n=>explicit.length?explicit.some(m=>m[1]===n.pillar&&m[2]===n.char):(relation.from+relation.to).includes(n.char));
-    return {...relation,id:String(index),lane,members};
-  });
-  return {nodes,rows};
-}
 function gzRelEscape(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function gzRelationRail(row){
   const xs=[49.5,148.5,247.5,346.5],members=row.members;
@@ -13931,80 +14108,6 @@ function zhTongGuan(zh){
   if(combos.length) s+=`十神组合取象：${combos.join('；')}。`;
   s+=`五行流通则气顺，气顺则诸事顺遂；阻塞之处，即是行运与调候的着力点。`;
   return s;
-}
-// 干支合冲刑害图示
-function zhGanZhiMap(zh){
-  const gans=[['年',zh.yearGZ[0]],['月',zh.monthGZ[0]],['日',zh.dayGZ[0]],['时',zh.hourGZ[0]]];
-  const zhis=[['年',zh.yearGZ[1]],['月',zh.monthGZ[1]],['日',zh.dayGZ[1]],['时',zh.hourGZ[1]]];
-  const rels=[];
-  const hePairs=[[0,5],[1,6],[2,7],[3,8],[4,9]];
-  const heName={0:'甲己合土',1:'乙庚合金',2:'丙辛合水',3:'丁壬合木',4:'戊癸合火'};
-  for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){
-    const a=gans[i][1],b=gans[j][1];
-    const p=hePairs.find(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
-    if(p) rels.push({t:'天干五合',name:heName[p[0]],from:gans[i][0]+GAN[a],to:gans[j][0]+GAN[b],cls:'he'});
-  }
-  // 天干四冲
-  const ganChong=[[0,6],[1,7],[2,8],[3,9]];
-  const ganChongName=[[0,'甲庚相冲'],[1,'乙辛相冲'],[2,'丙壬相冲'],[3,'丁癸相冲']];
-  for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){
-    const a=gans[i][1],b=gans[j][1];
-    const p=ganChong.find(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
-    if(p) rels.push({t:'天干相冲',name:ganChongName[ganChong.indexOf(p)][1],from:gans[i][0]+GAN[a],to:gans[j][0]+GAN[b],cls:'chong'});
-  }
-  const zhiHe=[[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
-  const zhiHeName=['子丑合土','寅亥合木','卯戌合火','辰酉合金','巳申合水','午未合土'];
-  for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){
-    const a=zhis[i][1],b=zhis[j][1];
-    const p=zhiHe.findIndex(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
-    if(p>=0) rels.push({t:'地支六合',name:zhiHeName[p],from:zhis[i][0]+ZHI[a],to:zhis[j][0]+ZHI[b],cls:'he'});
-  }
-  const zhiChong=[[0,6],[1,7],[2,8],[3,9],[4,10],[5,11]];
-  const zhiChongName=['子午相冲','丑未相冲','寅申相冲','卯酉相冲','辰戌相冲','巳亥相冲'];
-  for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){
-    const a=zhis[i][1],b=zhis[j][1];
-    const p=zhiChong.findIndex(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
-    if(p>=0) rels.push({t:'地支六冲',name:zhiChongName[p],from:zhis[i][0]+ZHI[a],to:zhis[j][0]+ZHI[b],cls:'chong'});
-  }
-  const zhiSanHe=[[[8,0,4],'申子辰合水'],[[11,3,7],'亥卯未合木'],[[2,6,10],'寅午戌合火'],[[5,9,1],'巳酉丑合金']];
-  zhiSanHe.forEach(([set,name])=>{
-    const present=set.filter(z=>zhis.some(x=>x[1]===z));
-    if(present.length>=2) rels.push({t:'地支三合',name:name+(present.length===3?'（三合全）':'（半合）'),from:present.map(z=>ZHI[z]).join(''),to:'',cls:'sanhe'});
-  });
-  const xings=[[[2,5,8],'寅巳申三刑'],[[1,10,7],'丑戌未三刑'],[[0,3],'子卯相刑']];
-  xings.forEach(([set,name])=>{
-    const present=set.filter(z=>zhis.some(x=>x[1]===z));
-    if(present.length>=2) rels.push({t:'地支相刑',name:name,from:present.map(z=>ZHI[z]).join(''),to:'',cls:'xing'});
-  });
-  // 自刑(辰辰/午午/酉酉/亥亥 需同支双见)
-  const ziXingZhi=[4,6,9,11];
-  ziXingZhi.forEach(z=>{
-    const hit=zhis.filter(x=>x[1]===z);
-    if(hit.length>=2) rels.push({t:'地支自刑',name:ZHI[z]+ZHI[z]+'自刑',from:hit.map(x=>x[0]+ZHI[z]).join('·'),to:'',cls:'xing'});
-  });
-  const zhiHai=[[0,7],[1,6],[2,5],[3,4],[8,11],[9,10]];
-  const zhiHaiName=['子未相害','丑午相害','寅巳相害','卯辰相害','申亥相害','酉戌相害'];
-  for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){
-    const a=zhis[i][1],b=zhis[j][1];
-    const p=zhiHai.findIndex(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
-    if(p>=0) rels.push({t:'地支六害',name:zhiHaiName[p],from:zhis[i][0]+ZHI[a],to:zhis[j][0]+ZHI[b],cls:'hai'});
-  }
-  const zhiPo=[[0,9],[6,3],[2,11],[5,8],[4,1],[10,7]];
-  const zhiPoName=['子酉相破','午卯相破','寅亥相破','巳申相破','辰丑相破','戌未相破'];
-  for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){
-    const a=zhis[i][1],b=zhis[j][1];
-    const p=zhiPo.findIndex(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
-    if(p>=0) rels.push({t:'地支六破',name:zhiPoName[p],from:zhis[i][0]+ZHI[a],to:zhis[j][0]+ZHI[b],cls:'po'});
-  }
-  // 地支暗合(藏干五合,非六合本气合)
-  const anHe=[[0,10],[1,2],[3,8],[5,8],[6,11]];
-  const anHeName={0:'子戌暗合(癸戊合)',1:'丑寅暗合(己甲合)',2:'卯申暗合(乙庚合)',3:'巳申暗合(丙辛合)',4:'午亥暗合(丁壬合)'};
-  for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){
-    const a=zhis[i][1],b=zhis[j][1];
-    const p=anHe.findIndex(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
-    if(p>=0) rels.push({t:'地支暗合',name:anHeName[p],from:zhis[i][0]+ZHI[a],to:zhis[j][0]+ZHI[b],cls:'anhe'});
-  }
-  return rels;
 }
 // 五行流通环形图(圆大小=命局数量, 金色实线=相生, 红色虚线=相克)
 function wxFlowSvg(zh){

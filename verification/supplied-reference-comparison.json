@@ -1,0 +1,379 @@
+{
+  "source": {
+    "archive": "111.zip",
+    "sha256": "13e798092f8da869dfc865b7d45e364ac805e890e36d9d41ea0e50c009173e8a",
+    "sample": "bazi-chart-1990-05-20T1030-male.json",
+    "scope": "Single supplied response; not an authoritative oracle"
+  },
+  "report": {
+    "schemaVersion": "1.0.0",
+    "verdict": "aligned-with-gaps",
+    "summary": {
+      "same": 38,
+      "different": 0,
+      "not-provided": 1
+    },
+    "fields": [
+      {
+        "path": "input.date",
+        "label": "出生日期",
+        "status": "same",
+        "local": "1990-05-20",
+        "reference": "1990-05-20",
+        "normalizedAlias": false
+      },
+      {
+        "path": "input.time",
+        "label": "钟表时分",
+        "status": "same",
+        "local": "10:30",
+        "reference": "10:30",
+        "normalizedAlias": false
+      },
+      {
+        "path": "input.gender",
+        "label": "性别参数",
+        "status": "same",
+        "local": 1,
+        "reference": 1,
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.year.text",
+        "label": "年柱 · 干支",
+        "status": "same",
+        "local": "庚午",
+        "reference": "庚午",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.year.hidden",
+        "label": "年柱 · 藏干集合",
+        "status": "same",
+        "local": [
+          "丁",
+          "己"
+        ],
+        "reference": [
+          "丁",
+          "己"
+        ],
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.year.tenGod",
+        "label": "年柱 · 干十神",
+        "status": "same",
+        "local": "正官",
+        "reference": "正官",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.year.branchTenGod",
+        "label": "年柱 · 支本气十神",
+        "status": "same",
+        "local": "食神",
+        "reference": "食神",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.year.nayin",
+        "label": "年柱 · 纳音",
+        "status": "same",
+        "local": "路旁土",
+        "reference": "路旁土",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.year.diShi",
+        "label": "年柱 · 十二长生",
+        "status": "same",
+        "local": "长生",
+        "reference": "长生",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.year.isKong",
+        "label": "年柱 · 日旬空亡",
+        "status": "same",
+        "local": true,
+        "reference": true,
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.month.text",
+        "label": "月柱 · 干支",
+        "status": "same",
+        "local": "辛巳",
+        "reference": "辛巳",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.month.hidden",
+        "label": "月柱 · 藏干集合",
+        "status": "same",
+        "local": [
+          "丙",
+          "庚",
+          "戊"
+        ],
+        "reference": [
+          "丙",
+          "庚",
+          "戊"
+        ],
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.month.tenGod",
+        "label": "月柱 · 干十神",
+        "status": "same",
+        "local": "七杀",
+        "reference": "七杀",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.month.branchTenGod",
+        "label": "月柱 · 支本气十神",
+        "status": "same",
+        "local": "伤官",
+        "reference": "伤官",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.month.nayin",
+        "label": "月柱 · 纳音",
+        "status": "same",
+        "local": "白蜡金",
+        "reference": "白蜡金",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.month.diShi",
+        "label": "月柱 · 十二长生",
+        "status": "same",
+        "local": "沐浴",
+        "reference": "沐浴",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.month.isKong",
+        "label": "月柱 · 日旬空亡",
+        "status": "same",
+        "local": false,
+        "reference": false,
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.day.text",
+        "label": "日柱 · 干支",
+        "status": "same",
+        "local": "乙酉",
+        "reference": "乙酉",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.day.hidden",
+        "label": "日柱 · 藏干集合",
+        "status": "same",
+        "local": [
+          "辛"
+        ],
+        "reference": [
+          "辛"
+        ],
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.day.tenGod",
+        "label": "日柱 · 干十神",
+        "status": "not-provided",
+        "local": "比肩",
+        "reference": null,
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.day.branchTenGod",
+        "label": "日柱 · 支本气十神",
+        "status": "same",
+        "local": "七杀",
+        "reference": "七杀",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.day.nayin",
+        "label": "日柱 · 纳音",
+        "status": "same",
+        "local": "井泉水",
+        "reference": "泉中水",
+        "normalizedAlias": true
+      },
+      {
+        "path": "pillars.day.diShi",
+        "label": "日柱 · 十二长生",
+        "status": "same",
+        "local": "绝",
+        "reference": "绝",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.day.isKong",
+        "label": "日柱 · 日旬空亡",
+        "status": "same",
+        "local": false,
+        "reference": false,
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.hour.text",
+        "label": "时柱 · 干支",
+        "status": "same",
+        "local": "辛巳",
+        "reference": "辛巳",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.hour.hidden",
+        "label": "时柱 · 藏干集合",
+        "status": "same",
+        "local": [
+          "丙",
+          "庚",
+          "戊"
+        ],
+        "reference": [
+          "丙",
+          "庚",
+          "戊"
+        ],
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.hour.tenGod",
+        "label": "时柱 · 干十神",
+        "status": "same",
+        "local": "七杀",
+        "reference": "七杀",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.hour.branchTenGod",
+        "label": "时柱 · 支本气十神",
+        "status": "same",
+        "local": "伤官",
+        "reference": "伤官",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.hour.nayin",
+        "label": "时柱 · 纳音",
+        "status": "same",
+        "local": "白蜡金",
+        "reference": "白蜡金",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.hour.diShi",
+        "label": "时柱 · 十二长生",
+        "status": "same",
+        "local": "沐浴",
+        "reference": "沐浴",
+        "normalizedAlias": false
+      },
+      {
+        "path": "pillars.hour.isKong",
+        "label": "时柱 · 日旬空亡",
+        "status": "same",
+        "local": false,
+        "reference": false,
+        "normalizedAlias": false
+      },
+      {
+        "path": "dayun.0",
+        "label": "第1步大运",
+        "status": "same",
+        "local": "壬午",
+        "reference": "壬午",
+        "normalizedAlias": false
+      },
+      {
+        "path": "dayun.1",
+        "label": "第2步大运",
+        "status": "same",
+        "local": "癸未",
+        "reference": "癸未",
+        "normalizedAlias": false
+      },
+      {
+        "path": "dayun.2",
+        "label": "第3步大运",
+        "status": "same",
+        "local": "甲申",
+        "reference": "甲申",
+        "normalizedAlias": false
+      },
+      {
+        "path": "dayun.3",
+        "label": "第4步大运",
+        "status": "same",
+        "local": "乙酉",
+        "reference": "乙酉",
+        "normalizedAlias": false
+      },
+      {
+        "path": "dayun.4",
+        "label": "第5步大运",
+        "status": "same",
+        "local": "丙戌",
+        "reference": "丙戌",
+        "normalizedAlias": false
+      },
+      {
+        "path": "dayun.5",
+        "label": "第6步大运",
+        "status": "same",
+        "local": "丁亥",
+        "reference": "丁亥",
+        "normalizedAlias": false
+      },
+      {
+        "path": "dayun.6",
+        "label": "第7步大运",
+        "status": "same",
+        "local": "戊子",
+        "reference": "戊子",
+        "normalizedAlias": false
+      },
+      {
+        "path": "dayun.7",
+        "label": "第8步大运",
+        "status": "same",
+        "local": "己丑",
+        "reference": "己丑",
+        "normalizedAlias": false
+      }
+    ],
+    "warnings": [
+      "口径尚未同时提供：utcOffsetMinutes",
+      "口径尚未同时提供：dstMinutes",
+      "口径尚未同时提供：dayBoundary",
+      "口径尚未同时提供：trueSolar",
+      "大运步数不同：仅比较共有的8步（本盘8步，对照9步）"
+    ],
+    "scope": "仅比较已提供的计算/传统表项，不认定任一实现为标准答案。藏干仅比较集合；空亡依据日柱旬。",
+    "excluded": [
+      "强弱分数与分档",
+      "喜忌用神",
+      "格局",
+      "神煞集合",
+      "AI解释",
+      "藏干中气/余气次序和权重"
+    ],
+    "rules": {
+      "version": "5.20.0",
+      "profile": "combined",
+      "strength": "legacy-strength-v1",
+      "dayBoundary": "zi-chu"
+    }
+  }
+}
