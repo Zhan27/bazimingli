@@ -55,3 +55,9 @@ test('Worker preserves SSE bytes, rejects incompatible content and caps streamin
   const wrong=await loadWorker(async()=>new Response('<html>bad</html>',{headers:{'Content-Type':'text/html'}})).worker.fetch(req(),env);assert.equal(wrong.status,502);
   const large=await loadWorker(async()=>new Response('x'.repeat(4194305),{headers:{'Content-Type':'application/json'}})).worker.fetch(req(),env);await assert.rejects(()=>large.text(),/响应过长/);
 });
+test('Worker forwards bounded inline JSON Schema formats and rejects invalid or reference-based schemas',async()=>{
+  let sent;const w=loadWorker(async(url,options)=>{sent=JSON.parse(options.body);return new Response('{}',{headers:{'Content-Type':'application/json'}});}).worker;
+  const format={type:'json_schema',json_schema:{name:'chart',strict:false,schema:{type:'object',properties:{conclusion:{type:'string'}}}}};
+  const r=await w.fetch(req({...payload,response_format:format}),env);await r.text();assert.deepEqual(sent.response_format,format);
+  for(const response_format of [{type:'unknown'},{type:'json_schema',json_schema:{...format.json_schema,name:'bad name'}},{type:'json_schema',json_schema:{...format.json_schema,schema:{$ref:'https://external.test/schema'}}}])assert.equal((await w.fetch(req({...payload,response_format}),env)).status,400);
+});

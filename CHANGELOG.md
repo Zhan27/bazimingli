@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.20.0 — 2026-10-22
+- Integrated JSON-first18-dimension AI cards with optional provider JSON Schema and explicitly unverified Markdown compatibility. Displays conclusions, computed fact references, source status, uncertainty, alternatives and requested-model/prompt/rule/time metadata.
+- Added explicit cancellation, a bounded recent-chart tab-session draft, local restore/revalidation, per-card regeneration and missing-dimension retries. Invalid replies preserve accepted cards; chart changes stop old work and stale responses cannot fill a new chart. No automatic paid retries.
+- Removed AI score replacement and forced wealth/education/numerical life-score instructions. Collapsed legacy heuristic grading behind an uncalibrated-demo notice; calculation outputs remain unchanged.
+- Kept legacy server-template mode compatible with full Markdown; blocks unsupported JSON/subset requests before contacting a provider. Source changes do not redeploy existing Workers.
+- Added pure attempt-state tests, browser workflow tests and six versioned synthetic contract/fault fixtures with a CI evaluation report. These are protocol/regression checks, not live-model or predictive-accuracy experiments.
+
 ## 5.19.2 — 2026-10-21
 - Fixed Chinese console output on English Windows/Python cp1252 streams; all logging after server binding now remains inside the cleanup boundary.
 - Added an explicit cp1252 regression test. This supersedes the unpublished5.19.1 tag whose Windows release gate caught the encoding failure; the older tag is retained unchanged.

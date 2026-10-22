@@ -70,6 +70,8 @@ wrangler tail
 
 本仓库修改不等于已部署服务更新；需要维护者按配置重新部署。`npm test`中的Worker测试使用虚构访问码和模拟上游，不发送收费模型请求。
 
+5.20的普通聊天路由支持转发`response_format: json_object`及有界内联`json_schema`，以便保留前端的结构化请求。Schema最多32768字符、嵌套14层，不接受`$ref`/`$dynamicRef`；模型仍需实际支持该格式。旧版`/v1/divine`模板流程仍为全量Markdown，JSON或局部生成请在前端关闭服务端Prompt模式。更新此能力需要重新部署Worker。
+
 ---
 
 ## 前端怎么填

@@ -1,0 +1,164 @@
+{
+  "fixtureVersion": "synthetic-contract-v1",
+  "ruleVersion": "5.20.0",
+  "promptVersions": [
+    "evidence-combined-1.1.0",
+    "evidence-balance-1.1.0",
+    "evidence-image-1.1.0",
+    "evidence-structure-1.1.0",
+    "evidence-climate-1.1.0"
+  ],
+  "scope": "Generated protocol fixtures and fault injections, not outputs from live models",
+  "cases": [
+    {
+      "id": "complete-reference",
+      "expectedPass": true,
+      "expectedError": null,
+      "matches": true,
+      "contractVersion": "1.0.0",
+      "chartId": "chart-9e34409a",
+      "complete": true,
+      "pass": true,
+      "errorCounts": {
+        "FACT_ERROR": 0,
+        "RULE_INCONSISTENCY": 0,
+        "REASONING_GAP": 0,
+        "EXPRESSION_ERROR": 0
+      },
+      "dimensionCount": 18,
+      "errors": [],
+      "scope": "Contract/explicit fact-reference checks only; prose factual accuracy and predictive validity are not established"
+    },
+    {
+      "id": "pillar-mismatch",
+      "expectedPass": false,
+      "expectedError": "FACT_ERROR",
+      "matches": true,
+      "contractVersion": "1.0.0",
+      "chartId": "chart-9e34409a",
+      "complete": true,
+      "pass": false,
+      "errorCounts": {
+        "FACT_ERROR": 1,
+        "RULE_INCONSISTENCY": 0,
+        "REASONING_GAP": 0,
+        "EXPRESSION_ERROR": 0
+      },
+      "dimensionCount": 18,
+      "errors": [
+        {
+          "type": "FACT_ERROR",
+          "path": "pillars",
+          "message": "AI四柱与计算事实不同，禁止覆盖"
+        }
+      ],
+      "scope": "Contract/explicit fact-reference checks only; prose factual accuracy and predictive validity are not established"
+    },
+    {
+      "id": "missing-dimension",
+      "expectedPass": false,
+      "expectedError": "REASONING_GAP",
+      "matches": true,
+      "contractVersion": "1.0.0",
+      "chartId": "chart-9e34409a",
+      "complete": false,
+      "pass": false,
+      "errorCounts": {
+        "FACT_ERROR": 0,
+        "RULE_INCONSISTENCY": 0,
+        "REASONING_GAP": 1,
+        "EXPRESSION_ERROR": 0
+      },
+      "dimensionCount": 17,
+      "errors": [
+        {
+          "type": "REASONING_GAP",
+          "path": "dimensions.18",
+          "message": "缺失维度"
+        }
+      ],
+      "scope": "Contract/explicit fact-reference checks only; prose factual accuracy and predictive validity are not established"
+    },
+    {
+      "id": "invented-source",
+      "expectedPass": false,
+      "expectedError": "RULE_INCONSISTENCY",
+      "matches": true,
+      "contractVersion": "1.0.0",
+      "chartId": "chart-9e34409a",
+      "complete": true,
+      "pass": false,
+      "errorCounts": {
+        "FACT_ERROR": 0,
+        "RULE_INCONSISTENCY": 1,
+        "REASONING_GAP": 0,
+        "EXPRESSION_ERROR": 0
+      },
+      "dimensionCount": 18,
+      "errors": [
+        {
+          "type": "RULE_INCONSISTENCY",
+          "path": "dimensions.1.rules",
+          "message": "规则ID不在版本化来源目录"
+        }
+      ],
+      "scope": "Contract/explicit fact-reference checks only; prose factual accuracy and predictive validity are not established"
+    },
+    {
+      "id": "wealth-prediction",
+      "expectedPass": false,
+      "expectedError": "RULE_INCONSISTENCY",
+      "matches": true,
+      "contractVersion": "1.0.0",
+      "chartId": "chart-9e34409a",
+      "complete": true,
+      "pass": false,
+      "errorCounts": {
+        "FACT_ERROR": 0,
+        "RULE_INCONSISTENCY": 1,
+        "REASONING_GAP": 0,
+        "EXPRESSION_ERROR": 0
+      },
+      "dimensionCount": 18,
+      "errors": [
+        {
+          "type": "RULE_INCONSISTENCY",
+          "path": "dimensions.1",
+          "message": "禁止宿命或未校准的量化预测"
+        }
+      ],
+      "scope": "Contract/explicit fact-reference checks only; prose factual accuracy and predictive validity are not established"
+    },
+    {
+      "id": "truncated-json",
+      "expectedPass": false,
+      "expectedError": "EXPRESSION_ERROR",
+      "matches": true,
+      "contractVersion": "1.0.0",
+      "chartId": "chart-9e34409a",
+      "complete": false,
+      "pass": false,
+      "errorCounts": {
+        "FACT_ERROR": 0,
+        "RULE_INCONSISTENCY": 0,
+        "REASONING_GAP": 0,
+        "EXPRESSION_ERROR": 1
+      },
+      "dimensionCount": 0,
+      "errors": [
+        {
+          "type": "EXPRESSION_ERROR",
+          "path": "root",
+          "message": "JSON未完整结束或格式无效"
+        }
+      ],
+      "scope": "Contract/explicit fact-reference checks only; prose factual accuracy and predictive validity are not established"
+    }
+  ],
+  "summary": {
+    "cases": 6,
+    "expectationsMatched": 6,
+    "syntheticFaultCasesRejected": 5,
+    "paidRequests": 0
+  }
+}

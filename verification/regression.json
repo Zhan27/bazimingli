@@ -1,5 +1,5 @@
 {
-  "version": "5.19.2",
+  "version": "5.20.0",
   "baseline": "v5.16",
   "scope": "All frozen chart cases, including four pillars, lunar date, solar term, DaYun, wuxing, strength and use-god. New rules additionally covered by calculation-rules and browser tests.",
   "total": 12,
@@ -17,7 +17,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.19.2",
+      "ruleVersion": "5.20.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -205,7 +205,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.19.2",
+      "ruleVersion": "5.20.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -393,7 +393,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.19.2",
+      "ruleVersion": "5.20.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -581,7 +581,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.19.2",
+      "ruleVersion": "5.20.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -769,7 +769,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.19.2",
+      "ruleVersion": "5.20.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -957,7 +957,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.19.2",
+      "ruleVersion": "5.20.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -1145,7 +1145,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.19.2",
+      "ruleVersion": "5.20.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -1333,7 +1333,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.19.2",
+      "ruleVersion": "5.20.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -1521,7 +1521,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.19.2",
+      "ruleVersion": "5.20.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -1709,7 +1709,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.19.2",
+      "ruleVersion": "5.20.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -1897,7 +1897,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.19.2",
+      "ruleVersion": "5.20.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -2085,7 +2085,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.19.2",
+      "ruleVersion": "5.20.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [

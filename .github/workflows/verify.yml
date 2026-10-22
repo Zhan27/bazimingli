@@ -30,6 +30,7 @@ jobs:
           path: |
             verification/regression.json
             verification/solar-reference.json
+            verification/ai-contract-evaluation.json
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

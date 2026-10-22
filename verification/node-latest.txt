@@ -1,0 +1,67 @@
+
+> bazimingli@5.20.0 test
+> node --test tests/*.test.cjs
+
+✔ structured output validates 18 dimensions and preserves all computed facts (1.4396ms)
+✔ fact errors, rules, missing evidence and unclear expression are distinguished (1.3878ms)
+✔ versioned knowledge has explicit verification status and independent school prompts (1.3565ms)
+✔ SSE parser handles Unicode chunks, final frame without newline, malformed/error frames and length limits (0.8072ms)
+✔ shared request layer streams a mocked provider and supports explicit cancellation without retry (19.8497ms)
+✔ versioned synthetic AI contract fixtures emit a bounded report and reject injected faults (142.8654ms)
+✔ attempts accept valid dimensions independently and reject root fact changes without touching the chart (139.643ms)
+✔ cancel/failure preserves accepted cards, partial text and metadata; restored running attempts are interrupted (150.3873ms)
+✔ Markdown compatibility is explicitly unverified and does not replace unrelated completed dimensions (142.4476ms)
+✔ malformed dimensions, extra properties, duplicates and uncalibrated prediction fields cannot be accepted (658.5491ms)
+✔ 18 dimensions parse standard, Markdown, numbered and fullwidth heading variants (1.9462ms)
+✔ missing, reordered, duplicate, incomplete streaming headings and supplementary sections (0.4924ms)
+✔ long replies retain content without truncation; oversized replies fail clearly (2.1669ms)
+✔ AI HTML rendering keeps script, SVG, handlers, entities and markdown links inert (0.4916ms)
+✔ public engine calculates without a DOM or storage and keeps its JSON input immutable (129.3132ms)
+✔ three separated modules share independent inputs/outputs and deterministic reference years (12.5379ms)
+✔ JSON chart differences, debug facts, school conflicts, evidence graph and bounded batch are usable (11.7771ms)
+✔ custom declarative scoring packs are validated, isolated and identify changed results (93.1562ms)
+✔ release check detects stale artifacts; secret/syntax failures do not overwrite output (616.2165ms)
+✔ all 100 ten-god mappings agree with the independent published lookup table (4.4831ms)
+✔ three wuxing count conventions give hand-counted totals without changing core facts (29.828ms)
+✔ strength command, root, and momentum components have independent hand-counted cases (0.5312ms)
+✔ five immutable school configurations share pillars but apply explicit use-god strategies (4.6537ms)
+✔ fixed UTC offsets, manual DST, fractional offsets and midnight/year crossing preserve one instant (0.8346ms)
+✔ NOAA solar-time components agree with independent Astronomy Engine hour-angle reference (21.429ms)
+✔ city database uses sourced WGS84 stable IDs, exact aliases and explicit ambiguity (23.6019ms)
+✔ unknown hour partitions all day, early/late Zi, exact Jie, solar crossing and unsupported edges (31.7755ms)
+✔ HKO solar/lunar benchmarks and labeled legacy epoch in both directions (52.0785ms)
+✔ seeded random Gregorian/lunar round trips, including endpoints (2002 cases) (5953.2393ms)
+✔ every lunar month start/end and leap boundary for all 200 supported lunar years (5119.042ms)
+✔ invalid lunar dates/leap months and out-of-range solar dates are rejected (11.3085ms)
+✔ sexagenary cycles wrap in both directions; all 60 pairs invert (4.7635ms)
+✔ all 24 solar terms for all supported years: before/at/after, year/month invariants (525.772ms)
+✔ 2026 major solar terms agree with HKO minute-resolution independent data within 60 seconds (0.2901ms)
+✔ four pillars fixed benchmark plus early/late Zi and exact Jie instant (0.6199ms)
+✔ NOAA equation of time, longitude sign, hour/day crossing and civil Jie separation (0.8058ms)
+✔ January DaYun uses previous December Jie and continuous fractional-day interval (0.355ms)
+✔ keys default to session storage; explicit persistence remains opt-in and can be cleared (154.9612ms)
+✔ unmarked legacy keys migrate; explicit saved choices survive reload (219.0931ms)
+✔ denied browser storage retains keys in page memory and reports the actual mode (88.0275ms)
+✔ backup uses ml_records; round trip restores all five categories and excludes secrets (3.0546ms)
+✔ v4 mingli_records backups migrate, both keys merge without duplicate IDs (0.391ms)
+✔ local legacy key migrates once and cannot resurrect after clearing (0.18ms)
+✔ malformed imports fail before any storage mutation (1.2344ms)
+✔ storage quota failure rolls back preceding category writes (0.4064ms)
+✔ every frozen v5.16 baseline recalculates unchanged and emits an inspectable report (256.2084ms)
+✔ five strength states retain all classification thresholds (1.076ms)
+✔ chart, summary and AI prompt retain exact five-state labels (40.7784ms)
+✔ Worker rejects unlisted/null origins, unknown routes, wrong methods and invalid credentials before upstream (28.818ms)
+✔ Worker bounds both declared and chunked UTF-8 bodies and rejects malformed requests without forwarding (6.9129ms)
+✔ Worker sanitizes payloads, caps tokens, publishes only allowed models and keeps responses uncached (3.8782ms)
+✔ Worker quota follows access code across IP changes, expires daily, and memory stays bounded (95.3596ms)
+✔ Worker suppresses upstream secrets/errors, rejects insecure upstream config, and cancels on timeout (26.1941ms)
+✔ Worker preserves SSE bytes, rejects incompatible content and caps streaming output (13.394ms)
+✔ Worker forwards bounded inline JSON Schema formats and rejects invalid or reference-based schemas (2.6272ms)
+ℹ tests 55
+ℹ suites 0
+ℹ pass 55
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12100.9861

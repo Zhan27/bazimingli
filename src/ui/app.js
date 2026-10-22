@@ -985,6 +985,7 @@ function zhCast(){
     const dayBoundary=document.getElementById('zh-day-boundary').value;
     const options={...readCalculationOptions('zh',school2),dayBoundary,trueSolar:trueSun};
     if(unknowHour){
+      aiEvidenceLeave();
       const result=unknownBirthCandidates(date,place,options);
       lastZh=null;lastCandidates=result;lastName=name;lastSchool=school2;
       localStorage.setItem('mingli_school',school2);
@@ -1710,7 +1711,7 @@ function zhDingDangHtml(zh){
   const basisHtml=(d.basis||[]).map(b=>`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed var(--line);font-size:.74rem"><span style="color:var(--ink2)">${b.k}</span><b style="color:var(--gold)">${b.v>0?'+':''}${b.v}</b></div>`).join('');
   html+=`<div style="text-align:right;margin-top:8px"><button type="button" class="btn btn-ghost basis-btn" data-basis="${encodeURIComponent(basisHtml)}" data-total="${d.score}" style="font-size:.7rem;padding:4px 10px">🧮 评分依据</button></div>`;
   html+=`<div style="margin-top:4px;font-size:.76rem;color:var(--ink2);line-height:1.8">${d.note}<br><span style="color:var(--ink3);font-size:.7rem">※ 定档为命理潜力区间（非绝对值），实际由个人努力、时代机遇与行运共同决定；下限守得住，上限靠本事。</span></div>`;
-  return html;
+  return '<p class="note">旧版启发式规则演示，分数、财富与学历档位均未经过现实数据校准，不是个人预测；AI不会改写本地计算。</p><details><summary>展开旧规则演示（未校准）</summary>'+html+'</details>';
 }
 /* 评分依据弹窗(读button.dataset,避免onclick属性嵌套) */
 function aiShowBasis(basisHtml,total){
@@ -1720,43 +1721,8 @@ function aiShowBasis(basisHtml,total){
   ov.innerHTML=`<div style="background:var(--card);border:1px solid var(--gold2);border-radius:14px;padding:20px;width:min(420px,92vw);max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)"><h4 style="margin:0 0 10px;color:var(--gold);font-size:.95rem">🧮 命局定分评分依据</h4><div style="font-size:.72rem;color:var(--ink3);margin-bottom:8px">综合定档评分体系（${total}分 / 100）</div>${basisHtml}<div style="margin-top:10px;font-size:.7rem;color:var(--ink3);line-height:1.6">评分项均来自命局排盘数据（得令/用神力量/通根/官杀有制/财官印流通/格局清纯/调候/五行流通/冲刑扣分）。为命理潜力评估，非现实承诺。</div><div style="text-align:right;margin-top:10px"><button class="btn btn-ghost" onclick="this.closest('div[style*=\\"position:fixed\\"]').remove()" style="font-size:.75rem">关闭</button></div></div>`;
   document.body.appendChild(ov);
 }
-/* AI 打分校准: 从 AI 第17维文本解析命局定分,替换本地打分(综合显示本地+AI) */
-function aiApplyDingDang(text){
-  if(!text) return;
-  const t=String(text);
-  // 优先匹配"命局定分"前缀的三种格式(XX/100|XX分|裸XX),避免误抓"100分制"等
-  let aiScore=null;
-  let m=t.match(/命局定分\s*(\d{1,3})\s*(?:\/\s*100|分)?/);
-  if(m) aiScore=parseInt(m[1]);
-  // 兜底: 无"命局定分"前缀时,按"XX/100|XX分"顺序试(限制0-100)
-  if(aiScore===null){
-    const m1=t.match(/(\d{1,3})\s*\/\s*100/);
-    const m2=t.match(/(\d{1,3})\s*分/);
-    if(m1&&parseInt(m1[1])<=100) aiScore=parseInt(m1[1]);
-    else if(m2&&parseInt(m2[1])<=100) aiScore=parseInt(m2[1]);
-  }
-  if(aiScore===null||aiScore<0||aiScore>100) return; // AI没给具体分,保持本地
-  // 提取格局等级
-  const gejuMatch=t.match(/(上等格局|中上格局|中等格局|中下格局|偏弱格局)/);
-  const aiGeju=gejuMatch?gejuMatch[1]:null;
-  const num=document.getElementById('dd-score-num');
-  const barFill=document.getElementById('dd-score-bar-fill');
-  const geju=document.getElementById('dd-geju');
-  const gejuCard=document.getElementById('dd-geju-card');
-  const desc=document.getElementById('dd-score-desc');
-  const lv=document.getElementById('dd-score-lv');
-  const badge=document.getElementById('dd-ai-badge');
-  const note=document.getElementById('dd-ai-note');
-  const localScore=num?parseInt(num.textContent):null;
-  if(num) num.textContent=aiScore;
-  if(barFill) barFill.style.width=Math.min(100,aiScore)+'%';
-  if(geju&&aiGeju) geju.textContent=aiGeju;
-  if(gejuCard&&aiGeju) gejuCard.textContent=aiGeju;
-  if(desc) desc.textContent=aiScore>=80?'天资卓越':aiScore>=60?'格局有成':aiScore>=45?'中规中矩':'有待行运';
-  if(lv) lv.textContent=aiScore>=80?'上上':aiScore>=60?'中上':aiScore>=45?'中等':'中下';
-  if(badge){badge.style.display='inline-block';badge.title='本地引擎 '+localScore+' 分 → AI 校准 '+aiScore+' 分';}
-  if(note){note.style.display='inline';note.title='本地引擎 '+localScore+' 分 · AI 综合定档 '+aiScore+' 分';}
-}
+/* AI评分替换已移除；传统解释不得覆盖计算值。 */
+
 /* 评分依据按钮事件委托 */
 document.addEventListener('click',function(e){
   const b=e.target.closest('.basis-btn');
@@ -2912,7 +2878,7 @@ function aiRenderDims(full){
           const aiBox=el.querySelector('.dim-ai');
           const aiBody=el.querySelector('.dim-ai-body');
           if(aiBox&&aiBody){aiBox.style.display='block';aiBody.innerHTML=aiMd2Html(segs[n].trim());}
-          aiApplyDingDang(segs[n]);
+          // Legacy Markdown may add interpretation text, never overwrite computed scores.
         }else if(idx===14){
           // 流年应期: 内容既写卡片,也同步到流年时间轴下方的"AI 流年深度解读"区(按21年展开的版本)
           const body=el.querySelector('.ai-dim-body');
@@ -3029,53 +2995,21 @@ function zhZwRefGuide(){
   ].join('\n');
 }
 function aiBuildSchoolPrompt(schoolIdx, mode){
-  const sch=aiBuildSchool(schoolIdx);
-  const s=parseInt(schoolIdx);
-  const dimList=AI_DIM_NAMES;
-  // 补齐 dimGuide 13-17 缺失(通用兜底)
-  const genGuide={
-    13:'大运总览：起运岁数、当前大运+下一步大运、每步大运主题与人生阶段',
-    14:'流年应期：**按"过去5年+未来15年=共21年"逐年展开**，每行格式："【YYYY年】干支(十神)｜喜忌(喜用/忌神/闲平)｜应期强度(强/中/弱)｜核心应事一句(30字内)"。21行按年份顺序列出，末尾给一句十年总结。',
-    15:'开运建议：方位/颜色/行业/习惯/心态 5条可落地建议',
-    16:'综合定档：**必须给出命局定分（0-100明确数字）**＋格局高低(上等/中上/中等/中下/偏弱等级)＋财富区间(十万-百万级量化)＋人生上下限(下限=最差行运,上限=喜用运全走)＋学历上下限＋**综合大运**(前/中/后三段喜用占比评估)，分数和等级必须明确给出',
-    17:'风险提示：需避免的决策陷阱+情绪风险+现实风险，克制不恐吓'
-  };
-  for(const k in genGuide){ sch.dimGuide[k]=sch.dimGuide[k]||genGuide[k]; }
-  const dimsLine=dimList.map((t,i)=>'【'+(i+1)+'】'+t+'：'+sch.dimGuide[i]).join('\n');
-  // 第17维综合定档·独立评分标准(不注入本地分数,给AI严谨评分规则,由AI独立定档)
-  const scoreRule='\n\n【第17维·综合定档评分标准（AI 独立计算，不参考任何既有分数）】\n100分制，基础分40（中等起点），按以下9项加减：\n1) 得令：月令本气生扶日主或为用神 +12；财官当令（克耗日主） -6；\n2) 用神力量：用神五行在原局个数 ×4（上限12）；用神完全不现 -8；\n3) 通根：印比四支通根，每根 +1~1.5（上限16）；\n4) 官杀有制：官杀≥2且食伤/印星≥2 +8；官杀≥2而无制 -6；\n5) 财官印流通：财、官、印俱现 +6；\n6) 格局清纯：正官七杀不混杂 +3；\n7) 调候：冬（亥子丑月）夏（巳午未月）生人有调候之神 +4，缺失 -4；春秋生 0；**出生地修正（时地权重）**：生于北方水地/西方金地者冬寒更重、生于南方火地者夏燥更重——地域助长寒燥则调候权重加倍（到位 +5、缺失 -6）；冬月生于南方火地或夏月生于北方水地者，地气已化解寒燥——调候权重减半（到位 +2、缺失 -2）；\n8) 五行流通：印→比→食伤→财链条俱全 +3；\n9) 冲刑：天干冲或地支六冲 ×-2/处，三刑 ×-1/处。\n最终分数=40+各项加减，限制在 20-95。\n格局等级：≥80 上等；60-79 中上；45-59 中等；30-44 中下；<30 偏弱。\n请先在【17】段内简列各项加减（如"得令-6、用神+8、通根+6…"共2行内），再给出最终「命局定分XX分（100分制）+格局等级」。';
-  const zwRef=zhZwRefText(lastZh); // 紫微参考数据(勾选"参考紫微斗数"时)
-  // 研究纪律(跃渊方法论: 假设-证据-反证、规则分层、不确定度、SAFE红线)
-  const researchDiscipline='\n\n【研究纪律（跃渊方法论）】\n1) 结论可证伪：每条断语给"倾向 + 证据 + 不确定度（高/中/低）"，不确定时明确说"目前更支持X"，禁止为显专业而强造唯一答案；\n2) 规则分层：结构性铁律（五行生克/十神定义/干支合冲刑害）> 核心法则（旺衰·格局·调候）> 流派法则 > 经验断语，冲突时高层优先并显式说明取舍；\n3) 允许竞争假设：存在路线级分歧（如正格 vs 从格、喜水 vs 喜火、身强 vs 身弱边缘）时，并列两条相反路线各给证据，并给出"判别点"（用哪类人生经历或大运可区分二者）；\n4) 拒绝迎合：不得因用户叙述"某年很顺/某年很背"而反向修改已给出的基础判断，只能将其作为应期佐证重新核查；\n  5) SAFE 红线：不做宿命定级（禁"必死/必灾/必离婚/必破财"式断言）、不做医学诊断、不写灾祸惊悚内容；身心/财富/婚恋内容仅作传统命理文化语境下的状态倾向参考。';
-  // 命格原型参照（借鉴 mingge「命格宇宙」断语体系: 十格象征 + 吉凶神顺逆要诀 + 格局成败六态判词 + 五维能量定义）
-  const mingGeRef='\n\n【命格原型参照（命格宇宙式断语体系）】\n以下为传统命格断语体系，用于佐证与润色各维度结论，勿逐条套用，择与本盘相符者化用：\n1) 十格象征：正官=规则名誉地位，重责任体面；七杀=魄力突破掌控，宜制化；正印=学识庇护靠山，主文凭慈和；偏印=偏门智慧孤高深钻，枭神夺食忌；食神=才华口福温和，制杀有力；伤官=聪明叛逆创造，伤官见官忌；正财=务实稳财节制，重积累；偏财=慷慨人脉流动财，广结善缘；比肩（建禄）=独立自主不服管，身弱喜之身强忌之；劫财（阳刃）=刚强攻击性，宜官杀制衡。\n2) 吉凶顺逆要诀（《子平真诠》）："财官印食，此四者为吉神，宜顺而生之；杀伤枭刃，此四者为凶神，宜逆而制之。"成格之路与破格之忌各随其格：官怕伤官见官、财怕比劫夺财、印怕贪财坏印、食怕枭神夺食；杀宜食神制杀/印化杀/羊刃合杀、伤官宜配印/生财/驾杀、枭宜财制、刃宜官杀制伏。\n3) 格局成败六态（判词风格）：成格=相神在位且原局无病，天赋结构自洽；败中有成=有病而药亦在原局，先受其困后得其解，上限高起伏大；成中有败=格已立但有一处病无药可解，有明确长处也有一处固定漏洞；待引发=格立而未点亮，非残缺而是未被引发，关键在何时行到那一步运；破格=病在明处而药不足以立格，"有病方为贵，无伤不是奇"；外格自成=从化专旺一路，论真与假，势顺则真一路到底反而更纯粹。\n4) 从格外格：从儿从财从杀从势，皆日主极弱弃命相从，"从得真时旦夕富"；专旺五格（曲直炎上稼穑从革润下）一行独旺，喜行化地、忌克我之行犯旺；化气格真化则全盘改以化神论命。\n5) 五维能量定义：财富=财星（聚敛变现）、权力=官杀（掌控规则）、才华=食伤（创造表达）、智识=印星（沉淀吸收）、意志=比劫（自我支撑）。';
-  let system=sch.role+'\n\n【知识库参考】\n'+aiBuildKnowledge(lastZh)+scoreRule+researchDiscipline+mingGeRef
-    +(zwRef?('\n\n【紫微互参总则】\n解读18维时须将八字与紫微双系统互证：八字主理命局体性（格局·喜用·大运），紫微辅参性情气质与行运节奏（命宫主星·四化·大限）。**至少8个维度**以"紫微佐证："标注引用具体星曜与八字结论互证，紫微相关内容约占全篇解读三成；两套行运系统（八字大运 vs 紫微大限）同段同吉凶则加重权重，冲突处单独辩证。\n\n【紫微专断】（附加段，在【18】之后输出，不计入维度标记）\n单独输出一段紫微斗数专项解读（约220字，不分小标题）：①命宫主星格局断语（如"太阳坐命旺地，光明磊落，广结善缘"）；②身宫主星=后天追求方向；③生年四化吉凶落宫（禄权科忌各主何事）；④大限顺逆与起运节奏，最后给一句紫微层面的总判断。要求引用本盘具体星曜与宫位，与八字结论呼应而非重复。'):'')
-    +'\n\n【输出要求】\n请基于命盘数据与知识库（按'+SCHOOLS[s]+'派侧重），对以下18个维度逐一深度解读。严格按此格式输出（每个维度一段，段首用【数字】标记，必须从【1】到【18】全部覆盖，不要遗漏）：\n【0】命局总览：日主·'+SCHOOLS[s]+'核心要点·喜忌一句话定调（60字内，无标记号，放最前）\n'
-    +dimsLine
-    +'\n\n【格式模板示例】（仅示范格式，勿照抄内容）\n【1】旺衰平衡：此处为第一维内容…\n【2】子平格局：此处为第二维内容…\n…\n【17】综合定档：命局定分75/100，中上格局，财富百万级，人生中平到中上，学历本科重点…\n【18】风险提示：此处为第十八维内容…\n\n【硬性要求】\n1) 每段150-260字（内容丰满：可含命理推断过程、分点展开、典籍引文，避免空洞），引用命盘具体数据（如"甲木坐辰偏财透干"）而非空泛套话；\n2) 每段融合至少一处典籍原文或命理口诀（如"财气通门户""有病方为贵"）；\n3) **必须站在'+SCHOOLS[s]+'视角**，不可泛泛而谈；\n4) 语言专业而有人味，避免"命主""格局较高"等废话；\n5) 严禁修改标记格式：每段必须【N】开头且【N】独占行首，严禁使用"一、""1.""-"等其它标题，严禁遗漏任何维度，**【18】风险提示为最后一段必须输出**；\n6) 第17维"综合定档"必须**严格按上述评分标准独立计算**（基础40起，按9项加减后限制20-95），以「命局定分XX分（100分制）」开头（XX为0-100的**整数**，不要用区间如"70-75"），然后给格局等级（上等/中上/中等/中下/偏弱）、财富"十万级/百万级/千万级"区间、人生上下限、学历区间、大运三段评估；\n7) 第18维"风险提示"只谈倾向与建议，禁止"必死/必灾/必离婚/必破财"等绝对化词语；\n8) 健康内容仅养生参考不作医疗诊断，财富仅倾向不作投资承诺，婚姻不制造焦虑。\n\n【流派对照】（附加段，在【18】与【紫微专断】之后输出，不计入维度标记）\n对同一命局，按以下 5 个流派各给一段约120字（100-150字）的对照解读，每段独立成段、段首用标记：\n【流1】旺衰平衡派：身强弱倾向＋喜用补益（结合得令/通根/评分）\n【流2】子平格局派：月令取格＋格局成败（引用《子平真诠》"专求月令"）\n【流3】盲派象法：做功主宾＋干支意象（引原局具体合冲刑害）\n【流4】穷通调候派：寒暖燥湿＋调候用神（冬火夏水等）\n【流5】综合多流派：四派交叉印证一句话收束\n要求：每段引用本盘具体干支数据（如"丁火坐亥、甲木透干"），语言专业有人味，避免空泛套话。';
-  const user='【基础信息（确认本盘身份，勿与它盘混淆）】\n'+aiBasicInfo(lastZh)+'\n\n【命盘数据】\n'+aiBuildChart(lastZh)+(zwRef?('\n\n'+zwRef+'\n\n'+zhZwRefGuide()):'');
-  return {system, user};
+  const chart=serializeChart(lastZh);
+  if(mode==='extract')return buildEvidencePrompt(chart,schoolIdx,{mode:document.getElementById('ai-output-format')?.value==='markdown'?'markdown':'json'});
+  const sp=buildEvidencePrompt(chart,schoolIdx,{mode:'markdown'});
+  const zw=zhZwRefText(lastZh)?'\n【紫微参考边界】仅作独立传统规则参考，不等于科学交叉验证；出处未核验，不强制原文或评分。':'';
+  return {system:sp.system+'\n【原项目知识线索：出处尚待核验】\n'+aiBuildKnowledge(lastZh)+zw,
+    user:'【基础信息（确认本盘身份，勿与它盘混淆）】\n'+aiBasicInfo(lastZh)+'\n\n【命盘数据】\n'+aiBuildChart(lastZh)+(zhZwRefText(lastZh)?('\n\n'+zhZwRefText(lastZh)+'\n\n'+zhZwRefGuide()):'')};
 }
 /* 提取 Prompt(无API Key时复制到任意AI对话使用) */
 function aiExtractPrompt(){
   if(!lastZh){alert('请先排盘');return;}
-  const dimList=AI_DIM_NAMES;
   const {system}=aiBuildSchoolPrompt(lastSchool,'extract');
-  let p='【本盘身份信息（勿与其它命盘混淆）】\n'+aiBasicInfo(lastZh)+'\n\n';
-  p+='【当前流派】'+SCHOOLS[lastSchool]+'（可在综合排盘/八字排盘表单顶部的"命理流派"下拉切换）\n\n';
-  p+='【使用方式】把以下 Prompt 完整复制到任意 AI 对话（WorkBuddy/DeepSeek/ChatGPT 等）发送，AI 会按'+SCHOOLS[lastSchool]+'视角、按【1】~【18】逐维输出（含综合定档·风险提示），回复粘贴回弹窗下方即可点亮 18 张卡片。\n\n';
-  p+='━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
-  p+=system;
-  const zwRef=zhZwRefText(lastZh);
-  if(zwRef) p+='\n\n'+zwRef+'\n\n'+zhZwRefGuide();
-  p+='\n\n━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
-  p+='【收到AI回复后】把回复全文粘贴回本弹窗下方「粘贴 AI 回复」框，点「🔁 回填 18 维卡片」即可（若某维缺失会有提示，可让 AI 补输出缺失的【N】段）。';
-  const ta=document.getElementById('ai-prompt-text');
-  ta.value=p;
+  const {user}=aiBuildSchoolPrompt(lastSchool,'extract');
+  document.getElementById('ai-prompt-text').value=system+'\n\n【命盘数据】\n'+user;
   document.getElementById('ai-reply-text').value='';
   document.getElementById('ai-prompt-modal').style.display='flex';
-  ta.scrollTop=0;
 }
 /* 复制 Prompt */
 function aiCopyPrompt(){
@@ -3118,89 +3052,15 @@ function aiFallbackZwRef(){
 }
 function aiApplyReply(){
   const text=document.getElementById('ai-reply-text').value;
-  if(!text.trim()){alert('请先粘贴 AI 的回复内容');return;}
-  try{ lastAIReply=text; }catch(e){} // 保存全文供追问使用
-  const raw=aiRenderDims(text);
-  const n=raw>=0?raw:0;
-  const missing=raw<0?-raw:0;
-  // 【18】风险提示缺失时自动用本地引擎兜底
-  const autoFallback=aiFallbackRisk();
-  let zwFb=0; try{ zwFb=aiFallbackZwRef(); }catch(e){}
-  const box=document.getElementById('ai-deep-box');
-  let msg=`✅ 已回填 ${n} 个维度卡片${autoFallback?'，【18】风险提示已用本地引擎自动兜底':''}`;
-  const missNow=missing-autoFallback;
-  if(missNow>0) msg+=`<br><span style="color:#c87a2d">⚠️ 仍缺失 ${missNow} 个维度：${Array.from({length:18},(_,i)=>aiDimHas(i)?null:(i+1)).filter(x=>x).join('、')}，请让 AI 补输出对应【N】段再粘贴</span>`;
-  if(box)box.innerHTML='<div style="padding:6px 2px"></div><div style="font-size:.82rem;color:var(--jade)">'+msg+'</div>';
-  if(n>0&&missNow>0) alert(`已回填 ${n}/18 维，仍缺失 ${missNow} 维（${Array.from({length:18},(_,i)=>aiDimHas(i)?null:(i+1)).filter(x=>x).join('、')}）。可让 AI 补输出对应【N】段再粘贴。`);
-  else if(n>0) alert(`已回填 ${n}/18 个维度卡片${autoFallback?'，风险提示已本地兜底':''}！`);
-  else alert('未识别到【1】~【18】标记，请确认粘贴的是完整 AI 回复（若 AI 用了"1.""一、"等格式，已尝试兼容，仍失败请让 AI 严格按【N】输出）');
+  if(!text.trim()){alert('请先粘贴AI回复');return;}
+  aiEvidenceApplyText(text);
+  document.getElementById('ai-prompt-msg').textContent='已处理；请查看卡片上的校验状态和AI区的错误清单。';
 }
 function aiDimHas(idx){
   const el=document.getElementById('ai-dim-'+idx);
   return !!(el&&el.querySelector('.ai-dim-badge')&&el.querySelector('.ai-dim-badge').style.display==='inline-block');
 }
-function aiDeepAnalyze(){
-  const c=aiGetConfig();
-  const box=document.getElementById('ai-deep-box');
-  if(!lastZh){alert('请先排盘');return;}
-  if(!box){alert('请先排盘（AI 深度解读随排盘结果生成）');return;}
-  if(!c.key){
-    box.innerHTML='<div style="padding:14px;text-align:center;color:var(--ink3);font-size:.85rem">⚠️ 尚未配置 AI Key。<br>点击右上角「🤖 AI 深度解读设置」填入 API Key 后重试。<br><span style="font-size:.74rem;color:var(--ink2)">支持 DeepSeek / OpenAI / 通义千问等任意 OpenAI 兼容接口，Key 仅存本机。没有 Key 也可用「📋 提取 Prompt」通道。</span></div>';
-    return;
-  }
-  const btn=document.getElementById('ai-deep-btn');
-  if(btn){btn.disabled=true;btn.textContent='⏳ AI 深度思考中…（约30-60秒）';}
-  box.innerHTML='<div style="padding:16px;color:var(--ink3);font-size:.82rem;text-align:center">🤖 正在按<b>'+SCHOOLS[lastSchool]+'</b>视角，综合<b>命盘数据 + 典籍知识库</b>深度推演 18 个维度（含综合定档·风险提示）…<br><span style="font-size:.72rem">各维度将实时填入卡片</span></div>';
-  // 预留渲染容器（原实现依赖 box.firstChild，先清空再插入更稳）
-  box.innerHTML='<div style="padding:6px 2px"></div>';
-  const container=box.firstChild;
-  const nearBottom=()=>box.scrollHeight-box.scrollTop-box.clientHeight<90;
-  let acc='';
-  const paint=()=>{
-    const stick=nearBottom();                       // 用户上翻阅读时不强行拽回底部
-    container.innerHTML=aiMd2Html(acc);
-    if(stick) box.scrollTop=box.scrollHeight;
-    try{aiRenderDims(acc);}catch(e){}
-  };
-  const finish=(ok)=>{
-    if(btn){btn.disabled=false;btn.textContent=ok?'🤖 AI 深度解读（重新生成）':'🤖 AI 深度解读';}
-  };
-  // 组装请求：服务端 Prompt 模式只上传命盘事实；直连模式在本地拼 system
-  let payload,url;
-  if(c.divine){
-    url=aiDivineEndpoint(c);
-    payload=aiDivinePayload(lastSchool);
-    payload.model=c.model;
-    payload.temperature=0.7;
-    if(c.maxTok>0) payload.max_tokens=c.maxTok;
-  }else{
-    const sp=aiBuildSchoolPrompt(lastSchool,'deep');
-    url=aiEndpoint(c);
-    payload={model:c.model,messages:[{role:'system',content:sp.system},{role:'user',content:sp.user}],temperature:0.7,stream:true};
-    if(c.maxTok>0) payload.max_tokens=c.maxTok;   // 避免 18 维被服务端默认值截断
-  }
-  aiStreamChat(url,{
-    method:'POST',
-    headers:aiHeaders(c),
-    body:JSON.stringify(payload)
-  },{
-    idleMs:90000,
-    totalMs:480000,
-    onDelta:(d)=>{ acc+=d; paint(); },
-    onDone:(full)=>{
-      acc=full||acc; paint();
-      try{ lastAIReply=acc; }catch(e){}
-      let fb=0; try{ fb=aiFallbackRisk(); }catch(e){}
-      try{ aiFallbackZwRef(); }catch(e){}
-      if(fb) box.innerHTML+='<div style="font-size:.8rem;color:var(--orange);margin-top:6px">⚠️ AI 未输出【18】风险提示，已用本地引擎自动兜底。</div>';
-      finish(true);
-    },
-    onError:(e)=>{
-      box.innerHTML='<div style="padding:14px;color:var(--red);font-size:.82rem">❌ 调用失败：'+esc0(e.message||e)+'<br><span style="color:var(--ink3);font-size:.74rem">检查「🤖 AI 深度解读设置」中的 BaseURL / Key / 模型名 / max_tokens；若因超时中断，可直接重试。</span></div>';
-      finish(false);
-    }
-  });
-}
+function aiDeepAnalyze(){aiEvidenceStart();}
 /* 极简转义（错误信息可能含后端原文） */
 
 function zhAnalysis(zh){
@@ -3815,6 +3675,7 @@ function zhChangeHourHint(){
   if(h){ h.focus(); if(h.scrollIntoView) h.scrollIntoView({behavior:'smooth',block:'center'}); }
 }
 function renderZongHe(zh,name){
+  aiEvidenceLeave();
   const d=zh;
   let html=`<div class="result"><div class="result-title">综合命盘 · 五术同参 </div>`;
   html+=`<div class="info-bar">`;
@@ -4020,7 +3881,7 @@ function renderZongHe(zh,name){
   const ana=zhAnalysis(zh);
   const mingStar=d.mingStars.length?d.mingStars.map(k=>ZW_STARS[k].name).join('、'):'主星不现';
   // 综合定档·总览(先总: 大号打分+雷达+大运曲线+评分依据, AI深度版容器也在内)
-  html+=`<div id="ai-dim-16" style="border:1px solid var(--gold2);border-radius:14px;padding:14px 16px;margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-family:'Noto Serif SC',serif;color:var(--gold);font-weight:700">🎯 综合定档 · 总览</span><span style="font-size:.7rem;color:var(--ink3)">（先总后分：命局整体打分定档 → 下方逐维细看）</span><span class="ai-dim-badge" style="display:none;font-size:.58rem;background:var(--jade);color:#fff;padding:1px 6px;border-radius:8px;white-space:nowrap">AI深度</span></div><div class="dim-local">${zhDingDangHtml(zh)}</div><div class="dim-ai" style="display:none;margin-top:10px;border-top:1px dashed var(--gold2);padding-top:10px"><div style="font-size:.72rem;color:var(--jade);margin-bottom:4px">🤖 AI 深度版综合定档</div><div class="dim-ai-body" style="font-size:.76rem;line-height:1.7;color:var(--ink)"></div></div></div>`;
+  html+=`<div id="ai-dim-16" style="border:1px solid var(--gold2);border-radius:14px;padding:14px 16px;margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-family:'Noto Serif SC',serif;color:var(--gold);font-weight:700">🎯 综合参考 · 规则说明</span><span style="font-size:.7rem;color:var(--ink3)">（先核对事实，再审阅传统解释）</span><span class="ai-dim-badge" style="display:none;font-size:.58rem;background:var(--jade);color:#fff;padding:1px 6px;border-radius:8px;white-space:nowrap">AI深度</span></div><div class="dim-local">${zhDingDangHtml(zh)}</div><div class="dim-ai" style="display:none;margin-top:10px;border-top:1px dashed var(--gold2);padding-top:10px"><div style="font-size:.72rem;color:var(--jade);margin-bottom:4px">🤖 AI 传统解释（不能替代计算事实）</div><div class="dim-ai-body" style="font-size:.76rem;line-height:1.7;color:var(--ink)"></div></div></div>`;
   // 三术论据横条
   html+=`<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 16px;font-size:.76rem;color:var(--ink2)">
   <span style="background:var(--card2);border:1px solid var(--line);padding:5px 13px;border-radius:14px">紫微 · 命宫${ZHI[d.mingGong]} · ${mingStar} · ${['水二','木三','金四','土五','火六'][d.ju-2]}局</span>
@@ -4045,14 +3906,15 @@ function renderZongHe(zh,name){
   html+=`</div>`;
   html+=`<div class="sec-page" id="zh-sec-4" style="display:none">`;
   // AI 深度解读(接入大模型,综合典籍+深度思考)
-  html+=`<div class="section-block" style="border:1px solid var(--jade)"><h3>🤖 AI 深度解读 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">（18 维全由大模型综合典籍 + 命盘深度思考；当前流派：<b style="color:var(--jade)">${SCHOOLS[lastSchool]}</b>，可回排盘表单顶部下拉切换）</span></h3>`;
+  html+=`<div class="section-block" style="border:1px solid var(--jade)"><h3>🤖 AI 深度解读 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">（计算事实只读；解读需核对依据；当前流派：<b style="color:var(--jade)">${SCHOOLS[lastSchool]}</b>，可回排盘表单顶部下拉切换）</span></h3>`;
   html+=`<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px"><button class="btn btn-primary" id="ai-deep-btn" onclick="aiDeepAnalyze()" style="border-color:var(--jade);background:var(--jade);color:#fff">🤖 一键 AI 深化 18 维</button><button class="btn btn-ghost" onclick="aiExtractPrompt()" style="font-size:.78rem;border-color:var(--gold);color:var(--gold)">📋 提取 Prompt（无 Key 用）</button><span style="font-size:.72rem;color:var(--ink3)">方式一：配置 API Key 一键生成；方式二：提取 Prompt 复制到任意 AI 对话，回复粘回回填</span></div>`;
-  html+=`<div id="ai-deep-box" style="background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;max-height:420px;overflow-y:auto;font-size:.85rem;line-height:1.9;color:var(--ink)"><span style="color:var(--ink3);font-size:.78rem">点击上方按钮，AI 将综合命盘数据与《滴天髓》《穷通宝鉴》《子平真诠》《渊海子平》等典籍知识（含典籍匹配与十神心法），按 18 个维度逐一深度解读，结果实时填入下方维度卡片（卡片左上角出现「AI深度解读」徽章）。</span></div>`;
+  html+=`<div id="ai-workflow-controls" class="ai-workflow-controls"></div><div id="ai-deep-box" style="background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;max-height:420px;overflow-y:auto;font-size:.85rem;line-height:1.9;color:var(--ink)"><span style="color:var(--ink3);font-size:.78rem">JSON回复完整结束后逐维检查四柱身份、字段与引用；错误维度保留草稿，已有结果不被无效回复覆盖。检查不证明自由文本正确或传统预测有效。</span></div>`;
   html+=`<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)"><div style="font-size:.8rem;color:var(--gold);margin-bottom:6px;font-weight:700">💬 AI 追问 <span style="font-size:.68rem;color:var(--ink3);font-weight:400">（先生成解读，再针对任一维度或年份深挖）</span></div><div style="display:flex;gap:8px;flex-wrap:wrap"><input id="ai-follow-input" placeholder="如：第14维里2032年为什么是喜用？展开讲讲" style="flex:1;min-width:220px;background:var(--card2);border:1px solid var(--line);color:var(--ink);padding:8px 12px;border-radius:10px;font-size:.82rem;font-family:inherit" onkeydown="if(event.key==='Enter')aiFollowUp()"><button class="btn btn-primary" onclick="aiFollowUp()" id="ai-follow-btn" style="font-size:.78rem;padding:7px 16px">发送追问</button></div><div id="ai-follow-box" style="margin-top:8px;font-size:.82rem;line-height:1.8;color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;max-height:320px;overflow-y:auto;display:none"></div></div>`;
   html+=`</div>`;
   html+=`<div class="note">说明：八字以节气定月、子时换日；紫微以农历定命身宫；奇门以时辰定局；六爻以时间起卦。四术共享同一出生时刻基准，结果相互独立、可互为印证。身强弱与用神为简化判断，仅供参酌。典籍佐证与十神心法已并入 AI 深度解读的提示词（知识库参考）中。</div>`;
   html+=`</div>`;
   document.getElementById('zh-result').innerHTML=html;
+  aiEvidenceMount();
   // 时间轴详情条: 初始显示当前年
   try{ if(typeof tlSelect==='function'&&window._tlData) tlSelect(new Date().getFullYear()); }catch(e){}
 }
@@ -4420,42 +4282,20 @@ function hhAiDeep(){
 
 /* ======================== AI 追问（多轮对话式深挖） ======================== */
 function aiFollowUp(){
-  const c=aiGetConfig();
-  const inp=document.getElementById('ai-follow-input');
-  const box=document.getElementById('ai-follow-box');
-  const btn=document.getElementById('ai-follow-btn');
-  const q=inp?inp.value.trim():'';
-  if(!q){alert('请输入追问内容');return;}
-  if(!lastZh){alert('请先排盘');return;}
-  if(!c.key){alert('请先在右上角「🤖 AI 深度解读设置」配置 API Key');return;}
-  if(!lastAIReply){alert('请先生成 AI 深度解读（或粘贴回填），追问将基于上次解读内容继续');return;}
-  if(btn){btn.disabled=true;btn.textContent='⏳ 推演中…';}
-  if(box){box.style.display='block';box.innerHTML='<div style="color:var(--ink3);font-size:.8rem">🤔 结合解读推演中…</div>';}
-  const system='你是该命盘的命理顾问。用户已获得基于其命盘的 18 维深度解读，现针对解读内容追问。请结合命盘数据回答：引用具体干支/十神/维度编号，200-400字，克制不绝对化，允许说"倾向为X"。命盘：'+aiBasicInfo(lastZh);
-  const messages=[
-    {role:'system',content:system},
-    {role:'assistant',content:lastAIReply.length>6000?lastAIReply.slice(-6000):lastAIReply},
-    {role:'user',content:q}
-  ];
-  const payload={model:c.model,messages:messages,temperature:0.7,stream:true};
-  let acc='';
-  const paint=()=>{ if(box){box.innerHTML='<div style="color:var(--ink3);font-size:.74rem;margin-bottom:6px">💬 '+esc0(q)+'</div>'+aiMd2Html(acc);} };
-  aiStreamChat(aiEndpoint(c),{
-    method:'POST',headers:aiHeaders(c),body:JSON.stringify(payload)
-  },{
+  const c=aiGetConfig(),inp=document.getElementById('ai-follow-input'),box=document.getElementById('ai-follow-box'),btn=document.getElementById('ai-follow-btn'),q=inp?.value.trim();
+  if(!q||!lastZh||!c.key||!lastAIReply){aiEvidenceNotice('追问需要当前命盘、API设置及已接收的解读。');return;}
+  if(aiEvidenceActive||aiFollowActive)return;
+  const chart=aiEvidenceChart(),id=chartFactId(chart);
+  const current=()=>lastZh&&chartFactId(aiEvidenceChart())===id;
+  if(btn)btn.disabled=true;if(box){box.style.display='block';box.textContent='正在生成追问回复…';}
+  const system='你是传统文化学习助手。计算事实只读，不得改写四柱或应用评分。不得给财富金额、学历上下限、医学诊断或命运必然结论。区分传统解释与事实，说明条件和不确定性，未核验原文不得当成已核对引文。针对追问用简洁文字回答。当前计算事实：'+JSON.stringify({chartId:id,pillars:chart.pillars,facts:aiFacts(chart),rules:chart.rules});
+  const payload={model:c.model,messages:[{role:'system',content:system},{role:'assistant',content:lastAIReply.slice(-12000)},{role:'user',content:q}],stream:true,temperature:0.4};
+  aiFollowActive=aiStreamChat(aiEndpoint(c),{method:'POST',headers:aiHeaders(c),body:JSON.stringify(payload)},{
     idleMs:90000,totalMs:180000,
-    onDelta:(d)=>{ acc+=d; paint(); },
-    onDone:(full)=>{
-      acc=full||acc; paint();
-      try{ lastAIReply+='\n\n【用户追问】'+q+'\n【追问解读】'+acc; }catch(e){}
-      if(btn){btn.disabled=false;btn.textContent='发送追问';}
-      if(inp) inp.value='';
-    },
-    onError:(e)=>{
-      if(box) box.innerHTML='<div style="color:var(--red);font-size:.82rem">❌ '+esc0(e.message||e)+'</div>';
-      if(btn){btn.disabled=false;btn.textContent='发送追问';}
-    }
-  });
+    onDelta:(d,all)=>{if(current()&&box)box.textContent=all;},
+    onDone:full=>{if(current()){if(box)box.textContent=full;if(inp)inp.value='';}aiFollowActive=null;if(btn)btn.disabled=false;aiEvidencePaint();},
+    onError:()=>{if(current()&&box)box.textContent+='\n请求中断；不会自动重发。';aiFollowActive=null;if(btn)btn.disabled=false;if(lastZh)aiEvidencePaint();}
+  });aiEvidencePaint();
 }
 /* ======================== 命盘导出（图片 + 记录备份） ======================== */
 // canvas 绘制命盘速览卡并下载 PNG
@@ -4495,7 +4335,7 @@ function exportChartPng(){
   const rows=[
     ['命 格',dd.geJu+(gj?'（'+gj.state+'）':'')],
     ['身强弱',strengthLabel(zh)+' · 用神'+WUXING[zh.yongShen]],
-    ['命局定分',dd.score+' / 100 · 质地'+(dd.score>=80?'绝':dd.score>=60?'良':'凡')],
+    ['旧规则演示分（未校准）',dd.score+' / 100 · 质地'+(dd.score>=80?'绝':dd.score>=60?'良':'凡')],
     ['大 运',zh.dy.startAge+'岁起运·'+(zh.dy.forward?'顺行':'逆行')+' · 当前'+(function(){const now=new Date().getFullYear();const age=now-zh.date.getFullYear()-((new Date().getMonth()<zh.date.getMonth())?1:0);let cur=zh.dy.dyList[0];zh.dy.dyList.forEach(dy=>{if(age>=dy.age)cur=dy;});return GAN[cur.g]+ZHI[cur.z]+'（'+cur.age+'-'+cur.endAge+'岁）';})()],
     ['五 行',WUXING.map((w,i)=>w+zh.wxCount[i]).join(' ')+(zh.tiaoHouWX>=0?' · 调候'+WUXING[zh.tiaoHouWX]:'')]
   ];
@@ -4741,6 +4581,7 @@ renderRecords();
 ['zw','bz','qm','ly'].forEach(mod=>renderModRecords(mod));
 
 initializeWorkbench();
+window.addEventListener('pagehide',aiEvidenceCancel);
 
 /* ============ v2 可访问性 & UX（2026-08-28） ============ */
 (function(){

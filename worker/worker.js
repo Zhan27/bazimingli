@@ -80,6 +80,15 @@ async function readBody(request,cap) {
   const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}
   try{return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));}catch{throw Error('请求体不是合法 UTF-8 JSON');}
 }
+function sanitizeResponseFormat(value) {
+  if(!value||typeof value!=='object'||Array.isArray(value))throw Error('response_format 不合法');
+  if(value.type==='json_object')return {type:'json_object'};
+  const s=value.json_schema;
+  if(value.type!=='json_schema'||!s||typeof s!=='object'||typeof s.name!=='string'||!/^[-a-zA-Z0-9_]{1,64}$/.test(s.name)||!s.schema||typeof s.schema!=='object'||Array.isArray(s.schema)||(s.strict!==undefined&&typeof s.strict!=='boolean'))throw Error('JSON Schema 格式不合法');
+  if(JSON.stringify(s.schema).length>32768)throw Error('JSON Schema 过大');
+  const visit=(node,depth)=>{if(depth>14)throw Error('JSON Schema 嵌套过深');if(node&&typeof node==='object')for(const [key,child] of Object.entries(node)){if(key==='$ref'||key==='$dynamicRef')throw Error('只支持不含引用的内联JSON Schema');visit(child,depth+1);}};visit(s.schema,0);
+  return {type:'json_schema',json_schema:{name:s.name,strict:s.strict??false,schema:s.schema}};
+}
 function sanitizeChat(body,cfg) {
   if(!body||typeof body!=='object'||Array.isArray(body)||!Array.isArray(body.messages)||!body.messages.length||body.messages.length>40)throw Error('messages 必须包含1至40条消息');
   const model=body.model||cfg.models[0];if(typeof model!=='string'||!cfg.models.includes(model))throw Error('模型不在白名单内');
@@ -89,6 +98,7 @@ function sanitizeChat(body,cfg) {
   });
   if(body.stream!==undefined&&typeof body.stream!=='boolean')throw Error('stream 必须是布尔值');
   const out={model,messages,stream:!!body.stream,max_tokens:cfg.tokens};
+  if(body.response_format!==undefined)out.response_format=sanitizeResponseFormat(body.response_format);
   if(body.temperature!==undefined){if(typeof body.temperature!=='number'||!Number.isFinite(body.temperature)||body.temperature<0||body.temperature>2)throw Error('temperature 必须在0至2之间');out.temperature=body.temperature;}
   if(body.max_tokens!==undefined){if(!Number.isSafeInteger(body.max_tokens)||body.max_tokens<1)throw Error('max_tokens 必须是正整数');out.max_tokens=Math.min(body.max_tokens,cfg.tokens);}
   return out;

@@ -1,0 +1,13 @@
+{
+  "version": "synthetic-contract-v1",
+  "scope": "Generated protocol fixtures and fault injections, not outputs from live models",
+  "input": {"date":"2024-02-10","time":"12:00"},
+  "cases": [
+    {"id":"complete-reference","change":"none","expectedPass":true,"expectedError":null},
+    {"id":"pillar-mismatch","change":"pillar","expectedPass":false,"expectedError":"FACT_ERROR"},
+    {"id":"missing-dimension","change":"missing","expectedPass":false,"expectedError":"REASONING_GAP"},
+    {"id":"invented-source","change":"source","expectedPass":false,"expectedError":"RULE_INCONSISTENCY"},
+    {"id":"wealth-prediction","change":"wealth","expectedPass":false,"expectedError":"RULE_INCONSISTENCY"},
+    {"id":"truncated-json","change":"truncated","expectedPass":false,"expectedError":"EXPRESSION_ERROR"}
+  ]
+}
