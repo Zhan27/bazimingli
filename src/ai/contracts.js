@@ -30,6 +30,7 @@ function validateAiResult(value,chart,{dimensionIds=AI_DIM_CONTRACTS.map(d=>d.id
   for(const d of dims.slice(0,18)){
     const p='dimensions.'+d?.id;
     if(!d||typeof d!=='object'||!Number.isInteger(d.id)||!dimensionIds.includes(d.id)||seen.has(d.id)){add('RULE_INCONSISTENCY',p,'维度ID无效、重复或不属于请求范围');continue;}seen.add(d.id);
+    for(const k of Object.keys(d))if(!['id','title','conclusion','facts','rules','explanation','uncertainty','alternatives'].includes(k))add('RULE_INCONSISTENCY',p+'.'+k,'存在契约外字段');
     for(const field of ['title','conclusion','explanation'])if(typeof d[field]!=='string'||!d[field].trim()||d[field].length>8000)add('EXPRESSION_ERROR',p+'.'+field,'文字缺失或过长');
     if(!['high','medium','low'].includes(d.uncertainty))add('RULE_INCONSISTENCY',p+'.uncertainty','须说明high/medium/low不确定性');
     if(!Array.isArray(d.facts)||!d.facts.length||d.facts.length>30)add('REASONING_GAP',p+'.facts','结论缺少盘面依据');
@@ -38,7 +39,7 @@ function validateAiResult(value,chart,{dimensionIds=AI_DIM_CONTRACTS.map(d=>d.id
     else for(const r of d.rules)if(!KNOWLEDGE_ENTRIES.some(k=>k.id===r))add('RULE_INCONSISTENCY',p+'.rules','规则ID不在版本化来源目录');
     if(!Array.isArray(d.alternatives)||d.alternatives.length>5||d.alternatives.some(x=>typeof x!=='string'||x.length>2000))add('EXPRESSION_ERROR',p+'.alternatives','竞争解释须为有界文本数组');
     if(chart.useGod.conflict&&d.id===3&&(!Array.isArray(d.alternatives)||!d.alternatives.length))add('REASONING_GAP',p+'.alternatives','调候与扶抑存在分歧，须保留竞争解释');
-    if(/必(?:死|灾|离婚|破财)|注定|财富.{0,8}\d+万|学历上限.{0,8}(博士|硕士)/.test((d.conclusion||'')+(d.explanation||'')))add('RULE_INCONSISTENCY',p,'禁止宿命或未校准的量化预测');
+    if(/必(?:死|灾|离婚|破财)|注定|(?:财富|资产|年薪).{0,10}(?:\d+\s*万|[百万千亿]+级)|学历(?:上限|下限|必达).{0,8}(博士|硕士|本科)|命局定分\s*\d+/.test(JSON.stringify([d.title,d.conclusion,d.explanation,d.alternatives])))add('RULE_INCONSISTENCY',p,'禁止宿命或未校准的量化预测');
   }
   const missing=dimensionIds.filter(id=>!seen.has(id));
   for(const id of missing)add('REASONING_GAP','dimensions.'+id,'缺失维度');
@@ -52,7 +53,7 @@ function parseStructuredAi(text,chart,options={}){
 function aiPromptVersion(schoolId){const p=getRuleProfile(schoolId);return 'evidence-'+p.key+'-1.0.0';}
 function buildEvidencePrompt(chart,schoolId,{dimensionIds=AI_DIM_CONTRACTS.map(d=>d.id),mode='json'}={}){
   const profile=getRuleProfile(schoolId),facts=aiFacts(chart);
-  const system='你是传统文化学习助手。计算事实只读，不得改写四柱。每项按结论、盘面事实ID、规则ID、解释、不确定性、竞争解释输出。未核验的典籍引文只作待核验线索，不可说成已核对原文。不得给命运必然结论、医学诊断、财富金额、学历上下限或看似精确的预测分数。\n流派独立配置：'+JSON.stringify(profile)+'\n本流派Prompt版本：'+aiPromptVersion(schoolId)+'\n流派任务：'+profile.focus+'\n输出维度契约：'+JSON.stringify(AI_DIM_CONTRACTS.filter(d=>dimensionIds.includes(d.id)))+'\n'+(mode==='markdown'?'兼容Markdown：每项以【维度ID】开头，保留全部依据字段。':'仅输出符合此JSON Schema的JSON：'+JSON.stringify(aiOutputSchema()));
+  const system='你是传统文化学习助手。计算事实只读，不得改写四柱或应用评分。每项按结论、盘面事实ID、规则ID、解释、不确定性、竞争解释输出。high表示不确定性高，不是高置信度。未核验的典籍引文只作待核验线索，不可说成已核对原文，不强制古籍原文。不得给命运必然结论、医学诊断、财富金额、学历上下限或看似精确的预测分数。仅输出请求的维度，不重复其余维度。\n流派独立配置：'+JSON.stringify(profile)+'\n本流派Prompt版本：'+aiPromptVersion(schoolId)+'\n流派任务：'+profile.focus+'\n输出维度契约：'+JSON.stringify(AI_DIM_CONTRACTS.filter(d=>dimensionIds.includes(d.id)))+'\n'+(mode==='markdown'?'兼容Markdown：每项以【维度ID】开头，保留全部依据字段。此格式不会被程序宣称完成事实与引用校验。':'仅输出符合此JSON Schema的JSON：'+JSON.stringify(aiOutputSchema()));
   const user=JSON.stringify({schemaVersion:AI_CONTRACT_VERSION,chartId:chartFactId(chart),pillars:chart.pillars.map(p=>p.text),facts,rules:chart.rules,requestedDimensionIds:dimensionIds,knowledge:searchKnowledge('',profile.key).slice(0,20)});
   return {system,user,version:aiPromptVersion(schoolId),knowledgeVersion:KNOWLEDGE_VERSION};
 }
