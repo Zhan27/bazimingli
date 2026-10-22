@@ -66,3 +66,35 @@
 
 ## 5.17.0
 Explicit timezone/day rules, unknown-time candidates, sourced city coordinates, count/scoring conventions, school configuration and full historical regression. See `ACCEPTANCE-11-20.md`.
+
+<!-- Earlier release notes archived from README. -->
+
+## 5.16
+- 统一 `ml_records`，兼容旧 `mingli_records` 和 v4 备份；v5 备份逐字段验证，排除 API 设置，导入失败回滚。
+- 从弱、身弱、中和、身强、身极强完整传递至命盘、摘要、Prompt 和 PNG；中和不再按身弱显示。
+- 节气使用 lunar-javascript 1.7.7 的交节时刻；支持具体出生时分和子初/子正换日。真太阳时实际参与日/时柱计算，保留跨日信息。
+- 日期范围明确为公历 **1900-01-31 至 2099-12-31**，非法农历/闰月/经度明确报错。
+- 年/月柱按出生瞬间的东八区标准时交节；日/时柱按所选太阳时与换日规则。历史夏令时不自动还原；仅知时辰、城市中心经度和近似均时差的精度限制在页面标示。
+- 增加历法来源与回归测试、18维异常解析测试、真实浏览器备份/恶意输入/离线/PNG检查，以及自动构建同步校验。
+- 修复姓名、地点、合婚详情和历史记录的动态 HTML 边界；新增 MIT、贡献指南和 Roadmap。
+
+
+## 5.15
+- **服务端 Prompt 模式**：设置里勾选「🎭 使用服务端 Prompt」后，18 维研判准则改由 worker 注入，请求走 `/v1/divine`，浏览器只上传命盘事实
+- **模板自动抽取**：`worker/extract-prompt.ps1` 从源码抽出 5 流派模板（18,918 字符），代入占位符，内置往返校验 10/10
+- **一致性校验**：`worker/verify-prompt.mjs` 从 worker 源码真实取出 `buildDivine()` 执行，与浏览器原始输出比对 —— **20 项逐字节一致**（含用另一张命盘交叉验证）
+- **精简发布版**：`worker/build-thin.ps1` 剥离 10,381 字符的 Prompt 实体，强制服务端模式，校验 8 项敏感标记全部清除 + JS 语法通过
+- **模板不入库**：`worker/prompt-template.json` 与校验样本已加入 `.gitignore`
+
+## 5.14
+- **AI 请求层重构**：四处 `fetch` 合并为统一 `aiFetch()` / `aiStreamChat()`，删掉三份重复的 SSE 解析
+- **超时保护**：非流式 60s；流式支持「静默 90s」+「总时长」双重中断，弱网不再无限挂起、按钮不再永久禁用
+- **错误提示可操作**：401/402/403/404/413/429/5xx 分别给出中文原因与修法，并带回上游原文摘要
+- **18 维不再被截断**：新增 `max_tokens` 设置（默认 8000）。此前用服务端默认 4096，长解读会被截在半路导致【18】缺失
+- **Key 安全**：不回显明文、「仅本次会话」模式、一键清除
+- **阅读体验**：流式输出时仅在你已滚动到底部才自动跟随，上翻查看不再被拽回
+- **BaseURL 容错**：自动补 `/chat/completions`，写完整路径或只写 `/v1` 都能用
+- **SEO / 分享**：补齐 OG、Twitter Card、theme-color、keywords、apple-touch-icon
+- **部署脚本**：新增 PowerShell 版；两个脚本都加了硬编码密钥自检
+- **中转服务**：新增 `worker/`，可把 API Key 移到服务端
+- **桌面版**：新增 `launcher.py`（此前 README 提到但仓库里缺该文件）

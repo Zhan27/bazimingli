@@ -1,197 +1,64 @@
 # 命理排盘 · 八字合婚一体机
 
-[English guide / 国际用户指南](README.en.md)
+[在线体验](https://zhan27.github.io/bazimingli/docs/) · [下载 EXE / HTML](https://github.com/Zhan27/bazimingli/releases/latest) · [English guide](README.en.md) · [完整更新日志](CHANGELOG.md)
 
-本项目面向世界各地对中国传统文化、八字及相关术数感兴趣的学习者与爱好者，提供排盘参考、规则查阅和学习交流工具。项目主要借助 **OpenAI Codex** 辅助完成代码编写与修改、数据整理与统计、测试验证及文档维护，持续提升计算过程的透明度与可复现性。项目内容用于传统文化学习与参考，不代表经过科学验证的预测结论。
+面向世界各地对中国传统文化、八字及相关术数感兴趣的学习者与爱好者，提供排盘参考、规则查阅和学习工具。项目主要借助 **OpenAI Codex** 完成代码编写与修改、数据整理与统计、测试验证及文档维护。
 
-一个**单文件、纯前端、本地计算**的传统命理排盘应用：八字排盘 + 紫微斗数 + 奇门遁甲 + 六爻 + 合婚配对 + AI 深度解读，发布文件包含全部逻辑，无需后端、无需安装。开发源码已拆分到 `src/`，经构建生成两个完全一致的单 HTML 文件。
+应用采用**单文件网页、本地计算**，也提供 Windows 桌面版。内容用于传统文化学习与参考；软件测试不代表预测结论经过科学验证，不构成医疗、投资或婚姻决策依据。
 
-> 🌐 在线体验：[玄机命理工作台](https://zhan27.github.io/bazimingli/docs/)
-> 🖥️ Windows 桌面版：见 [Release](https://github.com/Zhan27/bazimingli/releases)（`mingli-paipan.exe`）
+## 功能与更新概览
 
-## ✨ 功能特性
+- **多术数排盘**：综合排盘、八字、紫微斗数、奇门遁甲、六爻与合婚配对，支持公历和农历输入。
+- **历法与时间设置**：具体出生时分、UTC偏移、手动夏令时、真太阳时、子初/子正换日、城市点位选择和未知时辰候选。支持公历1900-01-31至2099-12-31，历史时区需自行核对。
+- **传统文化学习**：学习/专业视图、术语及来源状态查询、可筛选和高亮的干支关系图；“细读与核验”展示藏干十神、纳音、十二长生、日旬空亡及大运—流年—节气流月。
+- **AI辅助解读**：五套流派配置、18维卡片、事实与规则引用、不确定性说明；支持取消、会话草稿恢复、逐卡操作和主动重试。AI回复不替换本地计算结果。
+- **记录与核验**：五类本地记录统一搜索、排序、备注、备份与批量管理；支持学习快照、离线JSON对照、报告导出、摘要复制、PNG导出及无DOM的JSON计算API。
+- **多端阅读**：桌面与手机布局、三套主题、键盘操作、打印、独立HTML和Windows EXE。
 
-### 5.23：四柱细读与离线核验
-
-排盘结果工具栏点击“细读与核验”：逐柱查看藏干十神、纳音、十二长生和日旬空亡；选择大运、流年，再查看精确到秒的北京时间节气流月。可导出本盘学习数据，或导入已有JSON在本机对照，区分一致、差异、未提供字段及口径提示。导入文件不上传、不写入记录，导出数据可能包含出生资料。来源、支持格式和单一样本的核验边界见 [资料吸收说明](docs/REFERENCE-MATERIALS.md)。
-
-### 5.22：干支互动关系图
-
-天干、地支分区，每组关系独占一条平滑连线轨道，四柱对齐；支持类型、柱位筛选和关系固定高亮。重复地支保留各自柱位，三合、三刑不再绘成重叠闭环。
-
-### 5.21：统一记录与单卡操作
-
-页面底部集中管理五类记录，支持搜索、模块筛选、排序、备注、选中导出与批量删除。选中备份采用新格式合并导入，保留未选中记录；完整v4/v5备份继续兼容。AI卡片可以折叠、复制、单卡导出或重生成。数据保存与版本边界见 [记录说明](docs/RECORDS.md)。
-
-### 5.20：可核对依据的AI工作流
-
-新增JSON卡片与可选JSON Schema，逐维展示盘面事实、规则出处、不确定性和竞争解释；Markdown兼容内容明确标为未校验。支持停止生成、最近一盘的标签页草稿、恢复与重新校验、逐卡重生成和仅重试缺失维度。所有重试都需主动点击，可能产生服务商费用。AI回复不再替换本地计算评分；旧版量化分档作为未校准的规则演示折叠保留。实际使用与服务端兼容边界见 [AI工作流说明](docs/AI-CONTRACT.md)。
-
-### 5.19：传统文化学习工作台
-
-黛青导航与暖白内容区；桌面并排填写资料与核对命盘，手机按阅读顺序排列。学习/专业视图可以切换，复杂时区、流派和换日设置保留在展开区域。新增合成示例、入门指引、可检索的术语与出处状态、本地记录搜索和键盘导航。原有计算、六个模块、记录与备份继续保留。
+以上汇总历次迭代形成的主要能力。各版本变更统一收录于 [CHANGELOG.md](CHANGELOG.md)，完成与待做范围见 [进度说明](PROGRESS-21-96.md) 和 [路线图](ROADMAP.md)。
 
 ![工作台实际截图](verification/screenshots/workbench-desktop.png)
 
-设计参考与许可证核对见 [前端参考说明](docs/UI-REFERENCES.md)。当前版本下载见 [Releases](https://github.com/Zhan27/bazimingli/releases/latest)。后续已恢复分段开发，完成与待做范围见 [进度说明](PROGRESS-21-96.md)。5.19.1默认会话保存API Key，页面底部可阅读离线隐私说明；可选中转服务的限制与部署方式见 [Worker说明](worker/README.md)。
+## 快速使用
 
-### 5.17：计算规则与可追溯结果
-- 明确选择子初23:00或子正00:00换日；原钟表时刻、UTC偏移、手动夏令时修正、东八区时刻和真太阳时分项显示。默认仍为东八区，不自动查询历史时区。
-- 内置2,704个 GeoNames 城市点位（WGS84、稳定ID、来源版本），使用精确别名或地点选择器；同名点位要求选择，不猜测匹配。数据按 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 使用，来源为 [GeoNames](https://www.geonames.org/)。
-- 未知时辰显示按时辰、换日、交节等边界划分的候选区间和稳定/变化四柱，不生成确定时柱、大运或默认评分。
-- 五行支持天干、天干加本气、天干加全部藏干三种不加权统计；页面列出得令、通根、得势评分。显示口径不改变原有评分模型。
-- 五套流派配置统一驱动显示、取用策略及Prompt。象法、格局派保留其解释重点，量化扶抑仅供参考；未声称实现完整古典流派算法。
-- 每次CI运行全部历史基准，生成输入、来源、预期、实际和差异报告。新增逐项说明见 [11—20验收报告](ACCEPTANCE-11-20.md)。
+1. **在线**：打开[工作台](https://zhan27.github.io/bazimingli/docs/)，可先点击“试用示例”。
+2. **离线网页**：下载Release中的`mingli-paipan.html`，或直接打开源码仓库中的`命理排盘.html`。
+3. **Windows**：下载`mingli-paipan.exe`运行，原生窗口需要可用的WebView2运行时。
 
-### 排盘体系
-- **P1 命格总断**：四柱八字、身强弱判定、用神取用、格局定名、过三关断语（可勾选留存）
-- **P2 命盘细论**：宫位、大运流年、神煞、纳音等分模块细论
-- **P3 多维分析**：18 个维度卡片（性格、事业、财运、婚姻感情、健康等），每维独立成卡
-- 出生地进行**复合五行与气候调候修正**，支持农历/公历双历、真太阳时
-- 紫微斗数、奇门遁甲、六爻独立模块
+填写出生信息，核对时间、地点与换日设置后排盘。结果工具栏的“细读与核验”可查看盘面字段、按运年查看流月，或导入已有JSON进行本地对照。
 
-### AI 深度解读
-- **18 维 AI 卡片**：AI 输出按【1】~【18】解析，逐卡回填点亮（徽章 + 边框变色），支持风险提示本地兜底
-- **双通道**：内置 API 一键流式生成，或提取完整 Prompt 粘贴到任意外部 AI（DeepSeek / ChatGPT / Claude 等）后回填
-- **Prompt 研判导向**：喂给 AI 的是完整盘面事实与研判准则（而非硬分数），要求 AI 独立推导、推断过程可见
-- **5 大流派**：综合多流派 / 旺衰平衡派 / 盲派象法 / 子平格局派 / 穷通调候派，各有独立人格与研判侧重
+不同浏览器、在线站点、本地文件和桌面服务端口使用不同的存储空间；切换使用方式前请先导出需要保留的记录。国际出生信息与时间设置见 [English guide](README.en.md)。
 
-### 合婚配对
-- 双方八字合盘：合盘指数 + 十余项确定性维度（六合/六冲/三合/六害/三刑、天干五合、配偶星、纳音、九星命卦、紫微命宫、大运同步、调候互补等）
-- **深度研判**：星宫同位、缘分密码等延伸分析
-- **AI 合婚五段卡片**：相处模式 / 感情浓度 / 潜在矛盾点 / 经营建议 / 综合断，逐卡回填；解析器兼容 markdown 加粗、序号、### 标题等格式变体
-- **合婚结论回填命盘**：合过婚后，主盘"婚姻感情"卡片自动显示最近合婚摘要，并可一键带本命盘跳转合婚
+## 数据与AI
 
-### 其他
-- 多模块解读记录留存（localStorage），换设备可导出/导入
-- 三套主题（米白纸韵 / 玄墨青 / 青绿山水）、打印与导出 PNG、命盘摘要一键复制
-- 排盘计算在本地；主动使用 AI 时，命盘与输入信息会发送到你配置的服务地址
+排盘计算在当前设备完成；本地JSON对照不上传文件、不写入记录。记录、备份、图片、学习快照和复制的内容可能包含出生信息，请妥善保管。
 
-## 🚀 部署 / 运行
+AI为可选功能。主动请求解读或测试连接时，数据会发送至配置的服务地址，中转运营者及上游模型服务商可能接触请求，并可能产生费用。API Key默认保存于标签页会话，浏览器恢复会话可能保留；长期保存需主动选择。浏览器存储未经加密，可在AI设置中清除Key。备份及学习快照不包含API设置。
 
-### 本地运行
-直接双击打开 `命理排盘.html` 即可（也可用任意静态服务器）。
+操作与边界见 [AI工作流](docs/AI-CONTRACT.md)、[记录与备份](docs/RECORDS.md)；可选服务端中转及Prompt模式见 [Worker说明](worker/README.md)。
 
-### GitHub Pages（3 步）
-1. 本仓库 Fork / Clone 后，`docs/` 目录已是同步好的可部署副本（`index.html`）
-2. 仓库 **Settings → Pages → Source** 选择 `Deploy from a branch`，Branch 选 `main`，目录选 **`/docs`**，Save
-3. 访问 `https://<你的用户名>.github.io/<仓库名>/`
+## 开发与构建
 
-> 注：GitHub Pages 分支部署模式仅支持根目录（root）或 `/docs`，故部署副本放在 `docs/`。
-
-### 开发与更新发布文件
-
-需要 Node.js 22+；修改 `src/` 或 `data/` 后执行：
+需要Node.js 22+和Python 3.12+：
 
 ```bash
 npm ci
-npm run build
-npm run check
-npm test
-npm run regression
 npx playwright install chromium
-npm run test:e2e
+npm run build
+npm run verify
 ```
 
-也可运行兼容入口：
+修改`src/`或`data/`后重新构建。构建生成内容相同的`命理排盘.html`与`docs/index.html`；`npm run check`只校验同步状态。GitHub Actions执行构建检查、Node/Python/浏览器测试；版本发布流程另含Windows打包与自检。
 
-```bash
-pwsh -File sync_deploy.ps1   # Windows
-bash sync_deploy.sh          # macOS / Linux / WSL
-```
+| 文档 | 内容 |
+|---|---|
+| [贡献指南](CONTRIBUTING.md) · [架构说明](docs/ARCHITECTURE.md) | 源码结构与开发约定 |
+| [JSON API](docs/API.md) | 计算、比较、批处理与学习视图 |
+| [资料吸收与离线对照](docs/REFERENCE-MATERIALS.md) | 支持格式、来源与对照边界 |
+| [测试资料来源](tests/fixtures/SOURCES.md) | 回归基准、参考数据与精度限制 |
+| [前端参考](docs/UI-REFERENCES.md) | 界面参考与许可证核对 |
+| [发布流程](docs/RELEASING.md) | 版本、构建与附件验证 |
 
-两个入口均调用 `scripts/build.mjs`：按 `scripts/source-list.cjs` 清单嵌入源码、数据和固定版本历法库，检查 JS 语法及疑似密钥，再生成相同的 `命理排盘.html` 与 `docs/index.html`。`npm run check` 只比对、不写文件；GitHub Actions 自动检查、运行测试并保存计算回归报告。
+## 许可
 
-## 🖥️ Windows 桌面版（exe）
-
-`Release` 页提供打包好的单文件 exe（基于 pywebview + PyInstaller，运行需要可用的 WebView2 运行时）。自行打包：
-
-```bash
-python -m venv venv
-venv\Scripts\pip install pywebview pyinstaller
-venv\Scripts\pyinstaller --onefile --noconsole --name 命理排盘 --add-data "命理排盘.html;." launcher.py
-```
-
-`launcher.py` 用固定端口 `127.0.0.1:8765` 起本地回环服务再套原生窗口 —— 这样 origin 稳定，localStorage 里的记录和 AI 配置不会每次启动就丢（`file://` 直接加载在不透明源下写入不稳定）。
-
-## 📁 目录结构
-
-开发源码与规则说明见 [CONTRIBUTING.md](CONTRIBUTING.md)；测试资料和精度边界见 [SOURCES.md](tests/fixtures/SOURCES.md)；长期任务见 [ROADMAP.md](ROADMAP.md)。
-
-- `src/calendar/`、`src/bazi/`：无 DOM 的历法与四柱基础计算。综合引擎仍逐步拆分。
-- `src/storage/`、`src/ai/`：版本化备份与纯文本分段。
-- `src/ui/`、`src/template.html`：现有交互、术数与页面模板。
-- `vendor/`：内嵌历法库与原始 MIT 许可证。
-- `tests/`、`scripts/`、`.github/workflows/`：基准、构建、浏览器验证与 CI。
-
-```
-├── 命理排盘.html      # 主文件（全部功能，单文件自包含）
-├── docs/index.html    # 部署副本（GitHub Pages 入口，/docs 模式）
-├── worker/            # Cloudflare Worker 中转服务（隐藏 Key 与 Prompt）
-│   ├── worker.js            # 中转 + 服务端 Prompt 注入
-│   ├── extract-prompt.ps1   # 从源码自动抽取 Prompt 模板（含往返校验）
-│   ├── verify-prompt.mjs    # 模板一致性校验（逐字节比对）
-│   ├── build-thin.ps1       # 构建剥离 Prompt 的精简发布版
-│   └── README.md
-├── launcher.py        # 桌面版启动器（pywebview）
-├── sync_deploy.ps1    # 源文件 → docs 同步（Windows，含密钥自检）
-├── sync_deploy.sh     # 源文件 → docs 同步（macOS / Linux / WSL）
-└── .gitignore
-```
-
-## 🔑 AI 配置与 Key
-
-页面右上角「🤖 AI 深度解读设置」接入任意 OpenAI 兼容接口（DeepSeek / OpenAI / 通义千问等）。
-
-- Key **只存本机**（勾选「仅本次会话」则存 sessionStorage，关浏览器即失效），请求由浏览器直连你填的地址，不经第三方
-- 填入的 Key **不回显**，只显示脱敏尾号，防截图／录屏泄漏；随时可「🗑 清除 Key」
-- 仓库默认 `key:''`，**不含任何 Key**；导出备份也不包含 Key
-- 想把 Key 放到服务端（例如做成"打开就能用"的版本），见 [`worker/README.md`](worker/README.md) —— 前端零改动，BaseURL 填 Worker 地址、Key 栏填访问码即可
-
-### 🎭 服务端 Prompt 模式（防逆向）
-
-开启设置里的「使用服务端 Prompt」后，18 维研判准则（流派人格 / 独立评分标准 / 研究纪律 / 命格原型参照 / 输出格式）由 worker 的 `/v1/divine` 注入，浏览器只发命盘事实与知识库片段。
-
-- 配套 `worker/build-thin.ps1` 可把 Prompt **从发布版 HTML 里物理删除**，产出 `dist/index.html`
-- 已有校验脚本 `worker/verify-prompt.mjs`：Worker 拼出的 prompt 与原始输出**逐字节一致**（实测 20/20）
-- ⚠️ 前提：**源仓库必须不公开**。只要仓库还是 public，别人直接读源码就看到全部 Prompt，发精简版没有意义。详见 [`worker/README.md`](worker/README.md)
-
-## 📝 更新记录
-
-### v5.16
-- 统一 `ml_records`，兼容旧 `mingli_records` 和 v4 备份；v5 备份逐字段验证，排除 API 设置，导入失败回滚。
-- 从弱、身弱、中和、身强、身极强完整传递至命盘、摘要、Prompt 和 PNG；中和不再按身弱显示。
-- 节气使用 lunar-javascript 1.7.7 的交节时刻；支持具体出生时分和子初/子正换日。真太阳时实际参与日/时柱计算，保留跨日信息。
-- 日期范围明确为公历 **1900-01-31 至 2099-12-31**，非法农历/闰月/经度明确报错。
-- 年/月柱按出生瞬间的东八区标准时交节；日/时柱按所选太阳时与换日规则。历史夏令时不自动还原；仅知时辰、城市中心经度和近似均时差的精度限制在页面标示。
-- 增加历法来源与回归测试、18维异常解析测试、真实浏览器备份/恶意输入/离线/PNG检查，以及自动构建同步校验。
-- 修复姓名、地点、合婚详情和历史记录的动态 HTML 边界；新增 MIT、贡献指南和 Roadmap。
-
-
-### v5.15
-- **服务端 Prompt 模式**：设置里勾选「🎭 使用服务端 Prompt」后，18 维研判准则改由 worker 注入，请求走 `/v1/divine`，浏览器只上传命盘事实
-- **模板自动抽取**：`worker/extract-prompt.ps1` 从源码抽出 5 流派模板（18,918 字符），代入占位符，内置往返校验 10/10
-- **一致性校验**：`worker/verify-prompt.mjs` 从 worker 源码真实取出 `buildDivine()` 执行，与浏览器原始输出比对 —— **20 项逐字节一致**（含用另一张命盘交叉验证）
-- **精简发布版**：`worker/build-thin.ps1` 剥离 10,381 字符的 Prompt 实体，强制服务端模式，校验 8 项敏感标记全部清除 + JS 语法通过
-- **模板不入库**：`worker/prompt-template.json` 与校验样本已加入 `.gitignore`
-
-### v5.14
-- **AI 请求层重构**：四处 `fetch` 合并为统一 `aiFetch()` / `aiStreamChat()`，删掉三份重复的 SSE 解析
-- **超时保护**：非流式 60s；流式支持「静默 90s」+「总时长」双重中断，弱网不再无限挂起、按钮不再永久禁用
-- **错误提示可操作**：401/402/403/404/413/429/5xx 分别给出中文原因与修法，并带回上游原文摘要
-- **18 维不再被截断**：新增 `max_tokens` 设置（默认 8000）。此前用服务端默认 4096，长解读会被截在半路导致【18】缺失
-- **Key 安全**：不回显明文、「仅本次会话」模式、一键清除
-- **阅读体验**：流式输出时仅在你已滚动到底部才自动跟随，上翻查看不再被拽回
-- **BaseURL 容错**：自动补 `/chat/completions`，写完整路径或只写 `/v1` 都能用
-- **SEO / 分享**：补齐 OG、Twitter Card、theme-color、keywords、apple-touch-icon
-- **部署脚本**：新增 PowerShell 版；两个脚本都加了硬编码密钥自检
-- **中转服务**：新增 `worker/`，可把 API Key 移到服务端
-- **桌面版**：新增 `launcher.py`（此前 README 提到但仓库里缺该文件）
-
-## ⚠️ 免责声明
-
-本应用基于传统子平八字、紫微斗数等命理文化的确定性规则推演，AI 解读为概率性倾向参考。**仅供传统文化学习与娱乐，不构成任何医疗、投资、婚姻决策依据**。请理性看待，切勿迷信。
-
-## 📄 许可
-
-本项目采用 [MIT License](LICENSE)，允许复制、修改和分发（包括商业使用），须保留版权和许可声明；第三方依赖见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。命理文化用途的免责声明与软件许可分别适用。
+代码采用 [MIT License](LICENSE)。第三方依赖及数据见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)；城市数据来源于 [GeoNames](https://www.geonames.org/)，按 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 使用。
