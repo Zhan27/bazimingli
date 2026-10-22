@@ -42,6 +42,13 @@ test('offline adapters compare sets and explicit spelling aliases, preserve omis
   assert.throws(()=>api.normalizeReferenceChart({pillars:['甲丑','乙丑','丙寅','丁卯']}));
   assert.throws(()=>api.normalizeReferenceChart({action:'chart',data:{pillars:{}}}));
 });
+test('equal start-age numbers do not hide different period start years',()=>{
+  const chart=api.calculateChart(input),reference=json(api.createStudySnapshot(chart));
+  reference.facts.dayun.periods.forEach(p=>{p.startYear=p.years[0].year-1;});
+  const report=api.compareReferenceChart(chart,reference);
+  assert.equal(report.summary.different,0);assert.equal(report.verdict,'aligned-with-gaps');
+  assert.ok(report.warnings.some(w=>w.includes('有8步不同')&&w.includes('本盘1996、对照1995')));
+});
 test('named external responses remain reference claims; missing clock conventions never become a full pass',()=>{
   const chart=api.calculateChart(input),facts=api.chartStudyFacts(chart);
   const external={action:'chart',data:{input:{calendarType:'solar',birthYear:1990,birthMonth:5,birthDay:20,birthHour:10,birthMinute:30,gender:'male'},pillars:Object.fromEntries(facts.pillars.map(p=>[p.id,{ganZhi:p.text,tenGod:p.tenGod,branchTenGod:p.branchTenGod,hiddenStems:p.hidden.map(h=>({stem:h.gan})),naYin:p.nayin,diShi:p.diShi,isKong:p.isKong}])),dayun:{startAge:facts.dayun.startAge,list:facts.dayun.periods.map(p=>({ganZhi:p.text}))}}};

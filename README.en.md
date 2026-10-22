@@ -6,6 +6,8 @@ This project provides calculation references and learning tools for people aroun
 
 The interface is currently Chinese. This guide explains the main workflow and international birth-time settings; it does not claim full interface translation.
 
+The chart toolbar's “细读与核验” opens detailed pillar facts, DaYun/annual drill-down and twelve exact Jie-month intervals in Beijing time. Import a saved JSON reference for comparison entirely on the current device, or export a versioned learning snapshot. Files may contain birth details; no API settings are included. Missing fields and unspecified conventions remain visible, and another implementation is not treated as an authoritative oracle. See [reference formats and limitations](docs/REFERENCE-MATERIALS.md).
+
 ## Run it
 
 - Online: open the workbench above.

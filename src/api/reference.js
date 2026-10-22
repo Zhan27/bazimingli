@@ -26,7 +26,8 @@ function normalizeReferenceChart(value){
   });
   const date=small(input.date)??((!input.calendarType||input.calendarType==='solar')&&[input.birthYear,input.birthMonth,input.birthDay].every(Number.isInteger)?String(input.birthYear)+'-'+String(input.birthMonth).padStart(2,'0')+'-'+String(input.birthDay).padStart(2,'0'):undefined);
   const time=small(input.time)??([input.birthHour,input.birthMinute].every(Number.isInteger)?String(input.birthHour).padStart(2,'0')+':'+String(input.birthMinute).padStart(2,'0'):undefined);
-  return {pillars,dayun,startAge:Number.isFinite(data.dayun?.startAge)?data.dayun.startAge:undefined,input:{date,time,gender:input.gender==='male'?1:input.gender==='female'?0:[0,1].includes(input.gender)?input.gender:undefined},
+  const periodStartYears=periodSource?.map(p=>Number.isInteger(p.startYear)?p.startYear:Number.isInteger(p.years?.[0]?.year)?p.years[0].year:undefined);
+  return {pillars,dayun,periodStartYears,startAge:Number.isFinite(data.dayun?.startAge)?data.dayun.startAge:undefined,input:{date,time,gender:input.gender==='male'?1:input.gender==='female'?0:[0,1].includes(input.gender)?input.gender:undefined},
     conventions:Object.fromEntries(['utcOffsetMinutes','dstMinutes','dayBoundary','trueSolar'].map(k=>[k,input.options?.[k]]))};
 }
 function compareReferenceChart(chart,reference){
@@ -48,9 +49,11 @@ function compareReferenceChart(chart,reference){
     const n=Math.min(local.dayun.length,other.dayun.length);
     for(let i=0;i<n;i++)add('dayun.'+i,'第'+(i+1)+'步大运',local.dayun[i],other.dayun[i]);
     if(local.dayun.length!==other.dayun.length)warnings.push('大运步数不同：仅比较共有的'+n+'步（本盘'+local.dayun.length+'步，对照'+other.dayun.length+'步）');
+    const starts=Array.from({length:n},(_,i)=>({index:i,local:local.periodStartYears[i],reference:other.periodStartYears[i]})).filter(p=>Number.isInteger(p.local)&&Number.isInteger(p.reference)&&p.local!==p.reference);
+    if(starts.length){const p=starts[0];warnings.push('大运起始公历年有'+starts.length+'步不同：第'+(p.index+1)+'步本盘'+p.local+'、对照'+p.reference+'。请核对年龄及交运口径；不计入字段一致数。');}
   }else add('dayun','大运序列',local.dayun,undefined);
   if(other.startAge!==undefined&&local.startAge!==other.startAge)warnings.push('起运年龄不同：本盘'+local.startAge+'，对照'+other.startAge+'；先核对周岁/虚岁、交运时刻与舍入口径');
   const summary=Object.fromEntries(['same','different','not-provided'].map(s=>[s,fields.filter(f=>f.status===s).length]));
   return {schemaVersion:'1.0.0',verdict:summary.different?'differences':warnings.length||summary['not-provided']?'aligned-with-gaps':'aligned',summary,fields,warnings,
-    scope:'仅比较已提供的计算/传统表项，不认定任一实现为标准答案。藏干仅比较集合；空亡依据日柱旬。',excluded:['强弱分数与分档','喜忌用神','格局','神煞集合','AI解释','藏干中气/余气次序和权重'],rules:{...chart.rules}};
+    scope:'仅比较已提供的计算/传统表项，不认定任一实现为标准答案。藏干仅比较集合；空亡依据日柱旬。',excluded:['强弱分数与分档','喜忌用神','格局','神煞集合','AI解释','藏干中气/余气次序和权重','精确交运日期与流年年龄口径'],rules:{...chart.rules}};
 }

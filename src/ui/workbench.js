@@ -48,7 +48,9 @@ function enhanceWorkbenchChart(){
   const info=root.querySelector('.info-bar'),timing=[...root.children].find(s=>s!==info&&s.textContent.startsWith('输入钟表'));
   if(timing){const details=document.createElement('details');details.className='time-notes';details.open=workbenchMode()==='professional';const summary=document.createElement('summary');summary.textContent='出生时刻与换日规则 · '+(lastZh?.temporal.civilDate?fmtLocalDate(lastZh.temporal.civilDate):'');const body=document.createElement('div');body.textContent=timing.textContent;details.append(summary,body);info.after(details);timing.remove();}
   const nav=root.querySelector('#zh-sec-nav');
-  const toolbar=root.querySelector('button[onclick="shareCopy()"]')?.parentElement;if(toolbar)toolbar.classList.add('chart-toolbar');
+  const toolbar=root.querySelector('button[onclick="shareCopy()"]')?.parentElement;if(toolbar){
+    toolbar.classList.add('chart-toolbar');const study=document.createElement('button');study.type='button';study.className='btn btn-ghost';study.id='study-open';study.textContent='细读与核验';study.onclick=()=>showStudyWorkspace(serializeChart(lastZh));toolbar.appendChild(study);
+  }
   if(nav){nav.setAttribute('role','tablist');nav.setAttribute('aria-label','命盘内容');nav.querySelectorAll('button').forEach(b=>{b.setAttribute('role','tab');b.setAttribute('aria-selected',String(b.classList.contains('active')));b.addEventListener('click',()=>nav.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected',String(x===b))));});}
   const page=root.querySelector('#zh-sec-1'),first=page?.querySelector('.pillar-grid')?.closest('.section-block');
   if(first){first.classList.add('primary-pillars');page.prepend(first);const caption=document.createElement('p');caption.className='pillars-caption';caption.textContent='年、月、日、时四柱。颜色对应五行，日柱突出显示。';first.querySelector('h3')?.after(caption);}

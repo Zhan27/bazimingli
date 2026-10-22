@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="application-version" content="5.22.1">
+<meta name="application-version" content="5.23.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="description" content="玄机命理排盘：八字四柱、紫微斗数、奇门遁甲、六爻卜筮在线排盘工具，支持 AI 深度解读与多流派分析。">
 <meta name="keywords" content="八字排盘,紫微斗数,奇门遁甲,六爻,合婚,真太阳时,命理排盘,AI命理解读">
@@ -282,6 +282,11 @@ header .sub{font-size:.78rem;color:var(--ink3);margin-top:6px;letter-spacing:.2e
 /* 6) 滚动容器布局稳定（防重绘） */
 .sec-nav{contain:layout paint}
 /* Original study-workbench design; no third-party styles or assets copied. */
+.workspace-dialog-card.study-workspace-card{width:min(1040px,95vw);max-height:92vh;padding:26px;overscroll-behavior:contain;display:flex;flex-direction:column;overflow:hidden}.study-workspace-card [hidden]{display:none!important}.study-workspace-card>[role=tabpanel]{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:3px}.study-dialog-heading{flex-shrink:0;display:flex;justify-content:space-between;align-items:center;gap:12px}.study-eyebrow{font-size:9px;letter-spacing:2px;color:var(--ink3)}.study-workspace-card h2{font-family:"Songti SC","SimSun",serif;font-size:25px;margin:5px 0 15px;letter-spacing:2px}.study-workspace-card button{cursor:pointer}.study-workspace-card .btn{font-size:11px}.study-tabs{flex-shrink:0;display:flex;gap:22px;border-bottom:1px solid var(--line);margin-bottom:18px}.study-tabs button{background:none;color:var(--ink3);border:0;border-bottom:2px solid transparent;padding:10px 0;font:inherit;font-size:12px;min-height:40px}.study-tabs button[aria-selected=true]{color:var(--jade);border-bottom-color:var(--jade)}.study-note-line{font-size:11px!important;color:var(--ink2);line-height:1.9;margin:12px 0!important}
+.study-pillar-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.study-pillar{border:1px solid var(--line);border-radius:5px;padding:18px 14px;background:var(--card2);min-width:0}.study-pillar.is-day{border-color:var(--jade)}.study-pillar h3{font-size:11px;font-weight:400;color:var(--ink3);letter-spacing:3px;margin:0 0 8px}.study-glyphs{font:500 31px "Songti SC","SimSun",serif;color:var(--ink);letter-spacing:6px;margin-bottom:16px}.study-pillar dl{margin:0}.study-pillar dt{font-size:10px;color:var(--ink3);margin-top:12px}.study-pillar dd{font-size:12px;color:var(--ink);margin:3px 0 0;line-height:1.9;overflow-wrap:anywhere}.study-relations{font-size:11px;border-top:1px solid var(--line);padding:13px 0}.study-relations summary{cursor:pointer;color:var(--jade)}.study-relations p{font-size:11px}
+.study-workspace-card select{max-width:100%;background:var(--card2);border:1px solid var(--line);color:var(--ink);padding:8px 12px;font:inherit;font-size:12px;border-radius:4px}.study-workspace-card label{font-size:12px;color:var(--ink2)}.study-years{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:18px 0 24px}.study-years button{display:flex;flex-direction:column;gap:5px;min-width:0;background:var(--card2);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:12px 8px;text-align:left}.study-years button[aria-pressed=true]{border-color:var(--jade);box-shadow:inset 0 -2px var(--jade)}.study-years span{font-size:10px;color:var(--ink3)}.study-years b{font:500 24px "Songti SC","SimSun",serif;letter-spacing:3px}.study-years small{font-size:10px;color:var(--ink2)}.study-months{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.study-months article{background:var(--card2);border:1px solid var(--line);padding:12px;border-radius:4px;min-width:0}.study-months h4{font-size:13px;margin:0 0 8px;color:var(--jade)}.study-months p{font-size:10px;margin:3px 0;color:var(--ink2);overflow-wrap:anywhere}
+.study-file-label{display:block;padding:18px;background:var(--card2);border:1px dashed var(--line);border-radius:5px}.study-file-label input{display:block;max-width:100%;margin-top:10px;font-size:12px;color:var(--ink2)}#study-compare-status{font-size:11px;color:var(--jade);overflow-wrap:anywhere;line-height:1.8}.study-comparison-totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:20px 0}.study-comparison-totals>div{padding:15px;background:var(--card2);border:1px solid var(--line);border-radius:5px;display:flex;gap:12px;align-items:baseline}.study-comparison-totals b{font:400 29px Georgia,serif;color:var(--jade)}.study-comparison-totals span{font-size:11px;color:var(--ink2)}.study-warnings{font-size:11px;color:var(--gold);line-height:2;padding-left:18px}.study-compare-filter{display:flex;align-items:center;gap:6px;margin:15px 0}.study-compare-filter input{width:auto;min-height:0}.study-comparison-table{overflow:auto;max-width:100%;max-height:390px;margin:12px 0}.study-comparison-table table{width:100%;border-collapse:collapse;font-size:11px;min-width:520px;text-align:left}.study-comparison-table th,.study-comparison-table td{border-bottom:1px solid var(--line);padding:9px 8px;overflow-wrap:anywhere;white-space:normal}.study-comparison-table th{color:var(--ink3);font-weight:400;background:var(--card2)}.study-comparison-table tr[data-study-compare-status=different] td:last-child{color:var(--red)}.study-export-bar{flex-shrink:0;border-top:1px solid var(--line);margin-top:24px;padding-top:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.study-export-bar p{font-size:10px;color:var(--ink3);margin:0;flex:1;min-width:180px}.study-workspace-card button:focus-visible,.study-workspace-card input:focus-visible,.study-workspace-card select:focus-visible{outline:2px solid var(--jade);outline-offset:3px}
+@media(max-width:760px){.workspace-dialog-card.study-workspace-card{padding:18px;max-height:94vh}.study-workspace-card h2{font-size:21px;letter-spacing:1px}.study-pillar-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.study-pillar{padding:15px 12px}.study-years{grid-template-columns:repeat(2,minmax(0,1fr))}.study-months{grid-template-columns:minmax(0,1fr)}.study-tabs{gap:18px}.study-comparison-totals{gap:6px}.study-comparison-totals>div{padding:12px 8px;gap:6px}.study-comparison-totals b{font-size:25px}}
 .gz-explorer{--gz-he:#8c652c;--gz-chong:#a24337;--gz-sanhe:#34664d;--gz-xing:#9a5b29;--gz-hai:#626986;--gz-po:#9b4f72;--gz-anhe:#287c7a;container-type:inline-size;border:1px solid var(--line);border-radius:8px;padding:24px;margin-top:24px;background:var(--card2);min-width:0}
 .gz-explorer [hidden]{display:none!important}
 .gz-heading{padding:0 0 16px;margin-bottom:0;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px}.gz-eyebrow{font-size:9px;letter-spacing:1.7px;color:var(--ink3)}.gz-heading h3{font:600 23px "Songti SC","SimSun",serif;letter-spacing:2px;margin:6px 0 0;color:var(--ink)}.gz-heading small{font:11px "Microsoft YaHei",sans-serif;letter-spacing:0;color:var(--ink3);margin-left:7px}
@@ -11241,7 +11246,8 @@ function normalizeReferenceChart(value){
   });
   const date=small(input.date)??((!input.calendarType||input.calendarType==='solar')&&[input.birthYear,input.birthMonth,input.birthDay].every(Number.isInteger)?String(input.birthYear)+'-'+String(input.birthMonth).padStart(2,'0')+'-'+String(input.birthDay).padStart(2,'0'):undefined);
   const time=small(input.time)??([input.birthHour,input.birthMinute].every(Number.isInteger)?String(input.birthHour).padStart(2,'0')+':'+String(input.birthMinute).padStart(2,'0'):undefined);
-  return {pillars,dayun,startAge:Number.isFinite(data.dayun?.startAge)?data.dayun.startAge:undefined,input:{date,time,gender:input.gender==='male'?1:input.gender==='female'?0:[0,1].includes(input.gender)?input.gender:undefined},
+  const periodStartYears=periodSource?.map(p=>Number.isInteger(p.startYear)?p.startYear:Number.isInteger(p.years?.[0]?.year)?p.years[0].year:undefined);
+  return {pillars,dayun,periodStartYears,startAge:Number.isFinite(data.dayun?.startAge)?data.dayun.startAge:undefined,input:{date,time,gender:input.gender==='male'?1:input.gender==='female'?0:[0,1].includes(input.gender)?input.gender:undefined},
     conventions:Object.fromEntries(['utcOffsetMinutes','dstMinutes','dayBoundary','trueSolar'].map(k=>[k,input.options?.[k]]))};
 }
 function compareReferenceChart(chart,reference){
@@ -11263,11 +11269,13 @@ function compareReferenceChart(chart,reference){
     const n=Math.min(local.dayun.length,other.dayun.length);
     for(let i=0;i<n;i++)add('dayun.'+i,'第'+(i+1)+'步大运',local.dayun[i],other.dayun[i]);
     if(local.dayun.length!==other.dayun.length)warnings.push('大运步数不同：仅比较共有的'+n+'步（本盘'+local.dayun.length+'步，对照'+other.dayun.length+'步）');
+    const starts=Array.from({length:n},(_,i)=>({index:i,local:local.periodStartYears[i],reference:other.periodStartYears[i]})).filter(p=>Number.isInteger(p.local)&&Number.isInteger(p.reference)&&p.local!==p.reference);
+    if(starts.length){const p=starts[0];warnings.push('大运起始公历年有'+starts.length+'步不同：第'+(p.index+1)+'步本盘'+p.local+'、对照'+p.reference+'。请核对年龄及交运口径；不计入字段一致数。');}
   }else add('dayun','大运序列',local.dayun,undefined);
   if(other.startAge!==undefined&&local.startAge!==other.startAge)warnings.push('起运年龄不同：本盘'+local.startAge+'，对照'+other.startAge+'；先核对周岁/虚岁、交运时刻与舍入口径');
   const summary=Object.fromEntries(['same','different','not-provided'].map(s=>[s,fields.filter(f=>f.status===s).length]));
   return {schemaVersion:'1.0.0',verdict:summary.different?'differences':warnings.length||summary['not-provided']?'aligned-with-gaps':'aligned',summary,fields,warnings,
-    scope:'仅比较已提供的计算/传统表项，不认定任一实现为标准答案。藏干仅比较集合；空亡依据日柱旬。',excluded:['强弱分数与分档','喜忌用神','格局','神煞集合','AI解释','藏干中气/余气次序和权重'],rules:{...chart.rules}};
+    scope:'仅比较已提供的计算/传统表项，不认定任一实现为标准答案。藏干仅比较集合；空亡依据日柱旬。',excluded:['强弱分数与分档','喜忌用神','格局','神煞集合','AI解释','藏干中气/余气次序和权重','精确交运日期与流年年龄口径'],rules:{...chart.rules}};
 }
 
 /* Source: src/knowledge/catalog.js */
@@ -11743,7 +11751,9 @@ function enhanceWorkbenchChart(){
   const info=root.querySelector('.info-bar'),timing=[...root.children].find(s=>s!==info&&s.textContent.startsWith('输入钟表'));
   if(timing){const details=document.createElement('details');details.className='time-notes';details.open=workbenchMode()==='professional';const summary=document.createElement('summary');summary.textContent='出生时刻与换日规则 · '+(lastZh?.temporal.civilDate?fmtLocalDate(lastZh.temporal.civilDate):'');const body=document.createElement('div');body.textContent=timing.textContent;details.append(summary,body);info.after(details);timing.remove();}
   const nav=root.querySelector('#zh-sec-nav');
-  const toolbar=root.querySelector('button[onclick="shareCopy()"]')?.parentElement;if(toolbar)toolbar.classList.add('chart-toolbar');
+  const toolbar=root.querySelector('button[onclick="shareCopy()"]')?.parentElement;if(toolbar){
+    toolbar.classList.add('chart-toolbar');const study=document.createElement('button');study.type='button';study.className='btn btn-ghost';study.id='study-open';study.textContent='细读与核验';study.onclick=()=>showStudyWorkspace(serializeChart(lastZh));toolbar.appendChild(study);
+  }
   if(nav){nav.setAttribute('role','tablist');nav.setAttribute('aria-label','命盘内容');nav.querySelectorAll('button').forEach(b=>{b.setAttribute('role','tab');b.setAttribute('aria-selected',String(b.classList.contains('active')));b.addEventListener('click',()=>nav.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected',String(x===b))));});}
   const page=root.querySelector('#zh-sec-1'),first=page?.querySelector('.pillar-grid')?.closest('.section-block');
   if(first){first.classList.add('primary-pillars');page.prepend(first);const caption=document.createElement('p');caption.className='pillars-caption';caption.textContent='年、月、日、时四柱。颜色对应五行，日柱突出显示。';first.querySelector('h3')?.after(caption);}
@@ -12008,6 +12018,83 @@ function mountGanZhiRelations(holder){
     root.querySelector('[data-gz-glossary]').addEventListener('click',()=>showWorkspaceDialog('knowledge'));
     root.addEventListener('keydown',event=>{if(event.key==='Escape'){selected=null;rows.forEach(r=>r.setAttribute('aria-pressed','false'));highlight(null);}});
   });
+}
+
+/* Source: src/ui/study-workspace.js */
+/** Learning/inspection only: no storage mutation, AI request or third-party endpoint. */
+function studyDownload(data,name){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+  link.href=url;link.download=name;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function showStudyWorkspace(chart){
+  if(document.querySelector('.study-workspace-overlay'))return;
+  const facts=chartStudyFacts(chart),previous=document.activeElement,overlay=document.createElement('div'),card=document.createElement('div');
+  overlay.className='workspace-dialog study-workspace-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-labelledby','study-title');card.className='workspace-dialog-card study-workspace-card';overlay.appendChild(card);
+  card.innerHTML='<div class="study-dialog-heading"><div><span class="study-eyebrow">细读盘面 / STUDY DESK</span><h2 id="study-title">四柱学习与核验</h2></div><button type="button" class="btn btn-ghost" id="study-close">关闭</button></div><div class="study-tabs" role="tablist" aria-label="学习与核验内容"></div><section id="study-panel-facts" role="tabpanel" aria-labelledby="study-tab-facts"></section><section id="study-panel-timeline" role="tabpanel" aria-labelledby="study-tab-timeline" hidden></section><section id="study-panel-compare" role="tabpanel" aria-labelledby="study-tab-compare" hidden></section><div class="study-export-bar"><p>导出的本盘数据含出生时刻、地点与盘面，请妥善保管；不含API设置。</p><button type="button" class="btn btn-ghost" id="study-export">导出本盘数据</button></div>';
+  const find=id=>card.querySelector('#study-'+id),el=(tag,text,className)=>{const node=document.createElement(tag);if(text!==undefined)node.textContent=text;if(className)node.className=className;return node;};
+  const close=()=>{overlay.remove();previous?.focus();};find('close').onclick=close;
+  const tabs=[['facts','四柱细读'],['timeline','大运流年'],['compare','离线对照']].map(([id,title],i)=>{
+    const button=el('button',title);button.type='button';button.id='study-tab-'+id;button.setAttribute('role','tab');button.setAttribute('aria-controls','study-panel-'+id);button.setAttribute('aria-selected',String(i===0));button.tabIndex=i===0?0:-1;
+    button.onclick=()=>{tabs.forEach(b=>{const on=b===button;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;card.querySelector('#'+b.getAttribute('aria-controls')).hidden=!on;});};card.querySelector('.study-tabs').appendChild(button);return button;
+  });
+  card.querySelector('.study-tabs').onkeydown=event=>{const index=tabs.indexOf(document.activeElement);if(index<0)return;const next=event.key==='ArrowRight'?(index+1)%tabs.length:event.key==='ArrowLeft'?(index+tabs.length-1)%tabs.length:event.key==='Home'?0:event.key==='End'?tabs.length-1:null;if(next!==null){event.preventDefault();tabs[next].click();tabs[next].focus();}};
+  const factPanel=find('panel-facts');factPanel.appendChild(el('p','以日干观察十神与十二长生；每柱空亡统一参照'+facts.kongWang.xun+'，空亡支为'+facts.kongWang.branches.join('、')+'。','study-note-line'));
+  const pillarGrid=el('div',undefined,'study-pillar-grid');
+  facts.pillars.forEach((p,i)=>{
+    const item=el('article',undefined,'study-pillar'+(i===2?' is-day':''));item.append(el('h3',['年柱','月柱','日柱','时柱'][i]),el('div',p.text,'study-glyphs'));
+    const list=el('dl');
+    for(const [label,value] of [['干十神',i===2?'日主 · '+p.tenGod:p.tenGod],['支本气十神',p.branchTenGod],['藏干',p.hidden.map(h=>h.gan+' '+h.tenGod+(h.isMainQi?'（本气）':'')).join(' / ')],['纳音',p.nayin],['十二长生',p.diShi],['日旬空亡',p.isKong?'落空亡':'未落空亡']])list.append(el('dt',label),el('dd',value));
+    item.appendChild(list);pillarGrid.appendChild(item);
+  });factPanel.appendChild(pillarGrid);
+  factPanel.appendChild(el('p','藏干保留原有排列，仅标识本气；中气、余气的次序与权重不在此新增。以上是传统表项，用于学习查阅。','study-note-line'));
+  const relations=el('details',undefined,'study-relations'),summary=el('summary','原局关系与参与柱位 · '+facts.relations.length+'组');relations.appendChild(summary);
+  const positions={year:'年',month:'月',day:'日',hour:'时'};
+  facts.relations.forEach(r=>relations.appendChild(el('p',r.name+' · '+r.positions.map(p=>positions[p.pillar]+(r.lane==='gan'?'干':'支')+p.char).join('、'))));factPanel.appendChild(relations);
+  const timeline=find('panel-timeline'),select=el('select');select.id='study-period';select.setAttribute('aria-label','选择大运');
+  facts.dayun.periods.forEach(p=>{const option=el('option',p.text+' · '+p.startAge+'—'+p.endAge+'岁');option.value=String(p.index);select.appendChild(option);});
+  const selectLabel=el('label','大运 ');selectLabel.htmlFor=select.id;selectLabel.appendChild(select);
+  timeline.append(el('p',(facts.dayun.forward?'顺行':'逆行')+' · '+facts.dayun.startYears+'年'+facts.dayun.startMonths+'个月起运。年龄沿用本盘时间轴口径：流年公历年减有效出生公历年。','study-note-line'),selectLabel);
+  const years=el('div',undefined,'study-years'),monthHeading=el('h3'),monthNote=el('p','流年干支指该年立春后年柱。以下为立春至下一立春的12个节月；北京时间，含起点、不含终点。','study-note-line'),monthList=el('div',undefined,'study-months');timeline.append(years,monthHeading,monthNote,monthList);
+  const renderMonths=year=>{
+    monthHeading.textContent=year+'年 · 节气流月';monthList.replaceChildren();
+    years.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.studyYear===String(year))));
+    try{
+      const months=chartStudyMonths(chart,year).months;
+      months.forEach(m=>{const item=el('article');item.append(el('h4',m.number+' · '+m.jieQi+' / '+m.text),el('p',m.tenGod+' · '+m.nayin),el('p',m.startClock.replace('T',' ')+' 起'),el('p',m.endClock.replace('T',' ')+' 止'));monthList.appendChild(item);});
+    }catch(e){monthList.appendChild(el('p',e.message));}
+  };
+  const renderYears=()=>{
+    years.replaceChildren();const p=facts.dayun.periods[Number(select.value)];
+    p.years.forEach(y=>{const button=el('button');button.type='button';button.dataset.studyYear=String(y.year);button.setAttribute('aria-label',y.year+'年 '+y.text+' '+y.age+'岁');button.append(el('span',y.year+' · '+y.age+'岁'),el('b',y.text),el('small',y.tenGod+' / '+y.nayin));button.onclick=()=>renderMonths(y.year);years.appendChild(button);});
+    renderMonths(p.years.find(y=>y.year===beijingNow().getFullYear())?.year||p.years[0].year);
+  };
+  select.value=String(facts.dayun.periods.find(p=>p.years.some(y=>y.year===beijingNow().getFullYear()))?.index||0);select.onchange=renderYears;renderYears();
+  const compare=find('panel-compare');compare.innerHTML='<p class="study-note-line">选择已保存的对照JSON，在当前设备比较。文件不会上传，也不会写入排盘记录。两边都不是自动认定的标准答案。</p><label class="study-file-label">导入对照JSON<input type="file" id="study-reference-file" accept=".json,application/json"></label><p id="study-compare-status" role="status" aria-live="polite">支持本项目数据/学习快照、四柱数组及已保存的命名四柱响应；最多2MB。</p><div id="study-comparison-result"></div><button type="button" class="btn btn-ghost" id="study-report-export" disabled>导出对照报告</button>';
+  let report=null,readId=0;
+  const showReport=()=>{
+    const target=find('comparison-result');target.replaceChildren();if(!report)return;
+    const totals=el('div',undefined,'study-comparison-totals');for(const [key,label] of [['same','一致'],['different','差异'],['not-provided','未提供']]){const count=el('div');count.append(el('b',String(report.summary[key])),el('span',label));totals.appendChild(count);}target.appendChild(totals);
+    if(report.warnings.length){const list=el('ul',undefined,'study-warnings');report.warnings.forEach(w=>list.appendChild(el('li',w)));target.appendChild(list);}
+    const filterLabel=el('label',undefined,'study-compare-filter'),filter=el('input');filter.type='checkbox';filter.checked=true;filterLabel.append(filter,'仅看差异和未提供项');target.appendChild(filterLabel);
+    const wrap=el('div',undefined,'study-comparison-table'),table=el('table'),head=el('thead'),headRow=el('tr');['字段','本盘','对照','状态'].forEach(t=>headRow.appendChild(el('th',t)));head.appendChild(headRow);table.appendChild(head);const body=el('tbody');table.appendChild(body);wrap.appendChild(table);target.appendChild(wrap);
+    const text=value=>value===null?'未提供':typeof value==='boolean'?value?'是':'否':Array.isArray(value)?value.join('、'):String(value);
+    const render=()=>{body.replaceChildren();const fields=report.fields.filter(f=>!filter.checked||f.status!=='same');fields.forEach(f=>{const row=el('tr');row.dataset.studyCompareStatus=f.status;[f.label,text(f.local),text(f.reference),({same:'一致',different:'差异','not-provided':'未提供'}[f.status])+(f.normalizedAlias?'（异名）':'')].forEach(t=>row.appendChild(el('td',t)));body.appendChild(row);});if(!fields.length){const row=el('tr'),cell=el('td','未发现已提供字段的差异；仍请核对上方口径提示。');cell.colSpan=4;row.appendChild(cell);body.appendChild(row);}};filter.onchange=render;render();
+    target.appendChild(el('p','不比较：'+report.excluded.join('、')+'。','study-note-line'));
+  };
+  find('reference-file').onchange=async event=>{
+    const file=event.target.files?.[0],id=++readId;report=null;find('report-export').disabled=true;showReport();if(!file)return;
+    try{
+      if(file.size>2*1024*1024)throw new RangeError('文件超过2MB');
+      const text=await file.text();if(id!==readId||!overlay.isConnected)return;
+      report=compareReferenceChart(chart,JSON.parse(text.replace(/^\uFEFF/,'')));find('compare-status').textContent='对照已完成：'+file.name+'。已有字段一致不表示全部规则正确。';find('report-export').disabled=false;showReport();
+    }catch(e){if(id!==readId||!overlay.isConnected)return;find('compare-status').textContent='无法对照：'+e.message;}
+  };
+  find('report-export').onclick=()=>{if(report)studyDownload(report,'命理对照报告.json');};find('export').onclick=()=>studyDownload(createStudySnapshot(chart),'命理学习数据.json');
+  overlay.onclick=event=>{if(event.target===overlay)close();};overlay.onkeydown=event=>{
+    if(event.key==='Escape'){event.preventDefault();event.stopPropagation();close();}
+    if(event.key==='Tab'){const controls=[...card.querySelectorAll('button,input,select,textarea,a[href]')].filter(x=>!x.disabled&&x.tabIndex>=0&&x.getClientRects().length),first=controls[0],last=controls.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
+  };
+  document.body.appendChild(overlay);tabs[0].focus();
 }
 
 /* Source: src/ui/app.js */

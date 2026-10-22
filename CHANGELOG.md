@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.23.0 — 2026-10-22
+- Added “细读与核验” to the chart toolbar: detailed pillar facts, DaYun-to-annual-to-Jie-month drill-down, versioned learning snapshots, local JSON comparison and report export.
+- Disclose different DaYun start years even when the numeric start-age labels agree; keep age/turnover conventions outside field agreement counts.
+- Added explicit missing-field/alias/convention/coverage displays, bounded file reads, stale-read guards, safe text rendering and no record or credential-setting writes. Imported files stay on the current device.
+- Added desktop/mobile/dark screenshots and browser regressions for keyboard focus, filtering, exact monthly data, export, malformed/oversized files, XSS and absence of import-triggered network requests. Source code is independently implemented from product/schema ideas in the supplied archive.
+
 ## 5.22.1 — 2026-10-22
 - Added independent, DOM-free study facts, per-pillar natal day-xun void flags, position-aware relationships, ten annual entries per DaYun period and exact Beijing-clock Jie-month intervals. Existing calculation rules, chart schema and AI identity remain unchanged.
 - Added bounded offline JSON comparison adapters and a non-overwriting CLI. Keeps missing fields, explicit name aliases, unspecified time conventions and unequal DaYun coverage visible; no third-party service calls.
