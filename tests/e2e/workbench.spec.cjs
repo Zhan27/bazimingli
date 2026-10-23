@@ -30,7 +30,7 @@ test('mobile form, tabs, chart and dialogs fit a 390px screen, including dark th
   await page.setViewportSize({width:390,height:844});const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/');await expect(page.locator('.primary-pillars')).toBeVisible();
   await page.locator('#workspace-example').click();await expect(page.locator('#zh-result')).toContainText('学习示例');
   const overflow=()=>page.evaluate(()=>({page:document.documentElement.scrollWidth,viewport:innerWidth}));let size=await overflow();expect(size.page).toBeLessThanOrEqual(size.viewport+1);
-  await page.locator('#advanced-options summary').click();await expect(page.locator('#zh-day-boundary')).toBeVisible();await page.locator('#zh-day-boundary').selectOption('zi-zheng');await page.locator('#advanced-options summary').click();
+  await page.locator('#compact-edit').click();await page.locator('#advanced-options summary').click();await expect(page.locator('#zh-day-boundary')).toBeVisible();await page.locator('#zh-day-boundary').selectOption('zi-zheng');await page.locator('#advanced-options summary').click();
   fs.mkdirSync(screenshots,{recursive:true});await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:path.join(screenshots,'workbench-mobile.png'),fullPage:false});
   await page.locator('.primary-pillars').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(screenshots,'workbench-mobile-chart.png'),fullPage:false});
   await page.getByRole('button',{name:'切换到玄墨青暗色主题'}).click();await expect(page.locator('body')).toHaveAttribute('data-theme','xuanmo');await page.locator('.primary-pillars').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(screenshots,'workbench-dark.png'),fullPage:false});

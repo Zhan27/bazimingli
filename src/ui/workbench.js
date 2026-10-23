@@ -6,7 +6,7 @@ function setWorkbenchMode(mode){
   try{localStorage.setItem('mingli_view_mode',mode);}catch(e){/* View preference is optional. */}
   const advanced=document.getElementById('advanced-options');if(advanced)advanced.open=mode==='professional';
   document.querySelectorAll('[data-reader-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.readerMode===mode)));
-  document.querySelectorAll('.rules-disclosure').forEach(d=>{d.open=mode==='professional';});
+  document.querySelectorAll('.rules-disclosure,.compact-original').forEach(d=>{d.open=mode==='professional';});
 }
 function workbenchToast(message){
   document.querySelector('.ui-toast')?.remove();const el=document.createElement('div');el.className='ui-toast';el.setAttribute('role','status');el.textContent=message;document.body.appendChild(el);setTimeout(()=>el.remove(),2800);
@@ -59,7 +59,8 @@ function enhanceWorkbenchChart(){
   const gsg=root.querySelector('#zh-gsg');if(gsg){const d=document.createElement('details');d.className='reference-disclosure';const summary=document.createElement('summary');summary.textContent='断前事参考与时辰核对';gsg.before(d);d.append(summary,gsg);}
   if(page){for(const block of page.children){if(block.classList.contains('section-block')&&block!==first&&/命格总断|五维能量雷达|紫微斗数参考/.test(block.querySelector('h3')?.textContent||''))block.classList.add('reader-extra');}}
   const reader=document.createElement('div');reader.className='reader-mode';reader.append('阅读视图');for(const [value,label] of [['study','学习'],['professional','专业']]){const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.readerMode=value;b.setAttribute('aria-pressed',String(workbenchMode()===value));b.addEventListener('click',()=>setWorkbenchMode(value));reader.appendChild(b);}if(nav)nav.before(reader);
-  if(page){const note=document.createElement('p');note.className='study-note';note.textContent='先读盘面，再看解释。五行数量是统计口径，软件评分和传统断语未经现实预测校准。专业视图可展开原有完整内容。';first?.appendChild(note);}
+  if(page){const note=document.createElement('p');note.className='study-note';note.textContent='查阅十神、五行与干支关系，结合月令和大运继续研读。';first?.appendChild(note);}
+  compactWorkbenchChart(root,first);
 }
 function initializeWorkbench(){
   const wrap=document.querySelector('.wrap'),header=wrap.querySelector('header'),tabs=document.querySelector('.tabs');
@@ -86,5 +87,5 @@ function initializeWorkbench(){
   const privacy=document.createElement('button');privacy.className='btn btn-ghost';privacy.type='button';privacy.id='footer-privacy';privacy.textContent='隐私与数据';privacy.style.cssText='font-size:10px;padding:2px 6px;min-height:0';privacy.addEventListener('click',()=>showWorkspaceDialog('privacy'));footer.appendChild(privacy);
   const recordManager=document.createElement('button');recordManager.type='button';recordManager.id='record-manager-open';recordManager.className='btn btn-ghost';recordManager.textContent='统一记录管理';recordManager.addEventListener('click',showRecordManager);footer.appendChild(recordManager);
   const version=document.createElement('span');version.className='app-version';version.textContent=' · 应用v'+(document.querySelector('meta[name="application-version"]')?.content||'开发版')+' · 规则v'+RULE_VERSION;footer.appendChild(version);
-  setWorkbenchMode(workbenchMode());enhanceWorkbenchChart();new MutationObserver(enhanceWorkbenchChart).observe(document.getElementById('zh-result'),{childList:true});
+  initializeCompactWorkbench();setWorkbenchMode(workbenchMode());enhanceWorkbenchChart();new MutationObserver(enhanceWorkbenchChart).observe(document.getElementById('zh-result'),{childList:true});
 }
