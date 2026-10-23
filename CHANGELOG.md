@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.24.0 — 2026-10-23
+- Applied the approved compact study layout: narrow navigation, aligned four-pillar table, hidden-stem ten-gods, NaYin, twelve stages, day-xun void, month command, five-element counts and DaYun overview. Original full cards, weights, flow diagrams, use-god details and every existing action remain available.
+- Open Gan-Zhi relationships in a separate interactive eight-position workspace. Soft arrows use separate routing lanes and protected position labels; select characters or relationships, filter types, reset, and inspect all participants of repeated/group relations.
+- Added concise traditional meanings, chart-specific ten-god annotations and expandable primary-text references. Kept raw quotations separate from reading notes and removed repetitive relationship disclaimers.
+- Added mobile edit/records/AI actions, success-only form collapse, grouped export/backup actions, keyboard focus handling and viewport-bounded scrolling for AI settings.
+- DaYun overview buttons now locate and highlight the chosen period in the full table; mobile month-command labels keep the day count together without an orphaned character.
+- Preserved calculation rules5.20.0, chart/AI contracts, prompts, record formats, configuration and single-HTML delivery; no framework or dependency migration.
+
 ## 5.23.0 — 2026-10-22
 - Added “细读与核验” to the chart toolbar: detailed pillar facts, DaYun-to-annual-to-Jie-month drill-down, versioned learning snapshots, local JSON comparison and report export.
 - Disclose different DaYun start years even when the numeric start-age labels agree; keep age/turnover conventions outside field agreement counts.
