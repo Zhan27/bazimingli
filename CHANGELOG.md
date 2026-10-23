@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.26.0 — 2026-10-23
+- Corrected Ziwei Chang/Qu placement and derived EnGuang/TianGui, HongLuan/TianXi's one-palace offset, and the complete BoShi sequence starting from LuCun. Added twelve-hour/year-branch and both-gender/year-stem regressions against classical starting rules.
+- Fixed annual SiHua to use the named TaiSui year. Added optional `referenceDate` for observations that change at lunar New Year; displayed the actual annual year/stem and linked the classical source. Ziwei rules are independently versioned5.26.0; existing Bazi rules5.20.0, chart IDs and compatible drafts remain unchanged.
+
 ## 5.25.0 — 2026-10-23
 - Replaced score-tier-as-pattern summaries with a shared, deterministic month-premise reading model: distinct pattern paths, pillar evidence, exposed/hidden/rooted remedies, counterforces, separate climate and balance references, and natal versus transit observations. Overview, pattern detail, closing synthesis and PNG premise use the same model.
 - Retained historical scores and optional demonstrations; repaired their monthly ledger labels and output-month delta without changing the scores. Core calculation rules, AI templates, records and chart identity remain unchanged.

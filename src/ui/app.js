@@ -453,7 +453,8 @@ function renderZW(d){
   // 四化
   const huaName=['禄','权','科','忌'];
   html+=`<span>生年四化：<b>${d.siHua.map((s,i)=>s+huaName[i]).join(' ')}</b></span>`;
-  html+=`<span>流年四化：<b>${d.liuNianSiHua.map((s,i)=>s+huaName[i]).join(' ')}</b></span>`;
+  html+=`<span>流年四化（${d.referenceYear} ${GAN[d.annualYearGZ[0]]}${ZHI[d.annualYearGZ[1]]}）：<b>${d.liuNianSiHua.map((s,i)=>s+huaName[i]).join(' ')}</b></span>`;
+  html+=`<span>安星规则 v${d.rules.version} · <a href="https://zh.wikisource.org/wiki/紫微斗數全書/卷二" target="_blank" rel="noopener noreferrer">安星起例 ↗</a></span>`;
   html+=`<span>命主：<b>${d.mingZhuStar}</b></span>`;
   html+=`<span>身主：<b>${d.shenZhuStar}</b></span>`;
   html+=`<span>大限：<b>${d.daLim.forward?'顺行':'逆行'}（${d.ju}岁起运）</b></span>`;

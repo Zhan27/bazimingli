@@ -1,4 +1,5 @@
-/* Extracted without calculation changes. See docs/ARCHITECTURE.md. */
+/* Ziwei rules are versioned separately so Bazi chart/draft identities remain compatible. */
+const ZIWEI_RULE_VERSION='5.26.0';
 const ZW_STARS={
   ziwei:{name:"紫微",type:"main"},
   tianji:{name:"天机",type:"main"},
@@ -82,8 +83,8 @@ function placeMinorStars(lunarMonth,hourIdx,yearGan){
   const positions={};
   positions.zuoqu=((4+lunarMonth-1)%12+12)%12;       // 辰(4)起顺数生月
   positions.youbi=((10-(lunarMonth-1))%12+12)%12;    // 戌(10)起逆数生月
-  positions.wenchang=((4+hourIdx)%12+12)%12;         // 辰(4)起顺数生时
-  positions.wenqu=((10-hourIdx)%12+12)%12;           // 戌(10)起逆数生时
+  positions.wenchang=(10-hourIdx+12)%12;             // 文昌：戌起子时逆数
+  positions.wenqu=(4+hourIdx)%12;                    // 文曲：辰起子时顺数
   // 天魁天钺(年干): 甲0戊4庚6→丑1未7; 乙1己5→子0申8; 丙2丁3→亥11酉9; 壬8癸9→卯3巳5; 辛7→寅2午6(六辛逢虎马)
   const kuiYue={0:[1,7],4:[1,7],6:[1,7],1:[0,8],5:[0,8],2:[11,9],3:[11,9],8:[3,5],9:[3,5],7:[2,6]};
   const ky=kuiYue[yearGan]||[1,7];
@@ -147,7 +148,7 @@ function placeShenZhu(yearZhi){
 }
 
 function placeHongLuanTianXi(yearZhi){
-  const hongLuan=(4-yearZhi+12)%12;
+  const hongLuan=(3-yearZhi+12)%12; // 卯起子年逆数，天喜在对宫
   return {hongLuan:hongLuan,tianXi:(hongLuan+6)%12};
 }
 
@@ -229,12 +230,12 @@ function placeJiangQian12(yearZhi){
   return res;
 }
 
-function placeBoShi12(mingGong,gender,yearGan){
+function placeBoShi12(luCun,gender,yearGan){
   const yang=(yearGan%2===0);
   const forward=(yang&&gender===1)||(!yang&&gender===0); // 阳男阴女顺
   const names=['boShi','liShi','qingLong','xiaoHao2','jiangJun','zouShu','feiLian2','xiShen2','bingFu2','daHao2','fuBing','guanFu2'];
   const res={};
-  names.forEach((n,i)=>{ res[n]=(mingGong+(forward?i:-i)+12)%12; });
+  names.forEach((n,i)=>{ res[n]=(luCun+(forward?i:-i)+12)%12; });
   return res;
 }
 
@@ -281,10 +282,17 @@ const ZW_BRIGHT={
   "天钺":["庙","庙","庙","庙","庙","庙","庙","庙","庙","庙","庙","庙"]
 };
 
-function calculateZiwei({date,hourIdx,gender,referenceYear=beijingNow().getFullYear()}){
+function calculateZiwei({date,hourIdx,gender,referenceYear=beijingNow().getFullYear(),referenceDate}){
   assertSolarDate(date);
   if(!Number.isInteger(hourIdx)||hourIdx<0||hourIdx>11||![0,1].includes(gender))throw new RangeError('紫微时辰或性别参数无效');
   if(!Number.isInteger(referenceYear)||referenceYear<1901||referenceYear>2099)throw new RangeError('紫微流年参考年份须为1901至2099');
+  // A year label means that lunar year's Tai Sui, while a date observes lunar New Year.
+  let annualYear=referenceYear;
+  if(referenceDate!==undefined){
+    if(typeof referenceDate!=='string')throw new TypeError('紫微参考日期须为YYYY-MM-DD');
+    const target=parseCivilDate(referenceDate);assertSolarDate(target);
+    annualYear=solar2lunar(target).year;
+  }
 const lunar=solar2lunar(date);
   // 紫微斗数以农历排盘(年柱按农历正月初一,非八字立春)
   const lunarGZ=indexToGZ(((lunar.year-4)%60+60)%60);
@@ -337,19 +345,17 @@ const lunar=solar2lunar(date);
   const suiQian=placeSuiQian12(lunarGZ[1]);
   // 将前十二神(将星起顺行): 将星攀鞍岁驿息神华盖劫煞灾煞天煞指背咸池月煞亡神
   const jiangQian=placeJiangQian12(lunarGZ[1]);
-  // 博士十二神(命宫起,顺逆同大限): 博士力士青龙小耗将军奏书飞廉喜神病符大耗伏兵官府
-  const boShi=placeBoShi12(mingGong,gender,lunarGZ[0]);
-  // 流年四化(当前流年天干)
-  const nowYr=referenceYear;
-  const curLunar=solar2lunar(parseCivilDate(nowYr+'-01-01'));
-  const curGZ=indexToGZ(((curLunar.year-4)%60+60)%60);
+  // 博士十二神从禄存起，顺逆同大限。《紫微斗数全书》卷二。
+  const boShi=placeBoShi12(luCun,gender,lunarGZ[0]);
+  const curGZ=indexToGZ(((annualYear-4)%60+60)%60);
   const liuNianSiHua=SI_HUA[curGZ[0]]||SI_HUA[0];
   // 大限起运
   const daLim=getZWDaLim(mingGong,ju,gender,lunarGZ[0]);
   // 各宫天干(五虎遁定寅首)
   const gongGan={};
   for(let i=0;i<12;i++){ gongGan[i]=mingGongGan(lunarGZ[0],i); }
-  return {lunar,yearGZ:lunarGZ,ju,mingGong,shenGong,mgGan,stars,minorStars,siHua,liuNianSiHua,
+  return {rules:{version:ZIWEI_RULE_VERSION,yearBoundary:'lunar-new-year',leapMonth:'same-month',lateZi:'same-lunar-day'},referenceYear:annualYear,referenceDate:referenceDate??null,annualYearGZ:curGZ,
+    lunar,yearGZ:lunarGZ,ju,mingGong,shenGong,mgGan,stars,minorStars,siHua,liuNianSiHua,
     luCun,tianMa,hg,xc,ps,fl,tc,mingZhuStar,shenZhuStar,cs12,
     qingYang,tuoLuo,huoXing,lingXing,tianKong,diJie,jieKong,jieKong2,xunKong,xunKong2,
     tianShi,tianShang,hongLuan,tianXi,guChen,guaSu,longChi,fengGe,tianKu,tianXu,

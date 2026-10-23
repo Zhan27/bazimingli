@@ -81,7 +81,7 @@ function calculateModule(module,input){
   const i=validateChartInput(input),date=withBirthTime(parseCivilDate(i.date),i.hourIdx,i.time);
   const args={date,hourIdx:hourIndexAt(date),gender:i.gender,referenceYear:input.referenceYear??date.getFullYear()};
   let result;
-  if(module==='ziwei')result=calculateZiwei(args);
+  if(module==='ziwei')result=calculateZiwei({...args,referenceDate:input.referenceDate});
   else if(module==='qimen')result=calculateQimen({...args,school:input.school??1});
   else if(module==='liuyao')result=calculateLiuyao({dateStr:i.date,hourIdx:args.hourIdx,mode:input.mode??0,numStr:input.numStr??'',yaoSeq:input.yaoSeq??[]});
   else throw new RangeError('未知计算模块');
