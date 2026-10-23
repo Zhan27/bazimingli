@@ -329,24 +329,17 @@ function zhCompute(date,hourIdx,gender,place,options={}){
   const siHua=SI_HUA[lunarGZ[0]]||SI_HUA[0];
   const daLim=getZWDaLim(mingGong,ju,gender,lunarGZ[0]);
   // 奇门(转盘时家: 值符/值使加临时干宫)
-  const juInfo=qmGetJu(temporal.civilDate,1); // 综合排盘奇门佐证: 默认拆补法
-  const hourIdx60q=gzIndex(hourGZ[0],hourGZ[1]);
-  const xunHeadIdxq=Math.floor(hourIdx60q/10)*10;
-  const xunHeadGZq=indexToGZ(xunHeadIdxq);
-  const zfGong=zhiGongMap[xunHeadGZq[1]]||1;
+  const qimen=calculateQimen({date:temporal.civilDate,hourIdx:hourIndexAt(temporal.civilDate),dayBoundary:temporal.dayBoundary});
+  const {juInfo,zfGong}=qimen;
   // 六爻(时间起卦)
-  const sum=lunar.year%100+lunar.month+lunar.day;
-  const upGua=sum%8,downGua=(sum+lunar.day)%8,dongYao=(sum+hourIdx)%6||6;
-  const sixYao=[...[...BAGUA_BIN[downGua]].reverse(),...[...BAGUA_BIN[upGua]].reverse()];
-  const changedSix=[...sixYao]; changedSix[dongYao-1]=1-changedSix[dongYao-1];
-  const changeDown=BAGUA_BIN.findIndex(b=>JSON.stringify(b)===JSON.stringify(changedSix.slice(0,3).reverse()));
-  const changeUp=BAGUA_BIN.findIndex(b=>JSON.stringify(b)===JSON.stringify(changedSix.slice(3,6).reverse()));
+  const liuyao=calculateLiuyao({dateStr:fmtLocalDate(temporal.civilDate),time:unknownClock(civilMillis(temporal.civilDate)).slice(11,16),hourIdx:hourIndexAt(temporal.civilDate),dayBoundary:temporal.dayBoundary});
+  const {upGua,downGua,dongYao,changeUp,changeDown}=liuyao;
   return {date,hourIdx,gender,lunar,temporal,inputDate:temporal.inputDate,dayGan:dg,profile,ruleVersion:RULE_VERSION,school:profile.id,wxStatistics,strength,useGod,yearGZ,monthGZ,dayGZ,hourGZ,dg,pillars,wxCount,dy,
     tsCount,mainTenGods,strong,strengthScore,strengthType,congGe,yongShen,tiaoHouWX,
     place,placeWx,tiaoHouBoost,tiaoHouPlaceNote,
     caiZheng,caiPian,caiWei,caiKu,fuQiGong,hunCount,fqTs,taoHua,
     ju,mingGong,shenGong,mgGan,zwPos,stars,mingStars,siHua,daLim,
-    juInfo,zfGong,upGua,downGua,dongYao,changeUp,changeDown,guaName:BAGUA[upGua]+BAGUA[downGua],changeName:BAGUA[changeUp]+BAGUA[changeDown]};
+    qimen,liuyao,juInfo,zfGong,upGua,downGua,dongYao,changeUp,changeDown,guaName:GUA_NAMES[upGua*8+downGua],changeName:GUA_NAMES[changeUp*8+changeDown]};
 }
 
 // Explicit state is authoritative. Boolean flags remain for binary scoring rules.

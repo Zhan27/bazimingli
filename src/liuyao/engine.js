@@ -1,4 +1,8 @@
 /* Extracted without calculation changes. See docs/ARCHITECTURE.md. */
+const LIUYAO_RULE_VERSION='5.27.0';
+function tossLiuyaoCoins(random=Math.random){
+  let backs=0;for(let i=0;i<3;i++){const value=random();if(!Number.isFinite(value)||value<0||value>=1)throw new RangeError('铜钱随机源须返回0至1之间的数');if(value>=0.5)backs++;}return backs;
+}
 const BAGUA=["乾","兑","离","震","巽","坎","艮","坤"];
 
 const BAGUA_GLYPH=["","☱","☲","☳","☴","☵","☶",""];
@@ -99,12 +103,18 @@ function getShiYing(up,down){
   return SHIYING_TABLE[up*8+down]||{shi:3,ying:6,gong:up};
 }
 
-function calculateLiuyao({mode=0,dateStr,hourIdx=0,numStr='',yaoSeq=[]}){
+function calculateLiuyao({mode=0,dateStr,hourIdx=0,time='',dayBoundary='zi-chu',numStr='',yaoSeq=[],ruleMode='standard'}){
+  if(!['zi-chu','zi-zheng'].includes(dayBoundary))throw new RangeError('六爻换日规则无效');
+  if(!['standard','legacy'].includes(ruleMode))throw new RangeError('六爻取数规则无效');
   if(![0,1,2].includes(mode)||!Number.isInteger(hourIdx)||hourIdx<0||hourIdx>11)throw new RangeError('六爻模式或时辰无效');
   if(mode===2&&(!Array.isArray(yaoSeq)||yaoSeq.length!==6||yaoSeq.some(n=>!Number.isInteger(n)||n<0||n>3)))throw new RangeError('摇卦须为六个0至3的整数');
   if(mode===1){const nums=numStr.trim().split(/[\s,，]+/).map(Number);if(nums.length!==3||nums.some(n=>!Number.isSafeInteger(n)||n<0))throw new RangeError('请输入三个非负整数');}
 const lyYaoSeq=yaoSeq;
-let upGua,downGua,dongYao=0,dayGan=0,sixYao,changedSix,dongMarks=[];
+let upGua,downGua,dongYao=0,dayGan=null,sixYao,changedSix,dongMarks=[];
+  const date=dateStr?withBirthTime(parseCivilDate(dateStr),hourIdx,time):null;
+  const dayGZ=date?getDayGZ(moduleDayDate(date,dayBoundary)):null;
+  if(date)hourIdx=hourIndexAt(date);
+  const numberGua=n=>ruleMode==='legacy'?n%8:(n%8+7)%8;
   if(mode===2){
     // 铜钱摇卦: 从初爻到上爻
     if(!lyYaoSeq||lyYaoSeq.length!==6){throw new RangeError('请先摇完六爻（摇6次或点"自动摇完"）');}
@@ -116,29 +126,34 @@ let upGua,downGua,dongYao=0,dayGan=0,sixYao,changedSix,dongMarks=[];
     dongYao=firstDong+1; // 1-6, 静卦=0
     downGua=BAGUA_BIN.findIndex(b=>JSON.stringify(b)===JSON.stringify(sixYao.slice(0,3).reverse()));
     upGua=BAGUA_BIN.findIndex(b=>JSON.stringify(b)===JSON.stringify(sixYao.slice(3,6).reverse()));
-    if(dateStr){ const dd=parseCivilDate(dateStr); if(!isNaN(dd)) dayGan=getDayGZ(dd)[0]; }
+    if(dayGZ)dayGan=dayGZ[0];
   }else if(mode===1){
     const nums=numStr.trim().split(/[\s,，]+/).map(Number).filter(n=>!isNaN(n));
     if(nums.length<3){throw new RangeError('请输入三个数字');}
-    upGua=nums[0]%8; downGua=nums[1]%8; dongYao=(nums[2]%6)||6;
+    upGua=numberGua(nums[0]); downGua=numberGua(nums[1]); dongYao=(nums[2]%6)||6;
     sixYao=[...[...BAGUA_BIN[downGua]].reverse(),...[...BAGUA_BIN[upGua]].reverse()];
     dongMarks=[0,0,0,0,0,0]; dongMarks[dongYao-1]=1;
     changedSix=[...sixYao]; changedSix[dongYao-1]=1-changedSix[dongYao-1];
-    if(dateStr){ const dd=parseCivilDate(dateStr); if(!isNaN(dd)) dayGan=getDayGZ(dd)[0]; }
+    if(dayGZ)dayGan=dayGZ[0];
   }else{
     if(!dateStr){throw new RangeError('请选择日期');}
     const [y,m,d]=dateStr.split('-').map(Number);
-    const date=parseCivilDate(dateStr);
     const lunar=solar2lunar(date);
-    const sum=lunar.year%100+lunar.month+lunar.day;
-    upGua=sum%8; downGua=(sum+lunar.day)%8; dongYao=(sum+hourIdx)%6||6;
+    const sum=(ruleMode==='legacy'?lunar.year%100:((lunar.year-4)%12+12)%12+1)+lunar.month+lunar.day;
+    const total=sum+(ruleMode==='legacy'?hourIdx:hourIdx+1);
+    upGua=numberGua(sum); downGua=numberGua(ruleMode==='legacy'?sum+lunar.day:total); dongYao=total%6||6;
     sixYao=[...[...BAGUA_BIN[downGua]].reverse(),...[...BAGUA_BIN[upGua]].reverse()];
     dongMarks=[0,0,0,0,0,0]; dongMarks[dongYao-1]=1;
     changedSix=[...sixYao]; changedSix[dongYao-1]=1-changedSix[dongYao-1];
-    dayGan=getDayGZ(date)[0];
+    dayGan=dayGZ[0];
   }
   // 变卦上下
   const changeDown=BAGUA_BIN.findIndex(b=>JSON.stringify(b)===JSON.stringify(changedSix.slice(0,3).reverse()));
   const changeUp=BAGUA_BIN.findIndex(b=>JSON.stringify(b)===JSON.stringify(changedSix.slice(3,6).reverse()));
-  return {upGua,downGua,dongYao,changeUp,changeDown,sixYao,changedSix,dongMarks,hourIdx,dateStr,dayGan,mode,yaoSeq:lyYaoSeq};
+  const shiYing=getShiYing(upGua,downGua),na=getNaJia(upGua,downGua),changedNa=getNaJia(changeUp,changeDown);
+  const monthGZ=date?getMonthGZ(date):null,xunKong=dayGZ?kongwang(dayGZ):[];
+  const shenStart=dayGan===null?null:[0,0,1,1,2,3,4,4,5,5][dayGan];
+  const lines=na.map(([g,z],i)=>({position:i+1,yang:sixYao[i]===1,moving:!!dongMarks[i],gan:g,zhi:z,text:GAN[g]+ZHI[z],qin:getLiuQin(z,shiYing.gong),shen:shenStart===null?null:LIUSHEN[(shenStart+i)%6],shi:i+1===shiYing.shi,ying:i+1===shiYing.ying,kong:xunKong.includes(z),monthBroken:monthGZ?(monthGZ[1]+6)%12===z:null,
+    changed:{yang:changedSix[i]===1,gan:changedNa[i][0],zhi:changedNa[i][1],text:GAN[changedNa[i][0]]+ZHI[changedNa[i][1]],qin:getLiuQin(changedNa[i][1],shiYing.gong)}}));
+  return {rules:{version:LIUYAO_RULE_VERSION,ruleMode,dayBoundary,changeQinBasis:'natal-palace',leapMonth:'same-number'},upGua,downGua,dongYao,changeUp,changeDown,sixYao,changedSix,dongMarks,hourIdx,dateStr,time,dayGan,dayGZ,monthGZ,xunKong,shiYing,lines,mode,yaoSeq:[...lyYaoSeq]};
 }

@@ -1,12 +1,13 @@
 /* Versioned local record backups. No settings/API credentials are serialized. */
 const REC_KEY='ml_records';
 const MOD_REC_KEYS={zw:'zw_records',bz:'bz_records',qm:'qm_records',ly:'ly_records'};
-const RECORD_KEYS=[REC_KEY,...Object.values(MOD_REC_KEYS)];
+const PAIR_REC_KEY='hh_records';
+const RECORD_KEYS=[REC_KEY,...Object.values(MOD_REC_KEYS),PAIR_REC_KEY];
 const BACKUP_MAX_BYTES=2*1024*1024;
 function cleanRecord(record){
   if(!record||typeof record!=='object'||Array.isArray(record)) throw new Error('记录必须是对象');
   const r={};
-  for(const [field,max] of Object.entries({id:80,key:500,name:100,note:1000,dateStr:10,bazi:500,pillars:500,lunarText:200,title:500,nums:100,place:200,time:5,dayBoundary:20,wxMode:40})){
+  for(const [field,max] of Object.entries({id:80,key:500,name:100,note:1000,dateStr:10,bazi:500,pillars:500,lunarText:200,title:500,nums:100,place:200,time:5,dayBoundary:20,wxMode:40,ruleMode:20,moduleVersion:40})){
     if(record[field]===undefined) continue;
     let value=record[field];
     if(field==='id'&&Number.isSafeInteger(value)) value=String(value);
@@ -29,7 +30,33 @@ function cleanRecord(record){
   if(r.wxMode&&!WX_MODES[r.wxMode])throw new Error('五行统计口径无效');
   if(r.time&&!/^([01]\d|2[0-3]):[0-5]\d$/.test(r.time)) throw new Error('记录时间无效');
   if(r.dayBoundary&&!['zi-chu','zi-zheng'].includes(r.dayBoundary)) throw new Error('记录换日规则无效');
+  if(r.ruleMode&&!['standard','legacy'].includes(r.ruleMode))throw new Error('记录取数规则无效');
   return r;
+}
+function cleanPairSide(side){
+  const i=validateChartInput(side),o=i.options,date=withBirthTime(parseCivilDate(i.date),i.hourIdx,i.time);
+  if(i.unknownTime)throw new Error('合婚记录需要确定的出生时分');
+  if(typeof side.name!=='string'||side.name.length>100)throw new Error('合婚姓名无效');
+  const schoolId=o.schoolId??0,dayBoundary=o.dayBoundary??'zi-chu',wxMode=o.wxMode??'stems-main-qi',trueSolar=o.trueSolar??false;
+  getRuleProfile(schoolId);normalizeBirthTime(date,o);
+  if(!['zi-chu','zi-zheng'].includes(dayBoundary)||!WX_MODES[wxMode]||typeof trueSolar!=='boolean')throw new Error('合婚计算选项无效');
+  return {name:side.name,date:i.date,time:i.time,hourIdx:hourIndexAt(date),gender:i.gender,place:i.place,options:{schoolId,dayBoundary,wxMode,trueSolar,utcOffsetMinutes:o.utcOffsetMinutes??480,dstMinutes:o.dstMinutes??0}};
+}
+function cleanPairRecord(record){
+  const left=cleanPairSide(record?.left),right=cleanPairSide(record?.right);
+  if(!Number.isInteger(record.referenceYear)||record.referenceYear<1900||record.referenceYear>2099)throw new Error('合婚参考年份无效');
+  const base=cleanRecord({...record,dateStr:left.date,hourIdx:left.hourIdx,name:(left.name+' × '+right.name).slice(0,100)});
+  return {...base,referenceYear:record.referenceYear,left,right};
+}
+function cleanStoreList(key,list){
+  if(key!==PAIR_REC_KEY)return cleanRecordList(list);
+  if(!Array.isArray(list)||list.length>50)throw new Error('每类记录须为数组且最多50条');
+  const rows=list.map(cleanPairRecord);if(new Set(rows.map(r=>r.id)).size!==rows.length)throw new Error('存在重复记录ID');return rows;
+}
+function savePairRecord(left,right,referenceYear,storage=localStorage){
+  const l=cleanPairSide(left),r=cleanPairSide(right),rows=readStoredRecords(PAIR_REC_KEY,storage),signature=JSON.stringify([l,r,referenceYear]),old=rows.find(x=>JSON.stringify([x.left,x.right,x.referenceYear])===signature);
+  const record=cleanPairRecord({id:old?.id||Date.now()+'-'+Math.random().toString(36).slice(2,10),left:l,right:r,referenceYear,note:old?.note||'',ts:Date.now(),moduleVersion:HEHUN_RULE_VERSION,title:referenceYear+'年参照 · '+l.name+' × '+r.name});
+  storage.setItem(PAIR_REC_KEY,JSON.stringify([record,...rows.filter(x=>x.id!==record.id)].slice(0,50)));return record;
 }
 function cleanRecordList(list){
   if(!Array.isArray(list)||list.length>50) throw new Error('每类记录须为数组且最多50条');
@@ -45,7 +72,7 @@ function mergeLegacyRecords(current,legacy){
 }
 function readStoredRecords(key,storage=localStorage){
   const raw=storage.getItem(key);
-  return raw?cleanRecordList(JSON.parse(raw)):[];
+  return raw?cleanStoreList(key,JSON.parse(raw)):[];
 }
 function migrateLegacyRecords(storage=localStorage){
   if(!storage.getItem('mingli_records')) return;
@@ -56,23 +83,25 @@ function migrateLegacyRecords(storage=localStorage){
 function createRecordBackup(storage=localStorage){
   migrateLegacyRecords(storage);
   const data={version:'v5',exported:new Date().toISOString()};
-  RECORD_KEYS.forEach(k=>{ data[k]=readStoredRecords(k,storage); });
+  RECORD_KEYS.forEach(k=>{const rows=readStoredRecords(k,storage);if(k!==PAIR_REC_KEY||rows.length)data[k]=rows;});
+  if(data[PAIR_REC_KEY])data.version='v7';
   return data;
 }
 function parseRecordBackup(data){
   if(!data||typeof data!=='object'||Array.isArray(data)) throw new Error('备份必须是JSON对象');
-  if(!['v4','v5','v6-selection'].includes(data.version)) throw new Error('不支持该备份版本（支持v4/v5/v6-selection）');
+  if(!['v4','v5','v6-selection','v7','v7-selection'].includes(data.version)) throw new Error('不支持该备份版本（支持v4/v5/v6-selection/v7/v7-selection）');
+  if(Object.hasOwn(data,PAIR_REC_KEY)&&!data.version.startsWith('v7'))throw new Error('双盘记录须使用v7备份');
   const result={};
-  RECORD_KEYS.forEach(k=>{if(Object.hasOwn(data,k)) result[k]=cleanRecordList(data[k]);});
+  RECORD_KEYS.forEach(k=>{if(Object.hasOwn(data,k)) result[k]=cleanStoreList(k,data[k]);});
   if(Object.hasOwn(data,'mingli_records')) result[REC_KEY]=mergeLegacyRecords(result[REC_KEY]||[],cleanRecordList(data.mingli_records));
   if(!Object.keys(result).length) throw new Error('备份文件中未找到排盘记录');
   return result;
 }
 function restoreRecordBackup(data,storage=localStorage){
   const records=parseRecordBackup(data), before={};
-  if(data.version==='v6-selection')for(const key of Object.keys(records)){
+  if(data.version.endsWith('-selection'))for(const key of Object.keys(records)){
     const existing=key===REC_KEY?mergeLegacyRecords(readStoredRecords(key,storage),readStoredRecords('mingli_records',storage)):readStoredRecords(key,storage);
-    const ids=new Set(records[key].map(r=>r.id));records[key]=cleanRecordList([...records[key],...existing.filter(r=>!ids.has(r.id))]);
+    const ids=new Set(records[key].map(r=>r.id));records[key]=cleanStoreList(key,[...records[key],...existing.filter(r=>!ids.has(r.id))]);
   }
   Object.keys(records).forEach(k=>{before[k]=storage.getItem(k);});
   // Remove the migrated legacy key so clear/reload cannot resurrect old records.
@@ -89,7 +118,7 @@ function restoreRecordBackup(data,storage=localStorage){
   return Object.keys(records).length;
 }
 /** Known categories only; the manager never enumerates browser/API settings. */
-const RECORD_LABELS=Object.freeze({ml_records:'综合八字',bz_records:'八字页',zw_records:'紫微斗数',qm_records:'奇门遁甲',ly_records:'六爻'});
+const RECORD_LABELS=Object.freeze({ml_records:'综合八字',bz_records:'八字页',zw_records:'紫微斗数',qm_records:'奇门遁甲',ly_records:'六爻',hh_records:'合婚双盘'});
 function listRecordEntries({query='',category='all',sort='updated-desc'}={},storage=localStorage){
   if(typeof query!=='string'||query.length>200||!['all',...RECORD_KEYS].includes(category)||!['updated-desc','updated-asc','date-desc','date-asc','name'].includes(sort))throw new TypeError('记录筛选条件无效');
   migrateLegacyRecords(storage);const q=query.toLowerCase();
@@ -102,7 +131,7 @@ function listRecordEntries({query='',category='all',sort='updated-desc'}={},stor
   });
 }
 function selectedRecordEntries(selection,storage){
-  if(!Array.isArray(selection)||!selection.length||selection.length>250)throw new RangeError('请选择1至250条记录');
+  if(!Array.isArray(selection)||!selection.length||selection.length>300)throw new RangeError('请选择1至300条记录');
   const seen=new Set(),groups={};
   for(const item of selection){
     if(!item||!RECORD_KEYS.includes(item.key)||typeof item.id!=='string'||!/^[-\w]{1,80}$/.test(item.id))throw new TypeError('记录选择无效');
@@ -114,17 +143,18 @@ function selectedRecordEntries(selection,storage){
 }
 function createSelectedRecordBackup(selection,storage=localStorage){
   const {groups,seen}=selectedRecordEntries(selection,storage),out={version:'v6-selection',exported:new Date().toISOString()};
+  if(groups[PAIR_REC_KEY])out.version='v7-selection';
   for(const [key,rows] of Object.entries(groups))out[key]=rows.filter(r=>seen.has(key+'/'+r.id));return out;
 }
 function deleteRecordEntries(selection,storage=localStorage){
-  const {groups,seen}=selectedRecordEntries(selection,storage),data={version:'v5'};
+  const {groups,seen}=selectedRecordEntries(selection,storage),data={version:selection.some(x=>x.key===PAIR_REC_KEY)?'v7':'v5'};
   for(const [key,rows] of Object.entries(groups))data[key]=rows.filter(r=>!seen.has(key+'/'+r.id));
   restoreRecordBackup(data,storage);return selection.length;
 }
 function updateRecordNote(key,id,note,storage=localStorage){
   if(typeof note!=='string'||note.length>1000)throw new TypeError('备注最多1000字');selectedRecordEntries([{key,id}],storage);
-  const rows=readStoredRecords(key,storage).map(r=>r.id===id?{...r,note,ts:Date.now()}:r);restoreRecordBackup({version:'v5',[key]:rows},storage);
+  const rows=readStoredRecords(key,storage).map(r=>r.id===id?{...r,note,ts:Date.now()}:r);restoreRecordBackup({version:key===PAIR_REC_KEY?'v7':'v5',[key]:rows},storage);
 }
 function clearAllRecordEntries(storage=localStorage){
-  restoreRecordBackup({version:'v5',...Object.fromEntries(RECORD_KEYS.map(k=>[k,[]]))},storage);
+  restoreRecordBackup({version:'v7',...Object.fromEntries(RECORD_KEYS.map(k=>[k,[]]))},storage);
 }

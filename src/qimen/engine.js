@@ -1,4 +1,7 @@
 /* Extracted without calculation changes. See docs/ARCHITECTURE.md. */
+const QIMEN_RULE_VERSION='5.27.0';
+const QM_RING=[1,8,3,4,9,2,7,6]; // 坎艮震巽离坤兑乾，顺时针
+const QM_SOURCE='https://www.eee-learning.com/book/1345';
 const QM_GONG=["坎","坤","震","巽","中","乾","兑","艮","离"];
 
 const QM_GONG_NUM=[0,1,2,3,4,5,6,7,8,9];
@@ -37,19 +40,8 @@ const QM_JU_TABLE={
 };
 
 function qmGetYuan(date,termIdx){
-  const y=date.getFullYear(),m=date.getMonth(),d=date.getDate();
-  const termYear=termIdx===23&&date.getMonth()===0?y-1:y;
-  const termDay=solarTermDay(termYear,termIdx);
-  const termDate=civilFromMillis(Date.UTC(termYear,Math.floor(termIdx/2),termDay));
-  const diff=Math.round((civilDay(date)-civilDay(termDate))/86400000);
-  const tGZ=getDayGZ(termDate);
-  const tIdx=gzIndex(tGZ[0],tGZ[1]);
-  // 节气后第一个甲(0)/己(5)日(符头)距节天数: 0-9
-  let fuTou=0;
-  for(let i=0;i<10;i++){ const g=(tIdx+i)%10; if(g===0||g===5){ fuTou=i; break; } }
-  const daysSinceFu=diff-fuTou;
-  const yuan=((Math.floor(daysSinceFu/5)%3)+3)%3; // 0上元 1中元 2下元
-  return yuan;
+  const day=getDayGZ(date),idx=gzIndex(day[0],day[1]),head=indexToGZ(idx-idx%5);
+  return [0,2,1][head[1]%3]; // 符头支：子午卯酉上；寅申巳亥中；辰戌丑未下
 }
 
 function qmGetJu(date,school){
@@ -65,10 +57,10 @@ function qmGetJu(date,school){
   else{ yuan=Math.floor(dayIdx/20); } // 置闰法近似: 日干支三分
   const j=QM_JU_TABLE[termIdx]||[1,7,4];
   const ju=j[yuan]||j[0];
-  return {ju,yang,yuan,termIdx,dayGZ,dayIdx};
+  return {ju,yang,yuan,termIdx,dayGZ,dayIdx,fuTou:indexToGZ(dayIdx-dayIdx%5),method:school===1?'拆补法':'旧版日干支分段（近似）'};
 }
 
-const zhiGongMap={0:1,1:8,2:8,3:3,4:4,5:9,6:9,7:2,8:2,9:7,10:6,11:1};
+const zhiGongMap={0:1,1:8,2:8,3:3,4:4,5:4,6:9,7:2,8:2,9:7,10:6,11:6};
 
 function placeYi(ju,yang){
   const yiOrder=["戊","己","庚","辛","壬","癸","丁","丙","乙"];
@@ -87,18 +79,16 @@ const GONG_MEN={1:"休门",2:"死门",3:"伤门",4:"杜门",6:"开门",7:"惊门
 const GONG_SHEN={1:"值符",2:"腾蛇",3:"太阴",4:"六合",6:"白虎",7:"玄武",8:"九地",9:"九天"};
 
 function placeStarsTian(zfGong,hourGanGong){
-  const starSeq=[1,2,3,4,5,6,7,8,9].map(g=>GONG_STAR[g]);
-  const pan={};
-  const offset=(((zfGong-1)-(hourGanGong-1))%9+9)%9;
-  for(let g=1;g<=9;g++){ pan[g]=starSeq[((g-1+offset)%9+9)%9]; }
+  const pan={5:'天禽（寄天芮）'},from=QM_RING.indexOf(zfGong===5?2:zfGong),to=QM_RING.indexOf(hourGanGong===5?2:hourGanGong);
+  QM_RING.forEach((g,i)=>{const origin=QM_RING[(i-to+from+8)%8];pan[g]=GONG_STAR[origin]+(origin===2?'／天禽':'');});
   return pan;
 }
 
 function placeMenZhuan(zfGong,hourGanGong){
-  const order=[1,2,3,4,6,7,8,9];
+  const order=QM_RING;
   const menSeq=order.map(g=>GONG_MEN[g]);
   const pan={};
-  const zfIdx=order.indexOf(zfGong);
+  const zfIdx=order.indexOf(zfGong===5?2:zfGong);
   const hIdx=order.indexOf(hourGanGong===5?2:hourGanGong);
   order.forEach((g,i)=>{
     pan[g]=menSeq[((zfIdx-hIdx+i)%8+8)%8];
@@ -108,8 +98,8 @@ function placeMenZhuan(zfGong,hourGanGong){
 }
 
 function placeShenZhuan(zfGong,hourGanGong,yang){
-  const order=[1,2,3,4,6,7,8,9];
-  const shenSeq=order.map(g=>GONG_SHEN[g]); // [值符,腾蛇,太阴,六合,白虎,玄武,九地,九天]
+  const order=QM_RING;
+  const shenSeq=['值符','腾蛇','太阴','六合','白虎','玄武','九地','九天'];
   const pan={};
   const hG=hourGanGong===5?2:hourGanGong;
   if(yang){
@@ -123,18 +113,26 @@ function placeShenZhuan(zfGong,hourGanGong,yang){
   return pan;
 }
 
-function calculateQimen({date,hourIdx=hourIndexAt(date),school=1,minute=date.getMinutes(),hourHH=date.getHours()}){
+function calculateQimen({date,hourIdx=hourIndexAt(date),school=1,minute=date.getMinutes(),hourHH=date.getHours(),dayBoundary='zi-chu'}){
   assertSolarDate(date);
   if(!Number.isInteger(hourIdx)||hourIdx<0||hourIdx>11||![0,1].includes(school))throw new RangeError('奇门时辰或定局规则无效');
-const juInfo=qmGetJu(date,school);
-  const hourGZ=getHourGZ(date,hourIdx);
-  const dayGZ=getDayGZ(date);
+  const dayDate=moduleDayDate(date,dayBoundary),juInfo=qmGetJu(dayDate,school);
+  // 节气按实际时刻，符头按所选换日；两者不可相互覆盖。
+  juInfo.termIdx=getTermIndex(date);juInfo.yang=juInfo.termIdx>=23||juInfo.termIdx<=10;juInfo.ju=QM_JU_TABLE[juInfo.termIdx][juInfo.yuan];
+  const hourGZ=getHourGZ(dayDate,hourIdx);
+  const dayGZ=getDayGZ(dayDate);
   // 时辰旬首(六甲旬首)
   const hourIdx60=gzIndex(hourGZ[0],hourGZ[1]);
   const xunHeadIdx=Math.floor(hourIdx60/10)*10;
   const xunHeadGZ=indexToGZ(xunHeadIdx);
-  // 值符落宫 = 旬首地支所在宫
-  const zfGong=zhiGongMap[xunHeadGZ[1]]||1;
-  // 排盘
-  return {date,hourIdx,minute,hourHH,juInfo,hourGZ,dayGZ,zfGong,xunHeadGZ,school};
+  const diPan=placeYi(juInfo.ju,juInfo.yang),xunYi=['戊','己','庚','辛','壬','癸'][Math.floor(hourIdx60/10)];
+  const zfGong=Number(Object.keys(diPan).find(g=>diPan[g]===xunYi));
+  const hourStem=hourGZ[0]===0?xunYi:GAN[hourGZ[0]],hourGanOriginalGong=Number(Object.keys(diPan).find(g=>diPan[g]===hourStem)),hourGanGong=hourGanOriginalGong===5?2:hourGanOriginalGong;
+  const elapsed=hourIdx60%10,rawMenGong=((zfGong-1+(juInfo.yang?elapsed:-elapsed))%9+9)%9+1,zhiShiGong=rawMenGong===5?2:rawMenGong;
+  const tianPan=placeStarsTian(zfGong,hourGanGong),baMen=placeMenZhuan(zfGong,zhiShiGong),baShen=placeShenZhuan(zfGong,hourGanGong,juInfo.yang),tianGan={},tianJiGan={};
+  const from=QM_RING.indexOf(zfGong===5?2:zfGong),to=QM_RING.indexOf(hourGanGong);
+  for(const [i,g] of QM_RING.entries()){const origin=QM_RING[(i-to+from+8)%8];tianGan[g]=diPan[origin];tianJiGan[g]=origin===2?diPan[5]:null;}
+  const xunKongZhis=kongwang(hourGZ),xunKongGongs=[...new Set(xunKongZhis.map(z=>zhiGongMap[z]))],zfMen=GONG_MEN[zfGong===5?2:zfGong],zfStar=GONG_STAR[zfGong];
+  const palaces=Array.from({length:9},(_,i)=>{const g=i+1;return {number:g,name:QM_GONG[i],earthlyStem:diPan[g],heavenlyStem:tianGan[g]||null,carriedStem:tianJiGan[g]||null,star:tianPan[g]||null,door:baMen[g]||null,spirit:baShen[g]||null,void:xunKongGongs.includes(g),zhiFu:g===hourGanGong,zhiShi:g===zhiShiGong};});
+  return {rules:{version:QIMEN_RULE_VERSION,dayBoundary,clock:'UTC+08:00',rotation:'坎艮震巽离坤兑乾',center:'禽随芮；中五寄坤二',source:QM_SOURCE},date,hourIdx,minute,hourHH,juInfo,hourGZ,dayGZ,zfGong,xunHeadGZ,xunYi,hourGanGong,hourGanOriginalGong,zhiShiGong,rawMenGong,zfMen,zfStar,diPan,tianPan,baMen,baShen,tianGan,tianJiGan,xunKongZhis,xunKongGongs,palaces,school};
 }

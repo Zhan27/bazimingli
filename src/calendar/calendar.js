@@ -107,6 +107,10 @@ function trueSolarTime(date,longitude){
   return {longitude,longitudeMin,equationMin,offsetMin,date:correctedDate,dayOffset:Math.round((civilDay(correctedDate)-civilDay(date))/86400000),trueTime:{h:correctedDate.getHours(),m:correctedDate.getMinutes()}};
 }
 function hourIndexAt(date){ return Math.floor((date.getHours()+1)/2)%12; }
+function moduleDayDate(date,dayBoundary='zi-chu'){
+  if(!['zi-chu','zi-zheng'].includes(dayBoundary))throw new RangeError('未知换日规则');
+  return civilFromMillis(civilDay(date)+(dayBoundary==='zi-chu'&&date.getHours()>=23?86400000:0));
+}
 function withBirthTime(date,hourIdx,timeText,minute=0){
   assertSolarDate(date);
   if(!Number.isInteger(hourIdx)||hourIdx<0||hourIdx>11) throw new RangeError('请选择有效时辰');

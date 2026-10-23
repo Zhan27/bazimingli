@@ -82,8 +82,8 @@ function calculateModule(module,input){
   const args={date,hourIdx:hourIndexAt(date),gender:i.gender,referenceYear:input.referenceYear??date.getFullYear()};
   let result;
   if(module==='ziwei')result=calculateZiwei({...args,referenceDate:input.referenceDate});
-  else if(module==='qimen')result=calculateQimen({...args,school:input.school??1});
-  else if(module==='liuyao')result=calculateLiuyao({dateStr:i.date,hourIdx:args.hourIdx,mode:input.mode??0,numStr:input.numStr??'',yaoSeq:input.yaoSeq??[]});
+  else if(module==='qimen')result=calculateQimen({...args,school:input.school??1,dayBoundary:i.options.dayBoundary??'zi-chu'});
+  else if(module==='liuyao')result=calculateLiuyao({dateStr:i.date,hourIdx:args.hourIdx,time:i.time,dayBoundary:i.options.dayBoundary??'zi-chu',ruleMode:input.ruleMode??'standard',mode:input.mode??0,numStr:input.numStr??'',yaoSeq:input.yaoSeq??[]});
   else throw new RangeError('未知计算模块');
   return JSON.parse(JSON.stringify({schemaVersion:CHART_SCHEMA_VERSION,module,input,result}));
 }

@@ -1,11 +1,12 @@
 /* Extracted without calculation changes. See docs/ARCHITECTURE.md. */
-const HH_LIUHE={0:1,2:11,3:10,4:9,5:8,6:7};
+const HEHUN_RULE_VERSION='5.27.0';
+const HH_LIUHE={0:1,1:0,2:11,11:2,3:10,10:3,4:9,9:4,5:8,8:5,6:7,7:6};
 
 const HH_CHONG={0:6,1:7,2:8,3:9,4:10,5:11,6:0,7:1,8:2,9:3,10:4,11:5};
 
-const HH_HAI={0:5,5:0,1:6,6:1,2:5,3:4,4:3,5:2,6:1,8:11,11:8,9:10,10:9};
+const HH_HAI={0:7,7:0,1:6,6:1,2:5,5:2,3:4,4:3,8:11,11:8,9:10,10:9};
 
-const HH_TRI=[[2,5,8],[1,7,10]];
+const HH_TRI=[[2,5,8],[1,7,10],[0,3]];
 
 const HH_GAN_HE_PAIRS=[['甲','己','土'],['乙','庚','金'],['丙','辛','水'],['丁','壬','木'],['戊','癸','火']];
 
@@ -28,7 +29,7 @@ function hhRel(a,b){
   if(HH_HAI[a]===b) return {k:'hai',name:'六害',score:-6,desc:'暗耗之象，相处中易有细碎摩擦与消耗，忌积怨'};
   const d=Math.abs(a-b);
   if(d===4||d===8) return {k:'he3',name:'三合半合',score:8,desc:'半合有情的拱合之象，气场协调，互助有余'};
-  if(HH_TRI.some(t=>t.includes(a)&&t.includes(b))) return {k:'xing',name:'相刑',score:-8,desc:'无恩之刑，越亲近越易挑剔计较，须防翻旧账'};
+  if(a!==b&&HH_TRI.some(t=>t.includes(a)&&t.includes(b))) return {k:'xing',name:'相刑',score:-8,desc:'相刑关系，观察双方表达、边界与相处节奏'};
   return {k:'none',name:'平',score:0,desc:'中性之遇，相处平稳，亲疏多看经营'};
 }
 
@@ -47,9 +48,10 @@ const HH_SHISHEN_TXT={
 
 function hhPeiOuStar(zh){ return zh.gender===1?[4,5]:[6,7]; }
 
-function hhTaoHua(z){ return {0:8,4:8,8:8,2:5,6:5,10:5,1:11,5:11,9:11,3:0,7:0,11:0}[z]; }
+function hhTaoHua(z){ return taohuaZhi(z); }
+function hhEscape(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
-function hhDeepInsights(z1,z2,n1,n2,aspects){
+function hhDeepInsights(z1,z2,n1,n2,aspects,referenceYear){
   const out=[];
   // ① 星宫同位: 配偶星坐夫妻宫 + 透干得地(合婚第一要义)
   const p1=hhPeiOuStar(z1), p2=hhPeiOuStar(z2);
@@ -59,7 +61,7 @@ function hhDeepInsights(z1,z2,n1,n2,aspects){
   const t1=p1.includes(d1t), t2=p2.includes(d2t);
   const tou1=[z1.yearGZ[0],z1.monthGZ[0],z1.hourGZ[0]].some(g=>p1.includes(tenGod(z1.dg,g)));
   const tou2=[z2.yearGZ[0],z2.monthGZ[0],z2.hourGZ[0]].some(g=>p2.includes(tenGod(z2.dg,g)));
-  const nA=esc0(n1||'甲方'), nB=esc0(n2||'乙方');
+  const nA=hhEscape(n1||'甲方'), nB=hhEscape(n2||'乙方');
   let starTxt='';
   starTxt+='<b>'+nA+'</b>（'+(z1.gender===1?'男命·以财星为妻':'女命·以官星为夫')+'）：'+(t1?'配偶星<b>'+SHISHEN_NAME[d1t]+'</b>正坐夫妻宫——<b>星宫同位</b>，正缘归位，命里自有良配之象':'夫妻宫未坐配偶星（坐'+SHISHEN_NAME[d1t]+'），婚缘多靠大运引动')+'；'+(tou1?'且配偶星<b>透干</b>，婚缘根基有力':'配偶星不透干，婚缘待流年引动');
   starTxt+='。'+'<b>'+nB+'</b>（'+(z2.gender===1?'男命·以财星为妻':'女命·以官星为夫')+'）：'+(t2?'配偶星<b>'+SHISHEN_NAME[d2t]+'</b>正坐夫妻宫——<b>星宫同位</b>，正缘归位，命里自有良配之象':'夫妻宫未坐配偶星（坐'+SHISHEN_NAME[d2t]+'），婚缘多靠大运引动')+'；'+(tou2?'且配偶星<b>透干</b>，婚缘根基有力':'配偶星不透干，婚缘待流年引动');
@@ -70,7 +72,7 @@ function hhDeepInsights(z1,z2,n1,n2,aspects){
   const yinYang=y1!==y2;
   out.push({icon:'⚖️',title:'阴阳互济',score:yinYang?2:0,html:'双方日主 <b>'+GAN[z1.dg]+'</b>（'+(y1?'阳':'阴')+'）与 <b>'+GAN[z2.dg]+'</b>（'+(y2?'阳':'阴')+'）——'+(yinYang?'一阴一阳，<b>阴阳相济</b>，刚柔互补，婚姻易得平衡':'同属'+(y1?'阳':'阴')+'，气场同向，相处爽利直白，但易各执己见，需互为镜鉴')});
   // ③ 婚期窗口: 双方婚运(配偶星透干年/桃花年)重叠
-  const nowY=new Date().getFullYear();
+  const nowY=referenceYear;
   const y1arr=[], y2arr=[];
   for(let y=nowY;y<=nowY+9;y++){
     const [g,z]=indexToGZ(((y-4)%60+60)%60);
@@ -83,14 +85,15 @@ function hhDeepInsights(z1,z2,n1,n2,aspects){
   const best=aspects.filter(a=>a.score>0).sort((a,b)=>b.score-a.score)[0];
   const worst=aspects.filter(a=>a.score<0).sort((a,b)=>a.score-b.score)[0];
   let fixTxt='';
-  if(best) fixTxt+='你们<b>最合</b>之处在「'+esc0(best.k.replace(/\s*·.*/,''))+'」——<b>'+esc0(best.name)+'</b>（+'+best.score+'）：'+esc0(best.desc)+'。这是感情的根基，<b>多放大它</b>，日常相处就稳。';
-  if(worst) fixTxt+='<br>你们<b>最磨</b>之处在「'+esc0(worst.k.replace(/\s*·.*/,''))+'」——<b>'+esc0(worst.name)+'</b>（'+worst.score+'）：'+esc0(worst.desc)+'。这一处宜<b>提前立好边界、避开锋芒</b>，别让小事消耗大感情。';
+  if(best) fixTxt+='你们<b>最合</b>之处在「'+hhEscape(best.k.replace(/\s*·.*/,''))+'」——<b>'+hhEscape(best.name)+'</b>（+'+best.score+'）：'+hhEscape(best.desc)+'。这是感情的根基，<b>多放大它</b>，日常相处就稳。';
+  if(worst) fixTxt+='<br>你们<b>最磨</b>之处在「'+hhEscape(worst.k.replace(/\s*·.*/,''))+'」——<b>'+hhEscape(worst.name)+'</b>（'+worst.score+'）：'+hhEscape(worst.desc)+'。这一处宜<b>提前立好边界、避开锋芒</b>，别让小事消耗大感情。';
   if(!best&&!worst) fixTxt='此配无大合亦无大冲，感情全靠日常经营——仪式感、共同目标与定期深度沟通，比任何命理都重要。';
   out.push({icon:'🧭',title:'相处处方',score:0,html:fixTxt});
   return out;
 }
 
-function heHunCompute(z1,z2,n1,n2){
+function heHunCompute(z1,z2,n1,n2,referenceYear=beijingNow().getFullYear()){
+  if(!Number.isInteger(referenceYear)||referenceYear<1900||referenceYear>2099)throw new RangeError('合婚参考年须为1900至2099');
   const aspects=[];
   // 1. 年支·根基(两族基调)
   const yr=hhRel(z1.yearGZ[1],z2.yearGZ[1]);
@@ -137,7 +140,7 @@ function heHunCompute(z1,z2,n1,n2){
   let bu=0,buDesc=[];
   if(z1.yongShen!==undefined&&(z2.wxCount[z1.yongShen]||0)>=2){bu+=9;buDesc.push((n1||'甲方')+'之用神('+WUXING[z1.yongShen]+')在'+(n2||'乙方')+'命中成势，对方补我之所需');}
   if(z2.yongShen!==undefined&&(z1.wxCount[z2.yongShen]||0)>=2){bu+=9;buDesc.push((n2||'乙方')+'之用神('+WUXING[z2.yongShen]+')在'+(n1||'甲方')+'命中成势，对方补其之所需');}
-  if(z1.yongShen!==undefined&&z2.wxCount&&(z2.wxCount[(z1.yongShen+2)%5]||0)>=3){bu-=5;buDesc.push('注意：'+(n2||'乙方')+'命中最旺之五行克'+(n1||'甲')+'之用神，能量上互有牵制');}
+  for(const [a,b,an,bn] of [[z1,z2,n1,n2],[z2,z1,n2,n1]])if(a.yongShen!==undefined&&(b.wxCount[(a.yongShen+3)%5]||0)>=3){bu-=5;buDesc.push((bn||'对方')+'命中'+WUXING[(a.yongShen+3)%5]+'较多，克'+(an||'本方')+'之用神'+WUXING[a.yongShen]+'，互补与牵制并看');}
   aspects.push({icon:'🔋',k:'用神 · 能量互补',name:bu>0?'互补有助':bu<0?'互有牵制':'中性',score:bu,desc:buDesc.join('；')||'双方五行配置互无特别增益或损耗，相处平实'});
   // 10. 五行补缺
   const lack1=z1.wxCount.map((v,i)=>v===0?i:-1).filter(i=>i>=0);
@@ -151,7 +154,7 @@ function heHunCompute(z1,z2,n1,n2){
   const g2gua=getMingGua(z2.date.getFullYear(),z2.gender).replace(/\(.*?\)/,'');
   const east1=['坎卦','离卦','震卦','巽卦'].includes(g1gua), east2=['坎卦','离卦','震卦','巽卦'].includes(g2gua);
   const sameGua=east1===east2;
-  aspects.push({icon:'🧿',k:'九星 · 命卦配宫',name:sameGua?'东/西四命相合':'东四×西四相冲',score:sameGua?6:-6,desc:'男方命卦'+g1gua+'、女方命卦'+g2gua+'——'+(sameGua?'同属'+(east1?'东':'西')+'四命，气场同频，宅运相合':'一东一西，气场有扞格，起居习惯须互相迁就')});
+  aspects.push({icon:'🧿',k:'九星 · 命卦配宫',name:sameGua?'东/西四命相合':'东四×西四相冲',score:sameGua?6:-6,desc:(n1||'甲方')+'命卦'+g1gua+'、'+(n2||'乙方')+'命卦'+g2gua+'——'+(sameGua?'同属'+(east1?'东':'西')+'四命，气场同频，宅运相合':'一东一西，气场有扞格，起居习惯须互相迁就')});
   // 12. 紫微命宫星曜
   const mk1=z1.mingStars&&z1.mingStars[0], mk2=z2.mingStars&&z2.mingStars[0];
   const m1=mk1?ZW_STARS[mk1].name:'', m2=mk2?ZW_STARS[mk2].name:'';
@@ -164,8 +167,8 @@ function heHunCompute(z1,z2,n1,n2){
   } else { zwDesc='一方命宫主星不现，紫微层佐证有限'; }
   aspects.push({icon:'♈',k:'紫微 · 命宫星曜',name:zwName,score:zwScore,desc:zwDesc});
   // 13. 大运同步
-  const age1=new Date().getFullYear()-z1.date.getFullYear();
-  const age2=new Date().getFullYear()-z2.date.getFullYear();
+  const age1=referenceYear-z1.date.getFullYear();
+  const age2=referenceYear-z2.date.getFullYear();
   const dy1=z1.dy.dyList.find(d=>age1>=d.age&&age1<=d.endAge);
   const dy2=z2.dy.dyList.find(d=>age2>=d.age&&age2<=d.endAge);
   let dyScore=0,dyTxt='';
@@ -194,8 +197,15 @@ function heHunCompute(z1,z2,n1,n2){
     score>=40?'磨合之配：刑冲之象偏多，气场相撞——若情真，请以"慢"字诀相处，避锋芒、多留白':
     '慎配之参考：刑冲害显著、互补不足——传统合婚观多劝谨慎；若执手，须以极大的包容与边界感为前提';
   // v5.9 深度研判(精而不多)
-  const deep=hhDeepInsights(z1,z2,n1,n2,aspects);
-  return {score,aspects,summary,highlights,deep};
+  const deep=hhDeepInsights(z1,z2,n1,n2,aspects,referenceYear);
+  const positions=['年','月','日','时'];
+  const relations=[];
+  for(let a=0;a<4;a++)for(let b=0;b<4;b++){
+    const [ag,az]=z1.pillars[a],[bg,bz]=z2.pillars[b],rel=hhRel(az,bz),he=hhGanHeName(ag,bg);
+    if(he)relations.push({id:'gan-'+a+'-'+b,lane:'gan',name:he,left:{column:a,label:positions[a]+'干'+GAN[ag]},right:{column:b,label:positions[b]+'干'+GAN[bg]}});
+    if(rel.k!=='none')relations.push({id:'zhi-'+a+'-'+b,lane:'zhi',name:ZHI[az]+ZHI[bz]+rel.name,left:{column:a,label:positions[a]+'支'+ZHI[az]},right:{column:b,label:positions[b]+'支'+ZHI[bz]}});
+  }
+  return {rules:{version:HEHUN_RULE_VERSION},referenceYear,score,rawScore:60+aspects.reduce((sum,a)=>sum+a.score,0),ledger:{base:60,items:aspects.map(a=>({label:a.k,delta:a.score})),min:30,max:95,deepIncluded:false},relations,aspects,summary,highlights,deep};
 }
 
 function hhDeepText(r){

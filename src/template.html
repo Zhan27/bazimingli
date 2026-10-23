@@ -460,7 +460,7 @@ header .sub{font-size:.78rem;color:var(--ink3);margin-top:6px;letter-spacing:.2e
 <div class="field"><label>日期</label><input type="date" id="qm-date" min="1900-01-31" max="2099-12-31"></div>
 <div class="field"><label>时间(精确到分)</label><input type="time" id="qm-time" step="60" title="可精确到分钟，自动换算时辰（含晚子时23:00）"></div>
 <div class="field"><label>时辰</label><select id="qm-hour"></select></div>
-<div class="field"><label>定局法</label><select id="qm-school"><option value="1" selected>拆补法（推荐）</option><option value="0">置闰法</option></select></div>
+<div class="field"><label>定局法</label><select id="qm-school"><option value="1" selected>拆补法（推荐）</option><option value="0">旧版日干支分段（近似）</option></select></div>
 <button class="btn btn-primary" onclick="qmCast()">排 盘</button>
 <button class="btn btn-ghost" onclick="qmNow()">此刻</button>
 </div>
@@ -481,6 +481,9 @@ header .sub{font-size:.78rem;color:var(--ink3);margin-top:6px;letter-spacing:.2e
 <div class="field"><label>起卦方式</label><select id="ly-mode" onchange="lyModeChange()"><option value="0">时间起卦</option><option value="1">三数起卦</option><option value="2">铜钱摇卦</option></select></div>
 <div class="field"><label>日期</label><input type="date" id="ly-date" min="1900-01-31" max="2099-12-31"></div>
 <div class="field"><label>时辰</label><select id="ly-hour"></select></div>
+<div class="field"><label for="ly-time">具体时分（可选）</label><input type="time" id="ly-time"></div>
+<div class="field"><label for="ly-rule-mode">取数规则</label><select id="ly-rule-mode"><option value="standard">标准取数</option><option value="legacy">旧版取数（历史对照）</option></select></div>
+<div class="field"><label for="ly-day-boundary">日辰换日</label><select id="ly-day-boundary"><option value="zi-chu">子初23:00</option><option value="zi-zheng">子正00:00</option></select></div>
 <div class="field"><label>三数(空格隔开)</label><input id="ly-num" placeholder="如 3 8 6" style="min-width:130px"></div>
 <div class="field" id="ly-yao-wrap" style="display:none;align-items:center;gap:6px"><button type="button" class="btn btn-ghost" onclick="lyYaoOne()">摇一爻</button><button type="button" class="btn btn-ghost" onclick="lyYaoAuto()">自动摇完</button><span id="ly-yao-status" style="font-size:.74rem;color:var(--ink3)"></span></div>
 <button class="btn btn-primary" onclick="lyCast()">起 卦</button>
@@ -508,7 +511,7 @@ header .sub{font-size:.78rem;color:var(--ink3);margin-top:6px;letter-spacing:.2e
       <div class="field"><label>时辰</label><select id="hh1-hour"></select></div>
 <div class="field"><label for="hh1-time">具体时分（选填）</label><input type="time" id="hh1-time" step="60"></div>
       <div class="field"><label>出生地</label><div style="display:flex;gap:4px;align-items:center"><input maxlength="200" list="city-options" id="hh1-place" placeholder="选填,如:广州" style="min-width:80px"><button type="button" class="pp-btn" onclick="zhOpenPicker('hh1-place')" title="点选省/市">📍 选</button></div></div>
-    </div>
+    </div><details class="module-rule-note"><summary>时间与排盘规则</summary><div class="form-row"><div class="field"><label for="hh1-school">流派</label><select id="hh1-school"><option value="0">综合多流派</option><option value="1">旺衰平衡派</option><option value="2">盲派象法</option><option value="3">子平格局派</option><option value="4">穷通调候派</option></select></div><div class="field"><label for="hh1-utc-offset">出生地标准时区</label><select id="hh1-utc-offset" data-utc-offset></select></div><div class="field"><label for="hh1-dst">夏令时</label><select id="hh1-dst"><option value="0">无</option><option value="60">+1小时</option></select></div><div class="field"><label for="hh1-day-boundary">换日</label><select id="hh1-day-boundary"><option value="zi-chu">子初23:00</option><option value="zi-zheng">子正00:00</option></select></div><div class="field"><label for="hh1-true-solar">真太阳时</label><select id="hh1-true-solar"><option value="0">关闭</option><option value="1">按出生地校正</option></select></div><div class="field"><label for="hh1-wx-mode">五行统计</label><select id="hh1-wx-mode" data-wx-mode></select></div></div></details>
   </div>
   <div style="border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--card2)">
     <div style="font-size:.8rem;font-weight:700;color:var(--jade);margin-bottom:8px">♬ 乙方</div>
@@ -519,15 +522,17 @@ header .sub{font-size:.78rem;color:var(--ink3);margin-top:6px;letter-spacing:.2e
       <div class="field"><label>时辰</label><select id="hh2-hour"></select></div>
 <div class="field"><label for="hh2-time">具体时分（选填）</label><input type="time" id="hh2-time" step="60"></div>
       <div class="field"><label>出生地</label><div style="display:flex;gap:4px;align-items:center"><input maxlength="200" list="city-options" id="hh2-place" placeholder="选填,如:哈尔滨" style="min-width:80px"><button type="button" class="pp-btn" onclick="zhOpenPicker('hh2-place')" title="点选省/市">📍 选</button></div></div>
-    </div>
+    </div><details class="module-rule-note"><summary>时间与排盘规则</summary><div class="form-row"><div class="field"><label for="hh2-school">流派</label><select id="hh2-school"><option value="0">综合多流派</option><option value="1">旺衰平衡派</option><option value="2">盲派象法</option><option value="3">子平格局派</option><option value="4">穷通调候派</option></select></div><div class="field"><label for="hh2-utc-offset">出生地标准时区</label><select id="hh2-utc-offset" data-utc-offset></select></div><div class="field"><label for="hh2-dst">夏令时</label><select id="hh2-dst"><option value="0">无</option><option value="60">+1小时</option></select></div><div class="field"><label for="hh2-day-boundary">换日</label><select id="hh2-day-boundary"><option value="zi-chu">子初23:00</option><option value="zi-zheng">子正00:00</option></select></div><div class="field"><label for="hh2-true-solar">真太阳时</label><select id="hh2-true-solar"><option value="0">关闭</option><option value="1">按出生地校正</option></select></div><div class="field"><label for="hh2-wx-mode">五行统计</label><select id="hh2-wx-mode" data-wx-mode></select></div></div></details>
   </div>
 </div>
 <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+  <div class="field"><label for="hh-reference-year">参考年份</label><input type="number" id="hh-reference-year" min="1900" max="2099" placeholder="当前年"></div>
   <button class="btn btn-primary" onclick="hhCast()">💍 合盘计算</button>
-  <button class="btn btn-ghost" onclick="hhSwap()">⇄ 交换甲乙</button>
+  <button class="btn btn-ghost" onclick="hhSwap()">⇄ 交换甲乙</button><button type="button" class="btn btn-ghost" onclick="showRecordManager('hh_records')">合婚记录</button>
 </div>
 <div class="tip">合婚为传统民俗参考：年支看两族根基基调、日主十神论相处关系、日支（夫妻宫）看日常亲疏、用神互补看能量增益。结果仅为倾向参考，感情经营在人。</div>
 </div>
+<p id="hh-history-status" class="module-history-status" role="status"></p>
 <div class="result" id="hh-result" aria-live="polite"></div>
 <div class="result" id="hh-ai-wrap" style="display:none">
 <div class="result-title">🤖 AI 合婚深度解读
