@@ -2,11 +2,11 @@
   "fixtureVersion": "synthetic-contract-v1",
   "ruleVersion": "5.20.0",
   "promptVersions": [
-    "evidence-combined-1.1.0",
-    "evidence-balance-1.1.0",
-    "evidence-image-1.1.0",
-    "evidence-structure-1.1.0",
-    "evidence-climate-1.1.0"
+    "evidence-combined-1.2.0",
+    "evidence-balance-1.2.0",
+    "evidence-image-1.2.0",
+    "evidence-structure-1.2.0",
+    "evidence-climate-1.2.0"
   ],
   "scope": "Generated protocol fixtures and fault injections, not outputs from live models",
   "cases": [

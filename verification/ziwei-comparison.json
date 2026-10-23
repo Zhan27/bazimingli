@@ -1,0 +1,382 @@
+{
+  "reference": "npm iztro@2.6.3 (UMD); no network/provider calls",
+  "indexNormalization": "Compare earthly-branch names, never raw indices (iztro starts Yin; ours starts Zi). All fixtures synthetic.",
+  "hours": [
+    {
+      "hour": "子",
+      "ours": {
+        "文昌": "戌",
+        "文曲": "辰"
+      },
+      "reference": {
+        "文昌": "戌",
+        "文曲": "辰"
+      }
+    },
+    {
+      "hour": "丑",
+      "ours": {
+        "文昌": "酉",
+        "文曲": "巳"
+      },
+      "reference": {
+        "文昌": "酉",
+        "文曲": "巳"
+      }
+    },
+    {
+      "hour": "寅",
+      "ours": {
+        "文昌": "申",
+        "文曲": "午"
+      },
+      "reference": {
+        "文昌": "申",
+        "文曲": "午"
+      }
+    },
+    {
+      "hour": "卯",
+      "ours": {
+        "文昌": "未",
+        "文曲": "未"
+      },
+      "reference": {
+        "文昌": "未",
+        "文曲": "未"
+      }
+    },
+    {
+      "hour": "辰",
+      "ours": {
+        "文昌": "午",
+        "文曲": "申"
+      },
+      "reference": {
+        "文昌": "午",
+        "文曲": "申"
+      }
+    },
+    {
+      "hour": "巳",
+      "ours": {
+        "文昌": "巳",
+        "文曲": "酉"
+      },
+      "reference": {
+        "文昌": "巳",
+        "文曲": "酉"
+      }
+    },
+    {
+      "hour": "午",
+      "ours": {
+        "文昌": "辰",
+        "文曲": "戌"
+      },
+      "reference": {
+        "文昌": "辰",
+        "文曲": "戌"
+      }
+    },
+    {
+      "hour": "未",
+      "ours": {
+        "文昌": "卯",
+        "文曲": "亥"
+      },
+      "reference": {
+        "文昌": "卯",
+        "文曲": "亥"
+      }
+    },
+    {
+      "hour": "申",
+      "ours": {
+        "文昌": "寅",
+        "文曲": "子"
+      },
+      "reference": {
+        "文昌": "寅",
+        "文曲": "子"
+      }
+    },
+    {
+      "hour": "酉",
+      "ours": {
+        "文昌": "丑",
+        "文曲": "丑"
+      },
+      "reference": {
+        "文昌": "丑",
+        "文曲": "丑"
+      }
+    },
+    {
+      "hour": "戌",
+      "ours": {
+        "文昌": "子",
+        "文曲": "寅"
+      },
+      "reference": {
+        "文昌": "子",
+        "文曲": "寅"
+      }
+    },
+    {
+      "hour": "亥",
+      "ours": {
+        "文昌": "亥",
+        "文曲": "卯"
+      },
+      "reference": {
+        "文昌": "亥",
+        "文曲": "卯"
+      }
+    }
+  ],
+  "years": [
+    {
+      "year": 2020,
+      "yearBranch": "子",
+      "ours": {
+        "红鸾": "卯",
+        "天喜": "酉"
+      },
+      "reference": {
+        "红鸾": "卯",
+        "天喜": "酉"
+      }
+    },
+    {
+      "year": 2021,
+      "yearBranch": "丑",
+      "ours": {
+        "红鸾": "寅",
+        "天喜": "申"
+      },
+      "reference": {
+        "红鸾": "寅",
+        "天喜": "申"
+      }
+    },
+    {
+      "year": 2022,
+      "yearBranch": "寅",
+      "ours": {
+        "红鸾": "丑",
+        "天喜": "未"
+      },
+      "reference": {
+        "红鸾": "丑",
+        "天喜": "未"
+      }
+    },
+    {
+      "year": 2023,
+      "yearBranch": "卯",
+      "ours": {
+        "红鸾": "子",
+        "天喜": "午"
+      },
+      "reference": {
+        "红鸾": "子",
+        "天喜": "午"
+      }
+    },
+    {
+      "year": 2024,
+      "yearBranch": "辰",
+      "ours": {
+        "红鸾": "亥",
+        "天喜": "巳"
+      },
+      "reference": {
+        "红鸾": "亥",
+        "天喜": "巳"
+      }
+    },
+    {
+      "year": 2025,
+      "yearBranch": "巳",
+      "ours": {
+        "红鸾": "戌",
+        "天喜": "辰"
+      },
+      "reference": {
+        "红鸾": "戌",
+        "天喜": "辰"
+      }
+    },
+    {
+      "year": 2026,
+      "yearBranch": "午",
+      "ours": {
+        "红鸾": "酉",
+        "天喜": "卯"
+      },
+      "reference": {
+        "红鸾": "酉",
+        "天喜": "卯"
+      }
+    },
+    {
+      "year": 2027,
+      "yearBranch": "未",
+      "ours": {
+        "红鸾": "申",
+        "天喜": "寅"
+      },
+      "reference": {
+        "红鸾": "申",
+        "天喜": "寅"
+      }
+    },
+    {
+      "year": 2028,
+      "yearBranch": "申",
+      "ours": {
+        "红鸾": "未",
+        "天喜": "丑"
+      },
+      "reference": {
+        "红鸾": "未",
+        "天喜": "丑"
+      }
+    },
+    {
+      "year": 2029,
+      "yearBranch": "酉",
+      "ours": {
+        "红鸾": "午",
+        "天喜": "子"
+      },
+      "reference": {
+        "红鸾": "午",
+        "天喜": "子"
+      }
+    },
+    {
+      "year": 2030,
+      "yearBranch": "戌",
+      "ours": {
+        "红鸾": "巳",
+        "天喜": "亥"
+      },
+      "reference": {
+        "红鸾": "巳",
+        "天喜": "亥"
+      }
+    },
+    {
+      "year": 2031,
+      "yearBranch": "亥",
+      "ours": {
+        "红鸾": "辰",
+        "天喜": "戌"
+      },
+      "reference": {
+        "红鸾": "辰",
+        "天喜": "戌"
+      }
+    }
+  ],
+  "main": {
+    "checks": 1344,
+    "mismatches": 0,
+    "examples": []
+  },
+  "boShi": {
+    "checks": 96,
+    "mismatches": 0,
+    "examples": []
+  },
+  "annual": [
+    {
+      "label": 2024,
+      "ours": [
+        "廉贞",
+        "破军",
+        "武曲",
+        "太阳"
+      ],
+      "expectedAnnualAfterNewYear": [
+        "廉贞",
+        "破军",
+        "武曲",
+        "太阳"
+      ]
+    },
+    {
+      "label": 2025,
+      "ours": [
+        "天机",
+        "天梁",
+        "紫微",
+        "太阴"
+      ],
+      "expectedAnnualAfterNewYear": [
+        "天机",
+        "天梁",
+        "紫微",
+        "太阴"
+      ]
+    },
+    {
+      "label": 2026,
+      "ours": [
+        "天同",
+        "天机",
+        "文昌",
+        "廉贞"
+      ],
+      "expectedAnnualAfterNewYear": [
+        "天同",
+        "天机",
+        "文昌",
+        "廉贞"
+      ]
+    },
+    {
+      "label": 2027,
+      "ours": [
+        "太阴",
+        "天同",
+        "天机",
+        "巨门"
+      ],
+      "expectedAnnualAfterNewYear": [
+        "太阴",
+        "天同",
+        "天机",
+        "巨门"
+      ]
+    }
+  ],
+  "leaps": [
+    {
+      "date": "2023-03-25",
+      "lunar": {
+        "year": 2023,
+        "month": 2,
+        "day": 4,
+        "isLeap": true
+      },
+      "ours": "酉",
+      "fixedLeap": "酉",
+      "unfixedLeap": "酉"
+    },
+    {
+      "date": "2023-04-10",
+      "lunar": {
+        "year": 2023,
+        "month": 2,
+        "day": 20,
+        "isLeap": true
+      },
+      "ours": "酉",
+      "fixedLeap": "戌",
+      "unfixedLeap": "酉"
+    }
+  ]
+}
