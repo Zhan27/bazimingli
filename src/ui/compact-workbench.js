@@ -31,6 +31,7 @@ function compactWorkbenchChart(root,first){
   const toolbar=root.querySelector('.chart-toolbar');if(toolbar){
     const more=document.createElement('details');more.className='compact-more';more.innerHTML='<summary>更多 ···</summary><div class="compact-more-menu"></div>';
     const menu=more.querySelector('div');for(const b of [...toolbar.querySelectorAll('button')])if(b.id!=='study-open')menu.appendChild(b);
+    const glossary=document.createElement('button');glossary.type='button';glossary.className='btn btn-ghost';glossary.id='chart-glossary';glossary.textContent='术语与出处';glossary.onclick=()=>{more.open=false;more.querySelector('summary').focus();showWorkspaceDialog('knowledge');};menu.appendChild(glossary);
     toolbar.appendChild(more);menu.addEventListener('click',e=>{if(e.target.closest('button'))more.open=false;});
     toolbar.querySelector('#study-open')?.addEventListener('click',()=>{more.open=false;});
   }

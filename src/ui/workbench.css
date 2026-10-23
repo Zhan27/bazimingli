@@ -101,3 +101,18 @@ body[data-theme=xuanmo] .gz-explorer{--gz-he:#d8b276;--gz-chong:#e0a99b;--gz-san
 @media(min-width:901px){.sidebar-study{display:block;margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}.sidebar-study button{padding:9px 2px;font-size:10px;text-align:center;color:var(--ink2);letter-spacing:0;min-height:40px}}
 .compact-command-note{font-size:10px;color:var(--ink3);white-space:nowrap}.compact-periods button[aria-pressed=true]{background:color-mix(in srgb,var(--jade) 12%,var(--card));box-shadow:inset 0 -2px var(--jade)}.compact-selected-period{outline:2px solid var(--jade);outline-offset:-2px;background:color-mix(in srgb,var(--jade) 10%,var(--card))!important}
 @media(max-width:900px){.compact-command-note{display:block}}
+/* Compact, evidence-led synthesis. Shares the existing theme and native disclosure controls. */
+.mingge-summary h3 span{font-size:.7rem;font-weight:400;color:var(--ink3);margin-left:6px}
+.mingge-chips{display:flex;flex-wrap:wrap;gap:5px 12px;font-size:.73rem;color:var(--ink2)}
+.mingge-chips b{color:var(--jade);font-weight:650;margin-left:3px}
+.mingge-headline{margin:8px 0;font-size:.8rem;line-height:1.8;color:var(--ink)}
+.mingge-row{display:grid;grid-template-columns:5.7em minmax(0,1fr);gap:8px;padding:5px 0;border-bottom:1px solid var(--line);font-size:.74rem;line-height:1.75}
+.mingge-row>b{color:var(--ink2);font-weight:550}.mingge-row>span{min-width:0;overflow-wrap:anywhere}
+.mingge-row small{color:var(--ink3)}.mingge-row strong{font-weight:550;color:var(--jade)}
+.mingge-evidence,.mingge-transits,.reading-citations{margin-top:8px;font-size:.72rem;line-height:1.75}
+.mingge-evidence>summary,.mingge-transits>summary,.reading-citations>summary{cursor:pointer;color:var(--jade);padding:4px 0}
+.reading-citations>div{padding:6px 0;border-bottom:1px solid var(--line)}
+.reading-citations a,.glossary-results article>a{color:var(--jade);overflow-wrap:anywhere;font-size:.73rem}
+.reading-citations q,.reading-citations small,.glossary-results article>a,.glossary-results article>small{display:block}
+.reading-citations small{color:var(--ink3);font-size:.68rem}.reading-citations q{color:var(--ink2)}
+@media(max-width:480px){.mingge-row{grid-template-columns:4.5em minmax(0,1fr);gap:6px}.mingge-summary h3 span{display:inline;font-size:.65rem}.mingge-chips{gap:4px 9px}}

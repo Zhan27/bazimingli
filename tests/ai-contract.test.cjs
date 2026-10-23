@@ -12,7 +12,7 @@ test('fact errors, rules, missing evidence and unclear expression are distinguis
   assert.equal(e.run(`parseStructuredAi('{',contractChart).ok`),false);
 });
 test('versioned knowledge has explicit verification status and independent school prompts',()=>{
-  assert.equal(e.run(`searchKnowledge('比肩')[0].status`),'citation-pending');assert.equal(e.run(`searchKnowledge('比肩')[0].original`),null);
+  assert.equal(e.run(`searchKnowledge('比肩')[0].status`),'text-verified');assert.match(e.run(`searchKnowledge('比肩')[0].source`),/^https:/);
   const versions=e.json(`RULE_PROFILES.map(p=>buildEvidencePrompt(contractChart,p.id).version)`);assert.equal(new Set(versions).size,5);
   assert.equal(e.run(`evaluateAiResponse(JSON.stringify(validAi),contractChart).pass`),true);
 });

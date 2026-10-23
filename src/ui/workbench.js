@@ -19,10 +19,19 @@ function showWorkspaceDialog(kind){
   if(kind==='privacy'){
     for(const text of ['排盘计算在当前设备运行。在线页面的托管服务会收到访问网页所需的网络信息；本项目未添加分析统计或自动上传命盘的功能。','姓名、出生日期、时间、地点和排盘记录可能属于个人信息。保存的记录、主题和偏好存放在当前站点或本地页面的浏览器存储中；同一设备的其他使用者可能读到。','API Key 默认保存在标签页会话存储。浏览器恢复会话可能保留它；只有主动取消会话选项才长期保存。浏览器存储未经加密，使用后请在 AI 设置中清除 Key。存储不可用时只在当前页面内存保留。','仅主动调用 AI 或测试连接时才向配置的 API 地址发送请求。完整解读会发送姓名、出生信息、命盘、知识片段等；中转运营者和上游模型服务商可能接触请求，数据保留取决于其政策。请确认服务地址可信，避免填写不需要的真实姓名。','导出备份和导出图片、复制摘要或 Prompt 都可能包含出生资料。备份不包含 API 设置，但文件和剪贴板由您自行保管；删除本地记录不会删除已导出的文件或服务商保存的数据。','AI解读仅保留最近一盘的标签页会话草稿，包含出生资料和回复，不含API配置；AI区的清除草稿独立于清除Key和删除排盘记录。浏览器恢复会话可能保留草稿。','可在记录管理中逐条或全部删除记录；AI 设置中的清除 Key 独立生效。清除浏览器站点数据会同时移除该站点本地记录和偏好，请先保存需要的备份。']){const p=document.createElement('p');p.textContent=text;card.appendChild(p);}
   }else if(kind==='knowledge'){
-    const note=document.createElement('p');note.textContent='查阅术语定义与来源状态。原项目的古籍、经验断语尚待逐条核验，请作为学习线索。';card.appendChild(note);
+    const note=document.createElement('p');note.textContent='查阅术语定义、原文位置与核对范围。已定位的文献可直接打开。';card.appendChild(note);
     const search=document.createElement('input');search.className='glossary-search';search.type='search';search.placeholder='搜索十神、藏干、换日……';search.setAttribute('aria-label','搜索术语');card.appendChild(search);
     const results=document.createElement('div');results.className='glossary-results';card.appendChild(results);
-    const render=()=>{results.replaceChildren();const rows=searchKnowledge(search.value).slice(0,16);for(const k of rows){const article=document.createElement('article'),h=document.createElement('h3'),p=document.createElement('p'),meta=document.createElement('small');h.textContent=k.title;p.textContent=k.explanation;meta.textContent=k.book+' · '+({ 'citation-pending':'出处待核验','implementation-verified':'应用实现已测试','traditional-unverified':'传统规则未独立核验'}[k.status]||k.status);article.append(h,p,meta);results.appendChild(article);}if(!rows.length)results.textContent='未找到对应条目，试试“十神”或“藏干”。';};search.addEventListener('input',render);render();
+    const render=()=>{
+      results.replaceChildren();const rows=searchKnowledge(search.value).slice(0,16);
+      for(const k of rows){
+        const article=document.createElement('article'),h=document.createElement('h3'),p=document.createElement('p'),meta=document.createElement('small');
+        h.textContent=k.title;p.textContent=k.explanation;meta.textContent=k.book+' · '+({'text-verified':'已核对文献位置','citation-pending':'出处待核验','implementation-verified':'应用实现已测试','traditional-unverified':'传统规则未独立核验'}[k.status]||k.status);article.append(h,p,meta);
+        for(const source of k.sources||[]){const a=document.createElement('a');a.href=source.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='《'+source.book+'》·'+source.chapter+' ↗';article.appendChild(a);const scope=document.createElement('small');scope.textContent='核对范围：'+source.scope;article.appendChild(scope);}
+        results.appendChild(article);
+      }
+      if(!rows.length)results.textContent='未找到对应条目，试试“十神”或“藏干”。';
+    };search.addEventListener('input',render);render();
   }else{
     const p=document.createElement('p');p.textContent='这是一个面向世界各地传统文化爱好者的学习工具。先核对计算事实，再阅读传统解释。';card.appendChild(p);
     const ol=document.createElement('ol');for(const text of ['填写公历或农历、出生时分。时辰不确定可选择“不确定”，查看全天候选。','海外出生或使用历史夏令时，请展开“排盘设置”核对标准时偏移；真太阳时需要有效地点。','先看四柱、藏干与五行统计，再切换“大运流年”或“多维分析”。点术语可查看解释。','AI 解读需主动配置服务；发送时命盘资料会交给该服务商。软件评分与断语仅作传统文化参考。']){const li=document.createElement('li');li.textContent=text;ol.appendChild(li);}card.appendChild(ol);

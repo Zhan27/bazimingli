@@ -1,0 +1,356 @@
+{
+  "checkedOn": "2026-10-23",
+  "meaning": "Located source text and headings only; not predictive validation. Hash identifies the checked raw text or page response.",
+  "entries": [
+    {
+      "id": "gods",
+      "url": "https://zh.wikisource.org/wiki/淵海子平#论日为主",
+      "chapter": "基础、论日为主",
+      "scope": "十神生克、阴阳定义与日干坐标",
+      "checkedOn": "2026-10-23",
+      "sha256": "fa213bab63ff9a59ec50eedcbf7489c81f0077da3f312f8f05feeb1275043279",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "hidden",
+      "url": "https://zh.wikisource.org/wiki/淵海子平#又地支藏遁歌",
+      "chapter": "又地支藏遁歌",
+      "scope": "藏干成员；不核定本中余气权重",
+      "checkedOn": "2026-10-23",
+      "sha256": "fa213bab63ff9a59ec50eedcbf7489c81f0077da3f312f8f05feeb1275043279",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "pattern",
+      "url": "https://github.com/china-testing/bazi/blob/33b18354d5407727640e545c3aaec0efb4bf5282/books/zipingzhenquan.md#八论用神",
+      "chapter": "八、论用神",
+      "scope": "月令定分析起点；此处用神与扶抑五行取用分列",
+      "checkedOn": "2026-10-23",
+      "sha256": "1a88cb9ed81d08c80e1412fc1f096fa86922629db1bfdc4ddc18503eb0542a43",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "rescue",
+      "url": "https://github.com/china-testing/bazi/blob/33b18354d5407727640e545c3aaec0efb4bf5282/books/zipingzhenquan.md#九论用神成败救应",
+      "chapter": "九、论用神成败救应",
+      "scope": "各格配合、带忌与救应；应用仅筛选线索",
+      "checkedOn": "2026-10-23",
+      "sha256": "1a88cb9ed81d08c80e1412fc1f096fa86922629db1bfdc4ddc18503eb0542a43",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "climate",
+      "url": "https://github.com/china-testing/bazi/blob/33b18354d5407727640e545c3aaec0efb4bf5282/books/zipingzhenquan.md#十四论用神配气候得失",
+      "chapter": "十四、论用神配气候得失",
+      "scope": "调候可改变取用优先级；并非所有冬夏日干同取一字",
+      "checkedOn": "2026-10-23",
+      "sha256": "1a88cb9ed81d08c80e1412fc1f096fa86922629db1bfdc4ddc18503eb0542a43",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "root",
+      "url": "https://github.com/china-testing/bazi/blob/33b18354d5407727640e545c3aaec0efb4bf5282/books/zipingzhenquan.md#六论十干得时不旺失时不弱",
+      "chapter": "六、论十干得时不旺失时不弱",
+      "scope": "旺衰须兼看根与助力；软件权重另列",
+      "checkedOn": "2026-10-23",
+      "sha256": "1a88cb9ed81d08c80e1412fc1f096fa86922629db1bfdc4ddc18503eb0542a43",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "bridge",
+      "url": "https://zh.wikisource.org/wiki/滴天髓#通隔論",
+      "chapter": "通隔论",
+      "scope": "木土得火、火金得土、土水得金、金木得水、水火得木",
+      "checkedOn": "2026-10-23",
+      "sha256": "c293de5dece94ee576e174837c93c24bcd602bd406b092ffb584cc633d0405b1",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "growth",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷二#论五行旺相休囚死并寄生十二宫",
+      "chapter": "卷二·论五行旺相休囚死并寄生十二宫",
+      "scope": "十二长生名称与阶段释义，不把阶段名直接套作事件",
+      "checkedOn": "2026-10-23",
+      "sha256": "2f56b731c3d481547ea8ac74a2ee18f9649dd2c96be4b60d2ed123c6f7f2fd2a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "trine",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷二#论支元三合",
+      "chapter": "卷二·论支元三合",
+      "scope": "三合成员；半合与全局、合化分开",
+      "checkedOn": "2026-10-23",
+      "sha256": "2f56b731c3d481547ea8ac74a2ee18f9649dd2c96be4b60d2ed123c6f7f2fd2a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "he",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷二#论支元六合",
+      "chapter": "卷二·论支元六合",
+      "scope": "六合配对与合化条件",
+      "checkedOn": "2026-10-23",
+      "sha256": "2f56b731c3d481547ea8ac74a2ee18f9649dd2c96be4b60d2ed123c6f7f2fd2a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "chong",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷二#论冲击",
+      "chapter": "卷二·论冲击",
+      "scope": "六冲配对与旺衰条件",
+      "checkedOn": "2026-10-23",
+      "sha256": "2f56b731c3d481547ea8ac74a2ee18f9649dd2c96be4b60d2ed123c6f7f2fd2a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "xing",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷二#论三刑",
+      "chapter": "卷二·论三刑",
+      "scope": "寅巳申无恩、丑戌未恃势、子卯无礼及辰午酉亥自刑",
+      "checkedOn": "2026-10-23",
+      "sha256": "2f56b731c3d481547ea8ac74a2ee18f9649dd2c96be4b60d2ed123c6f7f2fd2a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "hai",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷二#论六害",
+      "chapter": "卷二·论六害",
+      "scope": "六害成员与合冲牵制",
+      "checkedOn": "2026-10-23",
+      "sha256": "2f56b731c3d481547ea8ac74a2ee18f9649dd2c96be4b60d2ed123c6f7f2fd2a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "transit",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷二#论大运",
+      "chapter": "卷二·论大运、论太岁",
+      "scope": "大运与流年分层，不用运中补字改写原局",
+      "checkedOn": "2026-10-23",
+      "sha256": "2f56b731c3d481547ea8ac74a2ee18f9649dd2c96be4b60d2ed123c6f7f2fd2a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "taiyuan",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷二#论胎元",
+      "chapter": "卷二·论胎元",
+      "scope": "胎元起例；不延伸到前世判断",
+      "checkedOn": "2026-10-23",
+      "sha256": "2f56b731c3d481547ea8ac74a2ee18f9649dd2c96be4b60d2ed123c6f7f2fd2a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "officer",
+      "url": "https://zh.wikisource.org/wiki/淵海子平#正官论",
+      "chapter": "正官论",
+      "scope": "官星与月令、刑冲伤官的配合",
+      "checkedOn": "2026-10-23",
+      "sha256": "fa213bab63ff9a59ec50eedcbf7489c81f0077da3f312f8f05feeb1275043279",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "food",
+      "url": "https://zh.wikisource.org/wiki/淵海子平#论食神",
+      "chapter": "论食神",
+      "scope": "食神泄气、生财及枭印配合",
+      "checkedOn": "2026-10-23",
+      "sha256": "fa213bab63ff9a59ec50eedcbf7489c81f0077da3f312f8f05feeb1275043279",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "kill",
+      "url": "https://zh.wikisource.org/wiki/淵海子平#论七杀",
+      "chapter": "论七杀",
+      "scope": "七杀制化与身强弱",
+      "checkedOn": "2026-10-23",
+      "sha256": "fa213bab63ff9a59ec50eedcbf7489c81f0077da3f312f8f05feeb1275043279",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "resource",
+      "url": "https://zh.wikisource.org/wiki/淵海子平#论印綬",
+      "chapter": "论印綬",
+      "scope": "印星生身与财印配合",
+      "checkedOn": "2026-10-23",
+      "sha256": "fa213bab63ff9a59ec50eedcbf7489c81f0077da3f312f8f05feeb1275043279",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "output",
+      "url": "https://zh.wikisource.org/wiki/淵海子平#论伤官",
+      "chapter": "论伤官",
+      "scope": "伤官泄气、见官与制化条件",
+      "checkedOn": "2026-10-23",
+      "sha256": "fa213bab63ff9a59ec50eedcbf7489c81f0077da3f312f8f05feeb1275043279",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "follow",
+      "url": "https://zh.wikisource.org/wiki/淵海子平#弃命从杀论",
+      "chapter": "弃命从杀论",
+      "scope": "从杀条件；不凭低分直接确认从格",
+      "checkedOn": "2026-10-23",
+      "sha256": "fa213bab63ff9a59ec50eedcbf7489c81f0077da3f312f8f05feeb1275043279",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "noble",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷三#论天乙贵人",
+      "chapter": "卷三·论天乙贵人",
+      "scope": "天乙名义、昼夜异说；查表沿用应用口径",
+      "checkedOn": "2026-10-23",
+      "sha256": "bff6027f532f849c5e1744237141def233af1df0a95b4a6592e1277883fc9d5a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "horse",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷三#论驿马",
+      "chapter": "卷三·论驿马",
+      "scope": "三合驿马起例与走动取象",
+      "checkedOn": "2026-10-23",
+      "sha256": "bff6027f532f849c5e1744237141def233af1df0a95b4a6592e1277883fc9d5a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "carriage",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷三#论金舆",
+      "chapter": "卷三·论金舆",
+      "scope": "金舆名义及禄前二辰起例",
+      "checkedOn": "2026-10-23",
+      "sha256": "bff6027f532f849c5e1744237141def233af1df0a95b4a6592e1277883fc9d5a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "virtues",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷三#论天月德",
+      "chapter": "卷三·论天月德",
+      "scope": "天德月德名称及传统助力取象；文本有异文，查表不覆盖",
+      "checkedOn": "2026-10-23",
+      "sha256": "bff6027f532f849c5e1744237141def233af1df0a95b4a6592e1277883fc9d5a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "ultimate",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷三#论太极贵",
+      "chapter": "卷三·论太极贵",
+      "scope": "太极贵名义与始终取象",
+      "checkedOn": "2026-10-23",
+      "sha256": "bff6027f532f849c5e1744237141def233af1df0a95b4a6592e1277883fc9d5a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "lonely",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷三#论孤辰寡宿",
+      "chapter": "卷三·论孤辰寡宿",
+      "scope": "三会方进退一辰起例",
+      "checkedOn": "2026-10-23",
+      "sha256": "bff6027f532f849c5e1744237141def233af1df0a95b4a6592e1277883fc9d5a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "robber",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷三#论劫煞亡神",
+      "chapter": "卷三·论劫煞亡神",
+      "scope": "劫煞与亡神起例、外夺与内失取象",
+      "checkedOn": "2026-10-23",
+      "sha256": "bff6027f532f849c5e1744237141def233af1df0a95b4a6592e1277883fc9d5a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "disaster",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷三#论灾煞",
+      "chapter": "卷三·论灾煞",
+      "scope": "三合局与冲将星之神的查法",
+      "checkedOn": "2026-10-23",
+      "sha256": "bff6027f532f849c5e1744237141def233af1df0a95b4a6592e1277883fc9d5a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "void",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷三#论空亡",
+      "chapter": "卷三·论空亡",
+      "scope": "旬中十干不到之支；不以空亡直接推出失业破财",
+      "checkedOn": "2026-10-23",
+      "sha256": "bff6027f532f849c5e1744237141def233af1df0a95b4a6592e1277883fc9d5a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "salary",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷三#论十干禄",
+      "chapter": "卷三·论十干禄",
+      "scope": "甲寅乙卯等十干禄位",
+      "checkedOn": "2026-10-23",
+      "sha256": "bff6027f532f849c5e1744237141def233af1df0a95b4a6592e1277883fc9d5a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "blade",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷三#论羊刃",
+      "chapter": "卷三·论羊刃",
+      "scope": "羊刃名义与阴干取法异说；不将现行帝旺查表冒充唯一原典规则",
+      "checkedOn": "2026-10-23",
+      "sha256": "bff6027f532f849c5e1744237141def233af1df0a95b4a6592e1277883fc9d5a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "stars",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷二#论将星华盖",
+      "chapter": "卷二·论将星华盖",
+      "scope": "三合中旺支与墓支的取法",
+      "checkedOn": "2026-10-23",
+      "sha256": "2f56b731c3d481547ea8ac74a2ee18f9649dd2c96be4b60d2ed123c6f7f2fd2a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "blossom",
+      "url": "https://zh.wikisource.org/wiki/三命通會/卷二#论咸池",
+      "chapter": "卷二·论咸池",
+      "scope": "咸池桃花名称、三合沐浴位起例",
+      "checkedOn": "2026-10-23",
+      "sha256": "2f56b731c3d481547ea8ac74a2ee18f9649dd2c96be4b60d2ed123c6f7f2fd2a",
+      "anchorFound": true,
+      "quoteFound": true
+    },
+    {
+      "id": "tables",
+      "url": "https://github.com/jinchenma94/bazi-skill/blob/112a5d84cd1a001a0038cafca3be68d93e4c0cc9/references/wuxing-tables.md#五行生克",
+      "chapter": "五行生克",
+      "scope": "五行生克方向；定义整理，非古籍引文",
+      "checkedOn": "2026-10-23",
+      "sha256": "25648384e04666e7dd0a04efa9b7c124c3b457fa5071535d733313fe3e06dc9b",
+      "anchorFound": true,
+      "quoteFound": true
+    }
+  ]
+}

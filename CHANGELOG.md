@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.25.0 — 2026-10-23
+- Replaced score-tier-as-pattern summaries with a shared, deterministic month-premise reading model: distinct pattern paths, pillar evidence, exposed/hidden/rooted remedies, counterforces, separate climate and balance references, and natal versus transit observations. Overview, pattern detail, closing synthesis and PNG premise use the same model.
+- Retained historical scores and optional demonstrations; repaired their monthly ledger labels and output-month delta without changing the scores. Core calculation rules, AI templates, records and chart identity remain unchanged.
+- Located and repaired 63 of 85 glossary entries, with 35 source locations, short quotations where available and explicit text-check scope; corrected bridging-element chains, punishment names and five-element typos. Kept 22 unresolved entries pending.
+- Reviewed six GitHub references and added MIT-attributed table fixtures (12 hidden-stem sets and 120 growth positions). No external service, framework, unlicensed code or model request was introduced.
+- Added mobile-accessible “术语与出处”, sourced term popups with keyboard dismissal, and desktop/mobile/dark browser checks.
+
 ## 5.24.0 — 2026-10-23
 - Applied the approved compact study layout: narrow navigation, aligned four-pillar table, hidden-stem ten-gods, NaYin, twelve stages, day-xun void, month command, five-element counts and DaYun overview. Original full cards, weights, flow diagrams, use-god details and every existing action remain available.
 - Open Gan-Zhi relationships in a separate interactive eight-position workspace. Soft arrows use separate routing lanes and protected position labels; select characters or relationships, filter types, reset, and inspect all participants of repeated/group relations.

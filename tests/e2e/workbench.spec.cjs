@@ -23,7 +23,7 @@ test('study layout shows four pillars first, retains hidden options and switches
 });
 test('guide and source-aware glossary are keyboard reachable, trap focus, and restore it',async({page})=>{
   await page.goto('/');await page.locator('#workspace-help').click();await expect(page.getByRole('dialog')).toContainText('先核对计算事实');await page.keyboard.press('Escape');await expect(page.locator('#workspace-help')).toBeFocused();
-  await page.getByRole('button',{name:'术语小辞典',exact:true}).click();await page.getByRole('searchbox',{name:'搜索术语'}).fill('比肩');await expect(page.locator('.glossary-results')).toContainText('出处待核验');await expect(page.locator('.glossary-results')).toContainText('比肩');await page.keyboard.press('Shift+Tab');await expect(page.getByRole('button',{name:'返回排盘'})).toBeFocused();await page.keyboard.press('Escape');
+  await page.getByRole('button',{name:'术语小辞典',exact:true}).click();await page.getByRole('searchbox',{name:'搜索术语'}).fill('比肩');await expect(page.locator('.glossary-results')).toContainText('已核对文献位置');await expect(page.locator('.glossary-results')).toContainText('比肩');await page.keyboard.press('Shift+Tab');await expect(page.getByRole('button',{name:'返回排盘'})).toBeFocused();await page.keyboard.press('Escape');
   await page.getByRole('tab',{name:/八字排盘/}).focus();await page.keyboard.press('ArrowRight');await expect(page.locator('#panel-ziwei')).toBeVisible();await expect(page.locator('#workspace-title')).toHaveText('紫微斗数');
 });
 test('mobile form, tabs, chart and dialogs fit a 390px screen, including dark theme',async({page})=>{

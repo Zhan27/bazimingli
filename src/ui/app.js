@@ -1653,14 +1653,14 @@ function zhDingDang(zh){
   // 评分依据明细(弹窗用)
   const basis=[
     {k:'基础分(中等起点)',v:40},
-    {k:['月令生扶/财官当令',mw===dw||mw===(dw+4)%5?12:-6][0],v:mw===dw||mw===(dw+4)%5?12:-6},
+    {k:'月令生扶/财官当令/食伤当令',v:mw===dw||mw===(dw+4)%5?12:mw===(dw+2)%5||mw===(dw+3)%5?-6:0},
     {k:'用神力量(个数×4,上限12)',v:Math.min(zh.wxCount[yw]*4,12)},
     {k:['用神不现-8',zh.wxCount[yw]===0?-8:0][0],v:zh.wxCount[yw]===0?-8:0},
     {k:'印比通根(上限16)',v:Math.min(rootScore*4,16)},
-    {k:['官杀有制+8','官杀旺无制-6',guan>=2&&(shi>=2||yin>=2)?8:guan>=2?-6:0][0],v:guan>=2&&(shi>=2||yin>=2)?8:guan>=2?-6:0},
+    {k:guan>=2?(shi>=2||yin>=2?'官杀有制':'官杀旺无制'):'官杀未达加减分阈值',v:guan>=2&&(shi>=2||yin>=2)?8:guan>=2?-6:0},
     {k:'财官印流通+6',v:cai>0&&guan>0&&yin>0?6:0},
     {k:'官杀不混杂+3',v:!(ts[6]>=1&&ts[7]>=1)?3:0},
-    {k:['调候到位+4','调候缺失-4',zh.tiaoHouWX>=0?(zh.wxCount[zh.tiaoHouWX]>=1?4:-4):0][0],v:zh.tiaoHouWX>=0?(zh.wxCount[zh.tiaoHouWX]>=1?4:-4):0},
+    {k:zh.tiaoHouWX>=0?(zh.wxCount[zh.tiaoHouWX]>=1?'调候到位':'调候缺失'):'无冬夏调候项',v:zh.tiaoHouWX>=0?(zh.wxCount[zh.tiaoHouWX]>=1?4:-4):0},
     {k:'五行流通+3',v:zh.wxCount[(dw+4)%5]>0&&zh.wxCount[(dw+1)%5]>0&&zh.wxCount[(dw+2)%5]>0?3:0},
     {k:`冲${chong}处×-2+刑${xing}处×-1`,v:-(chong*2+xing)}
   ];
@@ -1711,7 +1711,7 @@ function zhDingDangHtml(zh){
   const basisHtml=(d.basis||[]).map(b=>`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed var(--line);font-size:.74rem"><span style="color:var(--ink2)">${b.k}</span><b style="color:var(--gold)">${b.v>0?'+':''}${b.v}</b></div>`).join('');
   html+=`<div style="text-align:right;margin-top:8px"><button type="button" class="btn btn-ghost basis-btn" data-basis="${encodeURIComponent(basisHtml)}" data-total="${d.score}" style="font-size:.7rem;padding:4px 10px">🧮 评分依据</button></div>`;
   html+=`<div style="margin-top:4px;font-size:.76rem;color:var(--ink2);line-height:1.8">${d.note}<br><span style="color:var(--ink3);font-size:.7rem">※ 定档为命理潜力区间（非绝对值），实际由个人努力、时代机遇与行运共同决定；下限守得住，上限靠本事。</span></div>`;
-  return '<p class="note">旧版启发式规则演示，分数、财富与学历档位均未经过现实数据校准，不是个人预测；AI不会改写本地计算。</p><details><summary>展开旧规则演示（未校准）</summary>'+html+'</details>';
+  return '<div class="mingge-reference">'+mingGeSummaryBody(zh)+'</div><details><summary>展开旧规则演示（未校准）</summary>'+html+'</details>';
 }
 /* 评分依据弹窗(读button.dataset,避免onclick属性嵌套) */
 function aiShowBasis(basisHtml,total){
@@ -1738,10 +1738,14 @@ function tterm(name){
 }
 /* 弹窗: 显示术语释义 */
 function termTip(name){
-  const t=KB_TERMS[name];
+  const entry=termKnowledge(name);if(!entry)return;
+  const previous=document.activeElement;
+  const t={w:entry.category,d:entry.explanation};
   const ov=document.createElement('div');
   ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px)';
-  ov.onclick=function(e){ if(e.target===ov) document.body.removeChild(ov); };
+  const dismiss=()=>{ov.remove();previous?.focus();};
+  ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-label',name+'释义');
+  ov.onclick=e=>{if(e.target===ov)dismiss();};
   const catColor={十神:'var(--gold)',神煞:'var(--jade)',运程:'var(--purple)',地支关系:'var(--orange)',格局:'var(--red)',五行:'var(--blue)',基础:'var(--gold2)'};
   const col=catColor[t.w]||'var(--gold)';
   ov.innerHTML=`<div style="background:var(--card);border:1px solid ${col};border-radius:14px;padding:20px 22px;width:min(430px,92vw);max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
@@ -1749,12 +1753,16 @@ function termTip(name){
       <span style="font-family:'Noto Serif SC',serif;font-size:1.15rem;font-weight:800;color:${col}">${name}</span>
       <span style="font-size:.66rem;color:#fff;background:${col};border-radius:8px;padding:2px 8px">${t.w}</span>
     </div>
-    <div style="font-size:.82rem;color:var(--ink);line-height:1.9">${t.d}</div>
+    <div style="font-size:.82rem;color:var(--ink);line-height:1.9">${mingGeEscape(t.d)}</div>${VERIFIED_TERM_NOTES[name]?readingCitations(VERIFIED_TERM_NOTES[name].keys):'<small>出处待核验</small>'}
     <div style="text-align:right;margin-top:14px"><button class="btn btn-ghost term-close" style="font-size:.75rem;padding:5px 14px">关闭</button></div>
   </div>`;
   document.body.appendChild(ov);
   const close=ov.querySelector('.term-close');
-  if(close) close.onclick=function(){ document.body.removeChild(ov); };
+  if(close){close.onclick=dismiss;close.focus();}
+  ov.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){e.preventDefault();dismiss();}
+    if(e.key==='Tab'){const items=[...ov.querySelectorAll('button,a[href],summary')].filter(n=>n.getClientRects().length),first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}
+  });
 }
 /* 术语点击事件委托(含动态渲染的内容) */
 document.addEventListener('click',function(e){
@@ -1860,19 +1868,8 @@ function zhJianYi(zh){
 }
 // 命局格局(月令取格)
 function zhGeJu(zh){
-  const mz=zh.monthGZ[1];
-  const benQi=ZHI_HIDDEN[mz][0];
-  const ju=tenGod(zh.dg,benQi);
-  const juName=SHISHEN_NAME[ju];
-  let s=`格局之成，首看月令。月令${ZHI[mz]}，本气${GAN[benQi]}为日主之${juName}，此乃命之提纲。`;
-  const toud=[zh.yearGZ[0],zh.monthGZ[0],zh.hourGZ[0]].includes(benQi);
-  s+=toud?`${juName}透干，格局显明，成「${juName}格」，格局有根有力。`:`本气藏而不透，格局取月令杂气，为「藏格」，力弱而气聚，待大运引出则显。`;
-  const goodJu=[5,7,9,4].includes(ju);
-  s+=goodJu?`${juName}格为善格，主贵气端庄、行止有度，最忌官杀混杂、财被劫夺而破格，逢破格之运须谨守本业。`:`${juName}格主性情鲜明、成就独特，然成格须有制化配合——${[6].includes(ju)?'以食神制杀、以印化杀为妙':'以印护身、以财养格'}，无制则劳而有成有败。`;
-  if(zh.congGe) s+=`且日主极弱无依，弃命从势，成「从格」（从财/从官/从儿），行运喜所从之神，最忌印比破从，一破则危。`;
-  else s+=strengthText(zh,`日主身强，足以任格，格局有力，富贵可期，但强中防躁，宜以格中之财官收束。`,`日主身弱，须行印比运扶身，方能担起格局，弱格之成，全在得运。`);
-  s+=`《子平真诠》云『八字用神，专求月令』，格局之成败，全在喜忌配置与行运顺逆，命主宜知格而用、顺势而为。`;
-  return s;
+  const s=buildMingGeSummary(zh);
+  return '<p>'+mingGeEscape(s.headline)+'</p><p>本气'+mingGeEscape(s.month.gan)+'为'+mingGeEscape(s.month.god)+'；'+s.month.candidates.map(n=>mingGeEscape(GAN[n.gan])+'·'+mingGeEscape(SHISHEN_NAME[n.god])+'（'+(n.exposed?'透干':'藏支')+'）').join('、')+'。</p><p>'+s.paths.map(p=>mingGeEscape(p.title)+'：'+mingGeEscape(p.state)).join('；')+(s.obstacles.length?'。关节：'+s.obstacles.map(o=>mingGeEscape(o.title)+'·'+mingGeEscape(o.resolution)).join('；'):'')+'</p>'+readingCitations(['pattern','rescue']);
 }
 // 六亲缘分
 function zhLiuQin(zh){
@@ -2865,8 +2862,7 @@ function aiDeepAnalyze(){aiEvidenceStart();}
 /* 极简转义（错误信息可能含后端原文） */
 
 function zhAnalysis(zh){
-  const maxWx=zh.wxCount.indexOf(Math.max(...zh.wxCount));
-  const minWx=zh.wxCount.indexOf(Math.min(...zh.wxCount));
+  const synthesis=buildMingGeSummary(zh);
   const dims=[
     {icon:"⚖️",title:"旺衰平衡",content:zhWangShuai(zh)},
     {icon:"🏛️",title:"子平格局",content:zhGeJu(zh)},
@@ -2884,15 +2880,11 @@ function zhAnalysis(zh){
     {icon:"🛤️",title:"大运总览",content:zhDaYunZongLan(zh)},
     {icon:"📅",title:"流年应期",content:zhLiuNianDetail(zh)},
     {icon:"🔮",title:"开运建议",content:zhJianYi(zh)},
-    {icon:"🎯",title:"综合定档",content:(()=>{const dd=zhDingDang(zh);return `命局定分：${dd.score}/100（${dd.geJu}）。财富潜力：${dd.caiQuan}；人生区间：${dd.lifeLow}→${dd.lifeHigh}；学历潜力：${dd.xueQuan}。综合大运：${dd.dayunInfo}`;})()},
+    {icon:"🎯",title:"综合定档",content:mingGeEscape(synthesis.headline)},
     {icon:"⚠️",title:"风险提示",content:zhFengXian(zh)}
   ];
-  // 总论
-  let total=`此造${GAN[zh.dg]}${WUXING[GAN_WX[zh.dg]]}日主，${WUXING[maxWx]}旺${WUXING[minWx]}弱，${strengthLabel(zh)+'，'+strengthAdvice(zh)}，以${WUXING[zh.yongShen]}为用。`;
-  total+=`月令取${SHISHEN_NAME[tenGod(zh.dg,ZHI_HIDDEN[zh.monthGZ[1]][0])]}为格，${zh.dy.startAge}岁起运。`;
-  total+=`命局之基由八字定其体，紫微命宫${ZHI[zh.mingGong]}主其性，奇门${zh.juInfo.yang?'阳':'阴'}遁${zh.juInfo.ju}局观其时的气数，六爻${zh.guaName}变${zh.changeName}应其事机。`;
-  total+=`四术同源于${zh.lunar.year}年${lunarMonthName(zh.lunar.month,zh.lunar.isLeap)}${lunarDayName(zh.lunar.day)}${HOUR_NAMES[zh.hourIdx]}一瞬，合参互证，其旨归一。`;
-  total+=`命理之说，知命而用命：顺境借势而为，逆时蓄力深耕，趋吉避凶，宜以积极有为之心待之。`;
+  // The same factual reading model drives the overview, pattern detail and closing synthesis.
+  const total=mingGeEscape(synthesis.headline)+'取用：'+mingGeEscape(synthesis.useGod.profile)+'，当前取'+mingGeEscape(synthesis.useGod.selected)+'。'+(synthesis.useGod.conflict?'扶抑与调候分列，结合各自用途细看。':'')+zh.dy.startAge+'岁起运，运中补字见总断的行运看点。';
   return {dims,total};
 }
 /* ============ v5.4 出生地五行参考（方位补益·全国省/地级市/县级市全覆盖） ============ */
@@ -3024,60 +3016,14 @@ function zhBirthPlace(zh){
   }catch(e){ return ''; }
 }
 
-/* ============ v3 借鉴 mingge.org「命格宇宙」排布顺序（2026-08-28） ============ */
-// 排布哲学: 先总断后细盘、先静态后动态 —— 四柱 → 命格总断 → 五维能量 → 大运净值曲线 → 流年小运
-// ①a 格局成败六态判定（借鉴 mingge「格局成败·六态」确定性规则: 成格/败中有成/成中有败/待引发/破格/外格自成）
+/* ============ 总断先读提纲与配合，详细证据和行运按需展开 ============ */
+// Keep the legacy function name for export callers; all views read the same synthesis model.
 function zhGeJuZhuangTai(zh){
-  try{
-    const gt=[0,0,0,0,0,0,0,0,0,0]; // 天干透出
-    [zh.yearGZ[0],zh.monthGZ[0],zh.dayGZ[0],zh.hourGZ[0]].forEach(g=>{gt[tenGod(zh.dg,g)]++;});
-    const ts=[...gt]; // 透出+藏干本气
-    [zh.yearGZ[1],zh.monthGZ[1],zh.dayGZ[1],zh.hourGZ[1]].forEach(z=>{const h=ZHI_HIDDEN[z]?ZHI_HIDDEN[z][0]:undefined; if(h!==undefined) ts[tenGod(zh.dg,h)]++;});
-    const bings=[];
-    // 病以"透干并见"为准（藏干同宫不重复计），药仍看全局
-    if(gt[3]>=1&&ts[7]>=1) bings.push({k:'伤官见官',d:'伤官透干正撞官星——挣脱约束之气与名分之气相冲，为头号破法',drug:(ts[8]+ts[9]>=1)?'印星化解':'无药'});
-    if(gt[8]>=1&&ts[2]>=1) bings.push({k:'枭神夺食',d:'偏印透干克食神——才华出口被封，所学难外发',drug:(ts[4]+ts[5]>=1)?'财星制枭':'无药'});
-    if((gt[4]+gt[5]>=1)&&(ts[0]+ts[1]>=2)) bings.push({k:'比劫夺财',d:'财星透干而比劫成群——到手之财易被分夺',drug:ts[7]>=1?'官星护财':'无药'});
-    if(gt[6]>=1&&gt[7]>=1) bings.push({k:'官杀混杂',d:'正官七杀并透——贵气口径不一，取舍失据',drug:(ts[2]+ts[3]>=1)?'食伤去留':'无药'});
-    if((gt[4]+gt[5]>=1)&&gt[6]>=1&&strengthLabel(zh)==='身弱') bings.push({k:'财星党杀',d:'财杀并透而身弱难担——给刀递力，压力倍增',drug:(ts[8]+ts[9]>=1)?'印化杀':'无药'});
-    // 用神是否透干(相神在位)
-    const ys=zh.yongShen;
-    const ysTouGan=ys!==undefined&&[zh.yearGZ[0],zh.monthGZ[0],zh.dayGZ[0],zh.hourGZ[0]].some(g=>GAN_WX[g]===ys);
-    // 外格(从势): 日主极弱 + 印比极少 + 某党独旺
-    const wx=zh.wxCount||[];
-    const isCong=zh.congGe&&(ts[0]+ts[1]+ts[8]+ts[9]<=1)&&wx.length&&Math.max(...wx)>=5;
-    if(isCong) return {state:'外格自成',level:'外',desc:'五行势力极度偏向一方，不循"月令取格、以相神成之"的常规路——论真与假：势顺则真，一路到底反而比正格更纯粹；被岁运搅动则转假。顺势之运得力，逆势之运来时没有缓冲。'};
-    if(bings.length===0){
-      if(ysTouGan) return {state:'成格',level:'成',desc:'月令之格相神在位、原局无病——天赋结构自洽，想做的事与能调动的力量在同一条线上。'};
-      return {state:'待引发',level:'待',desc:'月令之格立在那里，但缺一位相神点亮——不是残缺，是未被引发。"格局成败要看岁运"，关键在于何时行到那一步运。'};
-    }
-    const allDrug=bings.every(b=>b.drug!=='无药');
-    if(allDrug) return {state:'败中有成',level:'带病',desc:'格局有明确的病，而解病的药恰好也在原局——先天带着问题也带着解法，人生多"先受其困、后得其解"；药通常只有一处，岁运冲克到药则旧病复发，上限高、起伏也大。病：'+bings.map(b=>b.k).join('、')+'；药：'+bings.map(b=>b.drug).join('、')};
-    return {state:'破格',level:'破',desc:'病在明处而原局的药不足以立格——"有病方为贵，无伤不是奇"，病在何处清楚了，该等哪一味药也就清楚了；岁运一旦补足那味药，翻转幅度比平顺命局大得多。病：'+bings.map(b=>b.k).join('、')+'；待补：'+bings.filter(b=>b.drug==='无药').map(b=>b.k+'之药').join('、')};
-  }catch(e){ return null; }
+  const s=buildMingGeSummary(zh);
+  return {state:s.state,level:'线索',desc:s.headline};
 }
-// ① 命格总断卡: 格局 + 定分 + 质地档(凡/良/绝) + 格局成败六态 + 一句总断(先给"命骨",再展开细盘)
 function zhMingGeCard(zh){
-  try{
-    const dd=zhDingDang(zh);
-    if(!dd||dd.score===undefined) return '';
-    const dq=dd.score>=80?'绝':dd.score>=60?'良':'凡';
-    const qd={'绝':'结构清朗、层次可辨，能量配置近于上乘','良':'结构完整、走得稳，多数命造所处','凡':'根基完整、中正平和，以勤补拙'}[dq]||'';
-    const gj=zhGeJuZhuangTai(zh);
-    const gjColor={成:'var(--jade)',带病:'var(--orange)',待:'var(--ink2)',破:'var(--red)',外:'var(--purple)'}[gj?gj.level:'']||'var(--ink2)';
-    return `<div class="section-block" style="border:1px solid var(--gold2);background:linear-gradient(135deg,rgba(176,138,62,.07),rgba(158,43,37,.03))">
-      <h3>🏮 命格总断 <span style="font-size:.68rem;color:var(--ink3);font-weight:400">（先总后分 · 四柱既定，先观命骨，再展细盘）</span></h3>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:stretch;margin-bottom:8px">
-        <div style="text-align:center;min-width:88px;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:7px 12px"><div style="font-size:.6rem;color:var(--ink3);letter-spacing:.18em">命 格</div><div style="font-size:1.02rem;font-weight:700;color:var(--gold)">${dd.geJu}</div></div>
-        <div style="text-align:center;min-width:88px;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:7px 12px"><div style="font-size:.6rem;color:var(--ink3);letter-spacing:.18em">身 强 弱</div><div style="font-size:1.02rem;font-weight:700;color:var(--red)">${strengthLabel(zh)}</div></div>
-        <div style="text-align:center;min-width:88px;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:7px 12px"><div style="font-size:.6rem;color:var(--ink3);letter-spacing:.18em">命局定分</div><div style="font-size:1.02rem;font-weight:700;color:var(--gold)">${dd.score}<span style="font-size:.62rem;color:var(--ink3)">/100</span></div></div>
-        <div style="text-align:center;min-width:88px;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:7px 12px"><div style="font-size:.6rem;color:var(--ink3);letter-spacing:.18em">质 地</div><div style="font-size:1.02rem;font-weight:700;color:${dq==='绝'?'var(--red)':dq==='良'?'var(--gold)':'var(--ink2)'}">${dq}</div></div>
-        ${gj?`<div style="text-align:center;min-width:88px;background:var(--card2);border:1px solid ${gjColor};border-radius:10px;padding:7px 12px"><div style="font-size:.6rem;color:var(--ink3);letter-spacing:.18em">格局成败</div><div style="font-size:.92rem;font-weight:700;color:${gjColor}">${gj.state}</div></div>`:''}
-      </div>
-      ${gj?`<div style="font-size:.74rem;color:var(--ink2);line-height:1.7;text-align:justify;padding:6px 12px;margin-bottom:8px;background:rgba(176,138,62,.05);border-left:3px solid ${gjColor};border-radius:6px">格局状态（借鉴《子平真诠》成败救应）：${gj.desc}</div>`:''}
-      <div style="font-size:.8rem;color:var(--ink);line-height:1.85;text-align:justify;padding:8px 12px;background:var(--card2);border:1px solid var(--line);border-radius:8px">${dd.note||''}<br><span style="color:var(--ink3);font-size:.74rem">质地断：${qd}。</span></div>
-    </div>`;
-  }catch(e){ return ''; }
+  return '<div class="section-block mingge-summary"><h3>命格总断 <span>先看提纲，再察配合</span></h3>'+mingGeSummaryBody(zh)+'</div>';
 }
 // ② 五维能量雷达: 十神五组(财/官杀/食伤/印/比劫) → SVG 五轴雷达(借鉴命格宇宙量化法: 透干计2、藏干本气计1)
 function zhWuWeiRadar(zh){
@@ -3667,7 +3613,7 @@ function renderZongHe(zh,name){
     </div>`;
   });
   html+=`</div>`;
-  html+=`<div class="section-block" style="border:1px solid var(--gold2)"><h3>多维综合分析 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">（先总后分 · 综合定档总览 → 17 维细看 · 紫微·奇门·六爻为佐证）</span></h3>`;
+  html+=`<div class="section-block" style="border:1px solid var(--gold2)"><h3>多维综合分析 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">（先总后分 · 命局结构 → 17 维细看 · 三术参考分列）</span></h3>`;
   // 综合分析(多维度,含三术论据)
   const ana=zhAnalysis(zh);
   const mingStar=d.mingStars.length?d.mingStars.map(k=>ZW_STARS[k].name).join('、'):'主星不现';
@@ -3861,7 +3807,7 @@ function aTerm(q,zh){
         if(sub.length===2 && k.includes(sub) && !['什么','的','是','叫','咋','呢','的'].includes(sub)) score=Math.max(score,50);
       }
     }
-    if(score>0) matches.push({key:k,entry:KB_TERMS[k],score});
+    if(score>0){const entry=termKnowledge(k);matches.push({key:k,entry:{w:entry.category,d:entry.explanation},score});}
   }
   matches.sort((a,b)=>b.score-a.score);
   if(matches.length){
@@ -3879,7 +3825,7 @@ function aTerm(q,zh){
       html+=top.slice(1).map(m=>` <span style="cursor:default">${m.key}</span>`).join('·');
       html+='</div>';
     }
-    html+='<div style="font-size:.7rem;color:var(--ink3);margin-top:8px">来源：本地命理知识库（综合《渊海子平》《滴天髓》《三命通会》等典籍编纂）</div>';
+    html+=VERIFIED_TERM_NOTES[top[0].key]?readingCitations(VERIFIED_TERM_NOTES[top[0].key].keys):'<small>出处待核验</small>';
     return html;
   }
   let s='<div style="margin-bottom:6px"><b style="color:var(--gold)"> 术语说明</b><br><span style="font-size:.82rem">「'+q.slice(0,20)+'」未直接命中本地术语库，可尝试询问：';
@@ -4093,7 +4039,7 @@ function aiFollowUp(){
 // canvas 绘制命盘速览卡并下载 PNG
 function exportChartPng(){
   if(!lastZh){alert(lastCandidates?'时辰未知，请先核对时分；候选模式不导出确定命盘图':'请先排盘');return;}
-  const zh=lastZh, dd=zhDingDang(zh), gj=zhGeJuZhuangTai(zh);
+  const zh=lastZh, dd=zhDingDang(zh), gj=zhGeJuZhuangTai(zh), synthesis=buildMingGeSummary(zh);
   const cv=document.createElement('canvas');
   cv.width=760; cv.height=470;
   const ctx=cv.getContext('2d');
@@ -4125,7 +4071,7 @@ function exportChartPng(){
   // 命格信息
   ctx.textAlign='left';
   const rows=[
-    ['命 格',dd.geJu+(gj?'（'+gj.state+'）':'')],
+    ['提 纲',synthesis.pattern+'（'+gj.state+'）'],
     ['身强弱',strengthLabel(zh)+' · 用神'+WUXING[zh.yongShen]],
     ['旧规则演示分（未校准）',dd.score+' / 100 · 质地'+(dd.score>=80?'绝':dd.score>=60?'良':'凡')],
     ['大 运',zh.dy.startAge+'岁起运·'+(zh.dy.forward?'顺行':'逆行')+' · 当前'+(function(){const now=new Date().getFullYear();const age=now-zh.date.getFullYear()-((new Date().getMonth()<zh.date.getMonth())?1:0);let cur=zh.dy.dyList[0];zh.dy.dyList.forEach(dy=>{if(age>=dy.age)cur=dy;});return GAN[cur.g]+ZHI[cur.z]+'（'+cur.age+'-'+cur.endAge+'岁）';})()],
