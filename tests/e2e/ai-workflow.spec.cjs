@@ -33,9 +33,18 @@ test('invalid dimensions stay missing, retry requests only missing IDs, and bad 
 });
 test('cancel retains partial text and reload/restore never automatically sends another API request',async({page})=>{
   await prepare(page);
+  const originalChartId=await page.evaluate(()=>chartFactId(aiEvidenceChart()));
   await page.evaluate(()=>{window.mockCalls=0;window.fetch=async()=>{window.mockCalls++;return new Response(new ReadableStream({start(c){c.enqueue(new TextEncoder().encode('data: '+JSON.stringify({choices:[{delta:{content:'{"schemaVersion":'}}]})+'\n\n'));},cancel(){window.mockCanceled=true;}}),{headers:{'Content-Type':'text/event-stream'}});};});
   await page.locator('#ai-deep-btn').click();await expect(page.locator('#ai-draft-text')).toContainText('schemaVersion');await page.locator('#ai-cancel').click();await expect(page.locator('#ai-workflow-status')).toContainText('已取消');expect(await page.evaluate(()=>window.mockCalls)).toBe(1);expect(await page.evaluate(()=>window.mockCanceled)).toBe(true);
-  let calls=0;await page.route('https://ai.mock.test/**',async route=>{calls++;await send(route,'unused');});await page.reload();await expect(page.locator('#zh-result')).not.toBeEmpty();await page.evaluate(()=>zhSecGo(4));await page.locator('#ai-restore-draft').click();await expect(page.locator('#ai-draft-text')).toContainText('schemaVersion');expect(calls).toBe(0);
+  let calls=0;await page.route('https://ai.mock.test/**',async route=>{calls++;await send(route,'unused');});
+  // Restore a different chart deliberately; a local recast is asynchronous and changes the active section.
+  await page.reload();await expect(page.locator('#zh-result')).not.toBeEmpty();
+  await page.evaluate(()=>{document.getElementById('zh-solar').value='2024-02-10';document.getElementById('zh-time').value='12:00';zhCast();});
+  await expect.poll(()=>page.evaluate(()=>aiEvidenceChart().input.date)).toBe('2024-02-10');
+  await page.evaluate(()=>zhSecGo(4));await page.locator('#ai-restore-draft').click();
+  await expect.poll(()=>page.evaluate(()=>chartFactId(aiEvidenceChart()))).toBe(originalChartId);
+  await expect(page.locator('#cast-loading')).not.toHaveClass(/show/);await page.evaluate(()=>zhSecGo(4));
+  await expect(page.locator('#ai-draft-text')).toContainText('schemaVersion');expect(calls).toBe(0);
   await page.locator('#ai-clear-draft').click();expect(await page.evaluate(()=>sessionStorage.getItem(AI_DRAFT_NS))).toBeNull();
 });
 test('late old-chart responses cannot fill a new chart and storage denial leaves an actionable memory-only state',async({page})=>{

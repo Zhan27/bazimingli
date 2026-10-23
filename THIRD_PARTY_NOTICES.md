@@ -1,5 +1,7 @@
 # Third-party notices
 
+The5.26 review and adopted design ideas are listed with fixed commits and license boundaries in `docs/REFERENCE-ADOPTION.md`. New condition, retrieval and transit code is independently implemented; no GPL source, mixed-license datasets, modern lecture material or unlicensed repository code is embedded. Ziwei starting sequences in `tests/ziwei-rules.test.cjs` are independently transcribed from the public-domain classical text linked there, with application-specific year-label handling documented separately.
+
 `tests/fixtures/open-source-tables.json` adapts hidden-stem member cells and twelve-growth-stage cells from **jinchenma94/bazi-skill**, commit `112a5d84cd1a001a0038cafca3be68d93e4c0cc9`, `references/wuxing-tables.md`, Copyright (c) 2025 jinchenma94, MIT. Full license: `vendor/bazi-skill-LICENSE.txt`. Changes: extracted table cells into JSON for independent development checks, with no adoption of hidden-qi ordering or weights. This fixture is not embedded in the application. Other reviewed projects are documented in `docs/SYNTHESIS.md`; their code and modern commentary were not copied.
 
 `vendor/lunar.js` is an unmodified copy of **lunar-javascript 1.7.7**, Copyright (c) 2018 6tail, MIT licensed. The full upstream license is in `vendor/lunar-LICENSE.txt`; its full text is also embedded in each generated HTML file. Upstream: https://github.com/6tail/lunar-javascript . The npm dependency is version pinned and recorded in `package-lock.json`.

@@ -6,7 +6,7 @@ for(const width of [1440,1024,390,320])test(`evidence-led synthesis and sourced 
   await page.goto('/');await page.locator('#workspace-example').click();await expect(page.locator('.compact-chart-name')).toHaveText('学习示例');await expect(page.locator('.mingge-summary')).toBeVisible();
   const before=await page.evaluate(()=>({chart:JSON.stringify(serializeChart(lastZh)),records:localStorage.getItem('ml_records')}));
   const summary=page.locator('.mingge-summary');await expect(summary).toContainText('比劫月令');await expect(summary).toContainText('中和');
-  await expect(summary).not.toContainText('质地断');await summary.locator('.mingge-evidence summary').click();await expect(summary.locator('.mingge-evidence')).toHaveAttribute('open','');await expect(summary).toContainText('月令');
+  await expect(summary).not.toContainText('质地断');await summary.locator('.mingge-evidence>summary').click();await expect(summary.locator('.mingge-evidence')).toHaveAttribute('open','');await expect(summary).toContainText('月令');
   await summary.locator('.mingge-transits summary').click();await expect(summary.locator('.mingge-transits')).toContainText('岁');
   await summary.locator('.reading-citations summary').click();expect(await summary.locator('a[target="_blank"]').count()).toBe(4);
   for(const link of await summary.locator('a').all())expect(await link.getAttribute('href')).toMatch(/^https:\/\//);

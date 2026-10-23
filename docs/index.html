@@ -399,6 +399,12 @@ body[data-theme=xuanmo] .gz-explorer{--gz-he:#d8b276;--gz-chong:#e0a99b;--gz-san
 .reading-citations q,.reading-citations small,.glossary-results article>a,.glossary-results article>small{display:block}
 .reading-citations small{color:var(--ink3);font-size:.68rem}.reading-citations q{color:var(--ink2)}
 @media(max-width:480px){.mingge-row{grid-template-columns:4.5em minmax(0,1fr);gap:6px}.mingge-summary h3 span{display:inline;font-size:.65rem}.mingge-chips{gap:4px 9px}}
+.mingge-locate{display:inline;font:inherit;color:var(--jade);background:transparent;border:0;border-bottom:1px dotted var(--line);padding:2px 0;text-align:left;white-space:normal;overflow-wrap:anywhere;cursor:pointer}
+.mingge-locate:focus-visible,.mingge-candidate summary:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
+.mingge-candidate{margin:6px 0;border:1px solid var(--line);border-radius:4px;padding:0 8px}.mingge-candidate>summary{padding:7px 0;cursor:pointer;color:var(--ink2)}.mingge-candidate>p{font-size:inherit;color:var(--ink3)}
+.mingge-candidate [data-condition-status=missing]{color:var(--ink2)}.mingge-candidate [data-condition-status=pending]{color:var(--ink3)}
+.study-layer-notes{border-left:2px solid var(--jade);background:var(--card2);padding:8px 10px;margin:10px 0;font-size:.75rem;line-height:1.8}.study-layer-notes p{margin:3px 0}.study-layer-notes a{color:var(--jade)}
+@media(max-width:480px){.mingge-locate{min-height:36px}.mingge-candidate>summary{min-height:44px;display:list-item}.mingge-candidate .mingge-row{grid-template-columns:minmax(0,1fr);gap:2px}}
 
 </style>
 </head>
@@ -11414,7 +11420,7 @@ function termKnowledge(title){
 }
 
 /* Source: src/knowledge/catalog.js */
-const KNOWLEDGE_VERSION='1.1.0';
+const KNOWLEDGE_VERSION='1.2.0';
 const KNOWLEDGE_ENTRIES=freezeRules([
   {id:'rule.hidden-stems',title:'地支藏干表',book:'应用规则表',chapter:'src/bazi/data.js',original:null,explanation:'按锁定藏干表列出本中余气。',schools:['all'],status:'implementation-verified',source:'tests/calculation-rules.test.cjs'},
   {id:'rule.branch-relations',title:'地支合冲关系',book:'应用规则表',chapter:'src/api/chart.js',original:null,explanation:'六合与六冲关系，解释效果未校准。',schools:['all'],status:'implementation-verified',source:'tests/api.test.cjs'},
@@ -11431,9 +11437,62 @@ function searchKnowledge(query='',school='all'){
 }
 function knowledgeCitation(id){const k=KNOWLEDGE_ENTRIES.find(x=>x.id===id);return k?{id:k.id,book:k.book,chapter:k.chapter,status:k.status,source:k.source,original:k.original,sources:k.sources||[],verificationScope:k.verificationScope||null}:null;}
 
+/* Source: src/knowledge/selection.js */
+/** Local deterministic relevance selection, independently implemented; scores are not confidence. */
+const KNOWLEDGE_SELECTION_VERSION='1.0.0';
+const KNOWLEDGE_DIMENSION_TOPICS=freezeRules([
+  ['五行','十神','日主','藏干','用神'],
+  ['格局','正官格','七杀格','正印格','食神格','伤官格','从格','通关'],
+  ['调候','用神','通关','五行'],
+  ['十神','天干相冲','六合','六冲','三刑','六害','地支暗合'],
+  ['天乙贵人','文昌贵人','桃花','驿马','华盖','禄神','羊刃'],
+  ['纳音','五行'],['十神','日主','比肩','食神','伤官'],
+  ['正财','偏财','食神','比肩','劫财','用神'],
+  ['正官','七杀','正印','偏印','文昌贵人','食神'],
+  ['正财','偏财','正官','七杀','六合','六冲','桃花'],
+  ['十神','比肩','劫财','正印','偏印','食神','伤官'],
+  ['五行','调候','用神','六冲'],['天乙贵人','天德贵人','月德贵人','比肩','劫财'],
+  ['大运','用神','通关','六合','六冲'],['流年','大运','六合','六冲','三刑'],
+  ['用神','调候','五行'],['格局','调候','用神','通关','十神','大运'],
+  ['格局','调候','用神','六冲','三刑','六害']
+]);
+function selectEvidenceKnowledge(chart,schoolId,{dimensionIds=Array.from({length:18},(_,i)=>i+1),limit=20}={}){
+  assertStudyChart(chart);
+  if(!Array.isArray(dimensionIds)||!dimensionIds.length||dimensionIds.length>18||new Set(dimensionIds).size!==dimensionIds.length||dimensionIds.some(id=>!Number.isInteger(id)||id<1||id>18))throw new TypeError('知识选取维度无效');
+  if(!Number.isInteger(limit)||limit<1||limit>40)throw new RangeError('知识选取数量须为1至40');
+  const profile=getRuleProfile(schoolId),signals=new Map(),add=(title,id)=>{if(!signals.has(title))signals.set(title,new Set());signals.get(title).add(id);};
+  for(const [i,p] of chart.pillars.entries()){
+    if(i!==2)add(p.tenGod,'pillar.'+p.id);
+    for(const h of p.hidden)add(h.tenGod,'hidden.'+p.id);
+  }
+  const relations=chartStudyFacts(chart).relations;
+  const relationTitles={he:'六合',chong:'六冲',xing:'三刑',hai:'六害',po:'地支相破',anhe:'地支暗合',sanhe:'三合'};
+  for(const r of relations){
+    const title=r.lane==='gan'?(r.kind==='chong'?'天干相冲':null):relationTitles[r.kind];
+    if(title)for(const p of r.positions)add(title,'pillar.'+p.pillar);
+  }
+  const month=chart.pillars[1].hidden[0]?.tenGod,patternGods={'正官格':'正官','七杀格':'七杀','正印格':'正印','食神格':'食神','伤官格':'伤官'};
+  const ranked=KNOWLEDGE_ENTRIES.filter(k=>k.schools.includes('all')||k.schools.includes(profile.key)).filter(k=>!Object.hasOwn(patternGods,k.title)||patternGods[k.title]===month).filter(k=>k.title!=='从格'||chart.strength.type==='从弱').map(k=>{
+    const dimensions=dimensionIds.filter(id=>KNOWLEDGE_DIMENSION_TOPICS[id-1].includes(k.title)),factIds=[...(signals.get(k.title)||[])].filter(Boolean),reasons=[];
+    if(dimensions.length)reasons.push('请求主题：'+dimensions.map(id=>AI_DIM_TITLES[id-1]).join('、'));
+    if(factIds.length)reasons.push('命盘实体：'+factIds.join('、'));
+    if(patternGods[k.title]===month){reasons.push('月令本气：'+month);factIds.push('hidden.month');}
+    if(k.id==='rule.climate'&&dimensions.length===0&&dimensionIds.some(id=>[3,17].includes(id)))reasons.push('调候与扶抑分列');
+    if(['rule.hidden-stems','rule.strength'].includes(k.id))reasons.push('基础计算约定');
+    const score=dimensions.length*12+factIds.length*2+(reasons.includes('基础计算约定')?4:0)+(k.id==='rule.climate'&&reasons.length?10:0);
+    return {...k,selection:{version:KNOWLEDGE_SELECTION_VERSION,reasons,dimensionIds:dimensions,factIds:[...new Set(factIds)],score}};
+  }).filter(k=>k.selection.reasons.length).sort((a,b)=>b.selection.score-a.selection.score||a.id.localeCompare(b.id,'en'));
+  const chosen=[],take=k=>{if(k&&chosen.length<limit&&!chosen.some(c=>c.id===k.id))chosen.push(k);};
+  for(const id of ['rule.hidden-stems','rule.strength'])take(ranked.find(k=>k.id===id));
+  // Give each requested topic an opportunity before filling the remaining relevance budget.
+  for(const id of [...dimensionIds].sort((a,b)=>a-b))take(ranked.find(k=>k.selection.dimensionIds.includes(id)&&!chosen.some(c=>c.selection.dimensionIds.includes(id))));
+  for(const k of ranked)take(k);
+  return chosen;
+}
+
 /* Source: src/interpretation/synthesis.js */
 /** Deterministic reading layer. Does not change calendar, strength, use-god, AI or chart schemas. */
-const MING_GE_VERSION='1.0.0';
+const MING_GE_VERSION='1.1.0';
 function buildMingGeSummary(zh){
   assertPillars(zh.pillars);
   const ids=['year','month','day','hour'],labels=['年','月','日','时'],dg=zh.pillars[2][0];
@@ -11444,8 +11503,20 @@ function buildMingGeSummary(zh){
   const main=ZHI_HIDDEN[zh.pillars[1][1]][0],god=tenGod(dg,main),strength=strengthLabel(zh);
   const month={branch:ZHI[zh.pillars[1][1]],gan:GAN[main],god:SHISHEN_NAME[god],exposed:visible.some(n=>n.gan===main),
     candidates:hidden.filter(n=>n.pillar===1).map(n=>({...n,exposed:visible.some(v=>v.gan===n.gan)}))};
-  const pattern=god<2?'比劫月令':month.god+'提纲',paths=[],obstacles=[];
-  const addPath=(id,title,groups,detail)=>{const evidence=groups.flatMap(pick);if(groups.every(g=>pick(g).length))paths.push({id,title,detail,evidence,state:groups.every(g=>exposed(g).some(n=>n.rooted))?'透干有根':groups.every(g=>exposed(g).length)?'透干待根':'藏干配合'});};
+  const pattern=god<2?'比劫月令':month.god+'提纲',paths=[],candidates=[],obstacles=[];
+  const addPath=(id,title,groups,detail)=>{
+    const evidence=groups.flatMap(pick),checks=groups.flatMap((g,i)=>{
+      const all=pick(g),v=exposed(g),name=g.map(n=>SHISHEN_NAME[n]).join('／');
+      return [{id:id+'.'+i+'.present',title:name+'出现',kind:'required',status:all.length?'met':'missing',evidence:all},
+        {id:id+'.'+i+'.exposed',title:name+'明透',kind:'supporting',status:v.length?'met':'missing',evidence:v},
+        {id:id+'.'+i+'.rooted',title:name+'透干有根',kind:'supporting',status:v.length?(v.some(n=>n.rooted)?'met':'missing'):'pending',evidence:v.filter(n=>n.rooted).flatMap(n=>[n,...hidden.filter(h=>GAN_WX[h.gan]===GAN_WX[n.gan])])}];
+    });
+    checks.push({id:id+'.force',title:'日主承受与制化轻重',kind:'review',status:'pending',evidence:[]});
+    const missing=checks.filter(c=>c.kind==='required'&&c.status==='missing').map(c=>c.title);
+    const candidate={id,title,detail,evidence,checks,missing,blocking:[],school:zh.profile?.key||'combined',sourceIds:['pattern','root','rescue'],ruleVersion:MING_GE_VERSION,
+      state:missing.length?'条件未齐':groups.every(g=>exposed(g).some(n=>n.rooted))?'透干有根':groups.every(g=>exposed(g).length)?'透干待根':'藏干配合'};
+    candidates.push(candidate);if(!missing.length)paths.push(candidate);
+  };
   const addObstacle=(id,title,groups,remedyGroups,detail)=>{
     if(!groups.every(g=>exposed(g).length))return;
     const remedies=remedyGroups.map(g=>{const evidence=pick(g),v=exposed(g);return {gods:g,title:g.map(i=>SHISHEN_NAME[i]).join('／'),evidence,state:v.some(n=>n.rooted)?'透干有根':v.length?'透干待根':evidence.length?'藏干待引':'原局未见'};});
@@ -11491,6 +11562,7 @@ function buildMingGeSummary(zh){
     }
     if(o.resolution==='救应有根'&&!o.remedies.some(r=>r.state==='透干有根'))o.resolution='救应受牵';
   }
+  for(const p of candidates)p.blocking=obstacles.filter(o=>o.evidence.some(n=>p.evidence.some(e=>e.id===n.id))).map(o=>({id:o.id,title:o.title,state:o.resolution,evidence:o.evidence,counterEvidence:o.remedies.flatMap(r=>r.counterEvidence||[])}));
   const strongPaths=paths.filter(p=>p.state==='透干有根'),pending=obstacles.filter(o=>o.resolution!=='救应有根');
   let state=obstacles.length?(pending.length?'制化待察':'救应线索'):strongPaths.length?'配合有根':paths.length?'配合藏支':'配合待察';
   if(strongPaths.length&&pending.length)state='配合与阻力并见';
@@ -11506,11 +11578,21 @@ function buildMingGeSummary(zh){
     const points=[{label:'运干'+GAN[d.g],gan:d.g},...ZHI_HIDDEN[d.z].map((gan,i)=>({label:'运支'+ZHI[d.z]+'藏'+GAN[gan]+(i===0?'（本气）':''),gan}))];
     const matching=points.filter(p=>GAN_WX[p.gan]===zh.yongShen);
     const triggered=obstacles.flatMap(o=>o.remedies.filter(r=>r.state!=='透干有根'&&points.some(p=>r.gods.includes(tenGod(dg,p.gan)))).map(r=>o.title+'：见'+r.title));
-    return {index,text:GAN[d.g]+ZHI[d.z],age:d.age,endAge:d.endAge,matching:matching.map(p=>p.label),triggered:[...new Set(triggered)]};
+    const events=mingGeLayerEvents(dg,obstacles,d.g,d.z,'dayun');
+    return {index,text:GAN[d.g]+ZHI[d.z],age:d.age,endAge:d.endAge,startYear:zh.date.getFullYear()+d.age,endYear:zh.date.getFullYear()+d.endAge,matching:matching.map(p=>p.label),triggered:[...new Set(triggered)],events};
   }).filter(d=>d.matching.length||d.triggered.length);
   const headline=GAN[dg]+WUXING[GAN_WX[dg]]+'日主，'+strength+'；'+month.branch+'月'+month.god+'提纲，'+(month.exposed?'本气透干':'本气藏支')+'。'+focus;
-  return {version:MING_GE_VERSION,pattern,month,strength,state,headline,focus,visible,hidden,roots,paths,obstacles,relations:relations.map(r=>({name:r.name,positions:r.members.map(n=>n.pillar+n.char)})),useGod,transits,
+  return {version:MING_GE_VERSION,pattern,month,strength,state,headline,focus,visible,hidden,roots,paths,candidates,obstacles,relations:relations.map(r=>({name:r.name,positions:r.members.map(n=>n.pillar+n.char)})),useGod,transits,
     sources:['pattern','rescue','climate','root']};
+}
+function mingGeLayerEvents(dayGan,obstacles,gan,zhi,layer){
+  const label=layer==='annual'?'年':'运',points=[{label:label+'干'+GAN[gan],gan},...ZHI_HIDDEN[zhi].map((g,i)=>({label:label+'支'+ZHI[zhi]+'藏'+GAN[g]+(i===0?'（本气）':''),gan:g}))];
+  const events=[];
+  for(const o of obstacles)for(const r of o.remedies){
+    if(r.state==='透干有根')continue;
+    for(const p of points)if(r.gods.includes(tenGod(dayGan,p.gan)))events.push({layer,participant:p.label,god:SHISHEN_NAME[tenGod(dayGan,p.gan)],target:o.title,natalState:r.state,evidence:r.evidence,sourceIds:['rescue']});
+  }
+  return events;
 }
 
 /* Source: src/storage/records.js */
@@ -11727,11 +11809,11 @@ function parseStructuredAi(text,chart,options={}){
   try{return {...validateAiResult(JSON.parse(raw.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'')),chart,options),format:'json'};}
   catch(e){if(options.partial)return {format:'json',pending:true,dimensions:[],errors:[]};return {format:'json',ok:false,dimensions:[],errors:[{type:'EXPRESSION_ERROR',path:'root',message:'JSON未完整结束或格式无效'}]};}
 }
-function aiPromptVersion(schoolId){const p=getRuleProfile(schoolId);return 'evidence-'+p.key+'-1.1.0';}
+function aiPromptVersion(schoolId){const p=getRuleProfile(schoolId);return 'evidence-'+p.key+'-1.2.0';}
 function buildEvidencePrompt(chart,schoolId,{dimensionIds=AI_DIM_CONTRACTS.map(d=>d.id),mode='json'}={}){
   const profile=getRuleProfile(schoolId),facts=aiFacts(chart);
   const system='你是传统文化学习助手。计算事实只读，不得改写四柱或应用评分。每项按结论、盘面事实ID、规则ID、解释、不确定性、竞争解释输出。high表示不确定性高，不是高置信度。未核验的典籍引文只作待核验线索，不可说成已核对原文，不强制古籍原文。不得给命运必然结论、医学诊断、财富金额、学历上下限或看似精确的预测分数。仅输出请求的维度，不重复其余维度。\n流派独立配置：'+JSON.stringify(profile)+'\n本流派Prompt版本：'+aiPromptVersion(schoolId)+'\n流派任务：'+profile.focus+'\n输出维度契约：'+JSON.stringify(AI_DIM_CONTRACTS.filter(d=>dimensionIds.includes(d.id)))+'\n'+(mode==='markdown'?'兼容Markdown：每项以【维度ID】开头，保留全部依据字段。此格式不会被程序宣称完成事实与引用校验。':'仅输出符合此JSON Schema的JSON：'+JSON.stringify(aiOutputSchema()));
-  const user=JSON.stringify({schemaVersion:AI_CONTRACT_VERSION,chartId:chartFactId(chart),pillars:chart.pillars.map(p=>p.text),facts,rules:chart.rules,requestedDimensionIds:dimensionIds,knowledge:searchKnowledge('',profile.key).slice(0,20)});
+  const user=JSON.stringify({schemaVersion:AI_CONTRACT_VERSION,chartId:chartFactId(chart),pillars:chart.pillars.map(p=>p.text),facts,rules:chart.rules,requestedDimensionIds:dimensionIds,knowledgeSelection:{version:KNOWLEDGE_SELECTION_VERSION,meaning:'主题与实体相关性，非来源可信度或成格认定'},knowledge:selectEvidenceKnowledge(chart,profile.id,{dimensionIds})});
   return {system,user,version:aiPromptVersion(schoolId),knowledgeVersion:KNOWLEDGE_VERSION};
 }
 function evaluateAiResponse(text,chart,options={}){
@@ -11929,7 +12011,7 @@ function readingCitations(keys){
 }
 function mingGeSummaryBody(zh){
   const s=buildMingGeSummary(zh),esc=mingGeEscape;
-  const evidence=rows=>rows.map(n=>esc(n.label)+'·'+esc(SHISHEN_NAME[n.god])).join('；');
+  const evidence=rows=>[...new Map(rows.map(n=>[n.id,n])).values()].map(n=>'<button type="button" class="mingge-locate" data-mingge-node="'+(n.id.includes('.hidden.')?'zhi':'gan')+'-'+n.pillar+'" aria-label="在关系图定位'+esc(n.label)+'">'+esc(n.label)+'·'+esc(SHISHEN_NAME[n.god])+' ↗</button>').join('；');
   const row=(label,text)=>'<div class="mingge-row"><b>'+esc(label)+'</b><span>'+text+'</span></div>';
   const paths=s.paths.length?s.paths.map(p=>esc(p.title)+' <small>'+esc(p.state)+'</small>').join(' · '):'先察财官食印的承接';
   const issue=s.obstacles.length?s.obstacles.map(o=>esc(o.title)+' <small>'+esc(o.resolution)+'</small>').join(' · '):'当前筛选未见提纲对应的明透阻力';
@@ -11940,16 +12022,31 @@ function mingGeSummaryBody(zh){
   html+=row('月令',esc(s.month.branch)+'藏'+s.month.candidates.map(n=>esc(GAN[n.gan])+'（'+esc(SHISHEN_NAME[n.god])+'，'+(n.exposed?'透干':'藏支')+'）').join('、')+'。以本气建立提纲；杂气透出与会支另看。');
   html+=row('根气',s.roots.length?evidence(s.roots):'四支藏干未见日主同五行根');
   html+=row('明透',evidence(s.visible));
-  for(const p of s.paths)html+=row(p.title,evidence(p.evidence)+'。'+esc(p.detail));
+  for(const p of s.candidates){
+    html+='<details class="mingge-candidate" data-mingge-path="'+esc(p.id)+'"><summary>'+esc(p.title)+' · '+esc(p.state)+(p.missing.length?' · 缺'+p.missing.length+'项':'')+'</summary><p>'+esc(p.detail)+'</p>';
+    for(const c of p.checks)html+=row(c.title,'<strong data-condition-status="'+c.status+'">'+({met:'满足',missing:'未满足',pending:'待察'}[c.status])+'</strong> <small>'+({required:'必要条件',supporting:'承接条件',review:'力量复核'}[c.kind])+'</small>'+(c.evidence.length?' · '+evidence(c.evidence):''));
+    if(p.missing.length)html+=row('缺项',esc(p.missing.join('、')));
+    for(const b of p.blocking)html+=row('伴随关节',esc(b.title)+' · '+esc(b.state)+'；'+evidence(b.evidence)+(b.counterEvidence.length?'；救应受牵：'+evidence(b.counterEvidence):''));
+    html+='</details>';
+  }
   for(const o of s.obstacles){
     html+=row(o.title,evidence(o.evidence)+'。'+esc(o.detail));
     for(const r of o.remedies)html+=row('救应·'+r.title,'<strong>'+esc(r.state)+'</strong> '+(r.evidence.length?evidence(r.evidence):'当前四柱未见')+(r.counterEvidence?.length?'；受牵线索：'+evidence(r.counterEvidence):''));
   }
   if(s.relations.length)html+=row('月支联动',s.relations.map(r=>esc(r.name)+'（'+esc(r.positions.join('、'))+'）').join('；')+'。合、冲、刑与提纲配合分列，不按关系条数判破格。');
   html+='</details><details class="mingge-transits"><summary>行运看点 · 运中补字与引动</summary>';
-  html+=s.transits.length?s.transits.map(d=>row(d.text+' '+d.age+'–'+d.endAge+'岁',[d.matching.length?'当前取用'+esc(s.useGod.selected)+'见于'+esc(d.matching.join('、')):'',...d.triggered.map(esc)].filter(Boolean).join('；'))).join(''):'<p>已排大运中未筛到对应取用或救应字；可继续查看完整大运。</p>';
+  html+=s.transits.length?s.transits.map(d=>row(d.text+' '+d.age+'–'+d.endAge+'岁','<small>'+d.startYear+'—'+d.endYear+'年 · 大运层</small><br>'+[d.matching.length?'当前取用'+esc(s.useGod.selected)+'见于'+esc(d.matching.join('、')):'',...d.events.map(e=>esc(e.participant)+'（'+esc(e.god)+'）→ '+esc(e.target)+'；原局'+esc(e.natalState))].filter(Boolean).join('；')+' <button type="button" class="mingge-locate" data-mingge-period="'+d.index+'">按运年细读 ↗</button>')).join(''):'<p>已排大运中未筛到对应取用或救应字；可继续查看完整大运。</p>';
   html+='</details>'+readingCitations(s.sources);
   return html;
+}
+function mountMingGeInteractions(root,zh){
+  if(root.mingGeClick)root.removeEventListener('click',root.mingGeClick);
+  // Capture this rendered chart rather than reading a later global chart from a stale control.
+  root.mingGeClick=event=>{
+    const node=event.target.closest('[data-mingge-node]'),period=event.target.closest('[data-mingge-period]');
+    if(node){const chart=Object.fromEntries(['year','month','day','hour'].map((id,i)=>[id+'GZ',zh.pillars[i]]));showGanZhiWorkspace(chart,'all',node.dataset.minggeNode);}
+    if(period)showStudyWorkspace(serializeChart(zh),{periodIndex:Number(period.dataset.minggePeriod),reading:buildMingGeSummary(zh)});
+  };root.addEventListener('click',root.mingGeClick);
 }
 
 /* Source: src/ui/workbench.js */
@@ -12013,7 +12110,7 @@ function enhanceWorkbenchChart(){
   if(timing){const details=document.createElement('details');details.className='time-notes';details.open=workbenchMode()==='professional';const summary=document.createElement('summary');summary.textContent='出生时刻与换日规则 · '+(lastZh?.temporal.civilDate?fmtLocalDate(lastZh.temporal.civilDate):'');const body=document.createElement('div');body.textContent=timing.textContent;details.append(summary,body);info.after(details);timing.remove();}
   const nav=root.querySelector('#zh-sec-nav');
   const toolbar=root.querySelector('button[onclick="shareCopy()"]')?.parentElement;if(toolbar){
-    toolbar.classList.add('chart-toolbar');const study=document.createElement('button');study.type='button';study.className='btn btn-ghost';study.id='study-open';study.textContent='细读与核验';study.onclick=()=>showStudyWorkspace(serializeChart(lastZh));toolbar.appendChild(study);
+    toolbar.classList.add('chart-toolbar');const study=document.createElement('button');study.type='button';study.className='btn btn-ghost';study.id='study-open';study.textContent='细读与核验';study.onclick=()=>showStudyWorkspace(serializeChart(lastZh),{reading:buildMingGeSummary(lastZh)});toolbar.appendChild(study);
   }
   if(nav){nav.setAttribute('role','tablist');nav.setAttribute('aria-label','命盘内容');nav.querySelectorAll('button').forEach(b=>{b.setAttribute('role','tab');b.setAttribute('aria-selected',String(b.classList.contains('active')));b.addEventListener('click',()=>nav.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected',String(x===b))));});}
   const page=root.querySelector('#zh-sec-1'),first=page?.querySelector('.pillar-grid')?.closest('.section-block');
@@ -12334,14 +12431,14 @@ function renderGanZhiRelations(zh){
   const chart=Object.fromEntries(['year','month','day','hour'].map(p=>[p+'GZ',zh[p+'GZ']])),{rows}=gzRelationModel(chart);
   return `<section class="gz-summary" aria-label="干支关系" data-gz-chart="${gzRelEscape(JSON.stringify(chart))}"><h3>干支关系 <small>${rows.length}组 · 点击进入八字连线</small></h3><div>${rows.slice(0,4).map(row=>`<button type="button" data-gz-open="${row.id}"><b>${gzRelEscape(row.name)}</b><small>${gzRelEscape(row.members.map(n=>n.pillar+(row.lane==='gan'?'干':'支')).join(' ↔ '))}</small></button>`).join('')||'<p>本盘暂无合、冲、刑、害、破、暗合关系</p>'}</div><button type="button" class="btn btn-ghost" data-gz-open="all">打开干支交互${rows.length>4?' · 全部'+rows.length+'组':''} ↗</button></section>`;
 }
-function showGanZhiWorkspace(chart,initial='all'){
+function showGanZhiWorkspace(chart,initial='all',initialNode=''){
   if(document.querySelector('.gz-workspace-overlay'))return;
   const {nodes,rows}=gzRelationModel(chart),previous=document.activeElement,overlay=document.createElement('div'),card=document.createElement('section');
   overlay.className='workspace-dialog gz-workspace-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-labelledby','gz-dialog-title');card.className='workspace-dialog-card gz-workspace-card';overlay.appendChild(card);
   const nodeHTML=nodes.map(n=>{const wx=n.lane==='gan'?GAN_WX[GAN.indexOf(n.char)]:ZHI_WX[ZHI.indexOf(n.char)],color=WUXING_CLS[WUXING[wx]],label=n.pillar+(n.lane==='gan'?'干':'支');return `<button type="button" class="gz-pillar${n.column===2?' gz-day':''}" data-gz-node="${n.id}" aria-label="${label+n.char}" aria-pressed="false" style="left:${[15,38.3,61.7,85][n.column]}%"><span>${label}</span><b style="color:var(--c-${color})">${n.char}</b></button>`;}).join('');
   card.innerHTML=`<div class="gz-dialog-heading"><h2 id="gz-dialog-title">干支关系与柱位</h2><button type="button" class="btn btn-ghost" data-gz-close>关闭</button></div><div class="gz-dialog-body"><section class="gz-explorer" aria-label="干支互动"><p class="gz-intro">年、月、日、时四列，天干在上、地支在下。点字定位，点关系查看。</p><div class="gz-filters" role="group" aria-label="按关系类型筛选"><button type="button" class="gz-type" data-gz-type="all" aria-pressed="true">全部 <span>${rows.length}</span></button>${Object.entries(GZ_RELATION_TYPES).map(([type,label])=>`<button type="button" class="gz-type gz-type-${type}" data-gz-type="${type}" aria-pressed="false">${label} <span>${rows.filter(r=>gzTypeMatches(r,type)).length}</span></button>`).join('')}<button type="button" class="gz-reset" data-gz-reset>重置</button></div><div class="gz-board" role="group" aria-label="八字关系交互图"><svg viewBox="0 0 640 300" preserveAspectRatio="none" aria-hidden="true" focusable="false"><defs>${rows.map(row=>`<marker id="gz-arrow-${row.id}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M1 1 L8 5 L1 9" fill="none" stroke="var(--gz-${row.cls})" stroke-width="1.6"/></marker>`).join('')}</defs><g data-gz-edges></g></svg><div data-gz-labels></div>${['年柱','月柱','日柱','时柱'].map((p,i)=>`<span class="gz-column" style="left:${[15,38.3,61.7,85][i]}%">${p}</span>`).join('')}${nodeHTML}</div><p class="gz-legend">上排天干 · 下排地支 <span>双端箭头表示关联柱位</span></p><div class="gz-status" role="status" aria-live="polite" data-gz-status></div><div class="gz-relation-list">${rows.map(row=>`<button type="button" class="gz-relation gz-type-${row.cls}" data-gz-relation="${row.id}" data-gz-kind="${row.cls}" data-gz-members="${row.members.map(n=>n.id).join(',')}" aria-pressed="false"><b>${gzRelEscape(row.name)}</b><small>${gzRelEscape(row.members.map(n=>n.pillar+(row.lane==='gan'?'干':'支')+n.char).join(' ↔ '))}</small></button>`).join('')}<p class="gz-empty" hidden>当前筛选没有匹配关系</p></div><button type="button" class="gz-reset" data-gz-glossary>查阅关系术语</button></section></div>`;
   const root=card.querySelector('.gz-explorer'),board=root.querySelector('.gz-board'),rowButtons=[...root.querySelectorAll('[data-gz-relation]')],nodeButtons=[...root.querySelectorAll('[data-gz-node]')];
-  let type='all',node='',selected=rows.some(r=>r.id===initial)?initial:'';
+  let type='all',node=nodes.some(n=>n.id===initialNode)?initialNode:'',selected=rows.some(r=>r.id===initial)?initial:'';
   const close=()=>{overlay.remove();document.body.classList.remove('gz-dialog-open');if(previous?.isConnected)previous.focus({preventScroll:true});};card.querySelector('[data-gz-close]').onclick=close;
   const render=()=>{
     const visible=rows.filter(r=>gzTypeMatches(r,type));if(selected&&!visible.some(r=>r.id===selected))selected='';
@@ -12371,7 +12468,7 @@ function studyDownload(data,name){
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');
   link.href=url;link.download=name;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-function showStudyWorkspace(chart){
+function showStudyWorkspace(chart,{periodIndex,reading}={}){
   if(document.querySelector('.study-workspace-overlay'))return;
   const facts=chartStudyFacts(chart),previous=document.activeElement,overlay=document.createElement('div'),card=document.createElement('div');
   overlay.className='workspace-dialog study-workspace-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-labelledby','study-title');card.className='workspace-dialog-card study-workspace-card';overlay.appendChild(card);
@@ -12399,9 +12496,19 @@ function showStudyWorkspace(chart){
   facts.dayun.periods.forEach(p=>{const option=el('option',p.text+' · '+p.startAge+'—'+p.endAge+'岁');option.value=String(p.index);select.appendChild(option);});
   const selectLabel=el('label','大运 ');selectLabel.htmlFor=select.id;selectLabel.appendChild(select);
   timeline.append(el('p',(facts.dayun.forward?'顺行':'逆行')+' · '+facts.dayun.startYears+'年'+facts.dayun.startMonths+'个月起运。年龄沿用本盘时间轴口径：流年公历年减有效出生公历年。','study-note-line'),selectLabel);
-  const years=el('div',undefined,'study-years'),monthHeading=el('h3'),monthNote=el('p','流年干支指该年立春后年柱。以下为立春至下一立春的12个节月；北京时间，含起点、不含终点。','study-note-line'),monthList=el('div',undefined,'study-months');timeline.append(years,monthHeading,monthNote,monthList);
+  const years=el('div',undefined,'study-years'),layerNotes=el('div',undefined,'study-layer-notes'),monthHeading=el('h3'),monthNote=el('p','流年干支指该年立春后年柱。以下为立春至下一立春的12个节月；北京时间，含起点、不含终点。','study-note-line'),monthList=el('div',undefined,'study-months');layerNotes.hidden=!reading;timeline.append(years,layerNotes,monthHeading,monthNote,monthList);
   const renderMonths=year=>{
     monthHeading.textContent=year+'年 · 节气流月';monthList.replaceChildren();
+    if(reading){
+      layerNotes.replaceChildren();const p=facts.dayun.periods[Number(select.value)],d=chart.dayun.dyList[p.index],[g,z]=indexToGZ(year-4);
+      layerNotes.append(el('p','原局 · '+reading.pattern+'，'+reading.state));
+      for(const [layer,title,gan,zhi] of [['dayun','大运 '+p.text,d.g,d.z],['annual','流年 '+year+' '+GAN[g]+ZHI[z],g,z]]){
+        const events=mingGeLayerEvents(chart.pillars[2].ganIndex,reading.obstacles,gan,zhi,layer);
+        const text=events.length?events.map(e=>e.participant+'（'+e.god+'）→ '+e.target+'；原局'+e.natalState).join('；'):'本层未筛到提纲关节所需的救应字';
+        layerNotes.append(el('p',title+' · '+text));
+      }
+      const source=el('a','制化与救应出处 ↗');source.href=READING_SOURCES.rescue.url;source.target='_blank';source.rel='noopener noreferrer';layerNotes.appendChild(source);
+    }
     years.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.studyYear===String(year))));
     try{
       const months=chartStudyMonths(chart,year).months;
@@ -12413,7 +12520,7 @@ function showStudyWorkspace(chart){
     p.years.forEach(y=>{const button=el('button');button.type='button';button.dataset.studyYear=String(y.year);button.setAttribute('aria-label',y.year+'年 '+y.text+' '+y.age+'岁');button.append(el('span',y.year+' · '+y.age+'岁'),el('b',y.text),el('small',y.tenGod+' / '+y.nayin));button.onclick=()=>renderMonths(y.year);years.appendChild(button);});
     renderMonths(p.years.find(y=>y.year===beijingNow().getFullYear())?.year||p.years[0].year);
   };
-  select.value=String(facts.dayun.periods.find(p=>p.years.some(y=>y.year===beijingNow().getFullYear()))?.index||0);select.onchange=renderYears;renderYears();
+  select.value=String(facts.dayun.periods.some(p=>p.index===periodIndex)?periodIndex:facts.dayun.periods.find(p=>p.years.some(y=>y.year===beijingNow().getFullYear()))?.index||0);select.onchange=renderYears;renderYears();
   const compare=find('panel-compare');compare.innerHTML='<p class="study-note-line">选择已保存的对照JSON，在当前设备比较。文件不会上传，也不会写入排盘记录。两边都不是自动认定的标准答案。</p><label class="study-file-label">导入对照JSON<input type="file" id="study-reference-file" accept=".json,application/json"></label><p id="study-compare-status" role="status" aria-live="polite">支持本项目数据/学习快照、四柱数组及已保存的命名四柱响应；最多2MB。</p><div id="study-comparison-result"></div><button type="button" class="btn btn-ghost" id="study-report-export" disabled>导出对照报告</button>';
   let report=null,readId=0;
   const showReport=()=>{
@@ -12439,7 +12546,7 @@ function showStudyWorkspace(chart){
     if(event.key==='Escape'){event.preventDefault();event.stopPropagation();close();}
     if(event.key==='Tab'){const controls=[...card.querySelectorAll('button,input,select,textarea,a[href]')].filter(x=>!x.disabled&&x.tabIndex>=0&&x.getClientRects().length),first=controls[0],last=controls.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   };
-  document.body.appendChild(overlay);tabs[0].focus();
+  document.body.appendChild(overlay);if(periodIndex!==undefined){tabs[1].click();tabs[1].focus();}else tabs[0].focus();
 }
 
 /* Source: src/ui/app.js */
@@ -16099,6 +16206,7 @@ function renderZongHe(zh,name){
   document.getElementById('zh-result').innerHTML=html;
   aiEvidenceMount();
   mountGanZhiRelations(document.getElementById('zh-result'));
+  mountMingGeInteractions(document.getElementById('zh-result'),zh);
   // 时间轴详情条: 初始显示当前年
   try{ if(typeof tlSelect==='function'&&window._tlData) tlSelect(new Date().getFullYear()); }catch(e){}
 }

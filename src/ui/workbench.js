@@ -58,7 +58,7 @@ function enhanceWorkbenchChart(){
   if(timing){const details=document.createElement('details');details.className='time-notes';details.open=workbenchMode()==='professional';const summary=document.createElement('summary');summary.textContent='出生时刻与换日规则 · '+(lastZh?.temporal.civilDate?fmtLocalDate(lastZh.temporal.civilDate):'');const body=document.createElement('div');body.textContent=timing.textContent;details.append(summary,body);info.after(details);timing.remove();}
   const nav=root.querySelector('#zh-sec-nav');
   const toolbar=root.querySelector('button[onclick="shareCopy()"]')?.parentElement;if(toolbar){
-    toolbar.classList.add('chart-toolbar');const study=document.createElement('button');study.type='button';study.className='btn btn-ghost';study.id='study-open';study.textContent='细读与核验';study.onclick=()=>showStudyWorkspace(serializeChart(lastZh));toolbar.appendChild(study);
+    toolbar.classList.add('chart-toolbar');const study=document.createElement('button');study.type='button';study.className='btn btn-ghost';study.id='study-open';study.textContent='细读与核验';study.onclick=()=>showStudyWorkspace(serializeChart(lastZh),{reading:buildMingGeSummary(lastZh)});toolbar.appendChild(study);
   }
   if(nav){nav.setAttribute('role','tablist');nav.setAttribute('aria-label','命盘内容');nav.querySelectorAll('button').forEach(b=>{b.setAttribute('role','tab');b.setAttribute('aria-selected',String(b.classList.contains('active')));b.addEventListener('click',()=>nav.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected',String(x===b))));});}
   const page=root.querySelector('#zh-sec-1'),first=page?.querySelector('.pillar-grid')?.closest('.section-block');

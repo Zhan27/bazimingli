@@ -116,3 +116,9 @@ body[data-theme=xuanmo] .gz-explorer{--gz-he:#d8b276;--gz-chong:#e0a99b;--gz-san
 .reading-citations q,.reading-citations small,.glossary-results article>a,.glossary-results article>small{display:block}
 .reading-citations small{color:var(--ink3);font-size:.68rem}.reading-citations q{color:var(--ink2)}
 @media(max-width:480px){.mingge-row{grid-template-columns:4.5em minmax(0,1fr);gap:6px}.mingge-summary h3 span{display:inline;font-size:.65rem}.mingge-chips{gap:4px 9px}}
+.mingge-locate{display:inline;font:inherit;color:var(--jade);background:transparent;border:0;border-bottom:1px dotted var(--line);padding:2px 0;text-align:left;white-space:normal;overflow-wrap:anywhere;cursor:pointer}
+.mingge-locate:focus-visible,.mingge-candidate summary:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
+.mingge-candidate{margin:6px 0;border:1px solid var(--line);border-radius:4px;padding:0 8px}.mingge-candidate>summary{padding:7px 0;cursor:pointer;color:var(--ink2)}.mingge-candidate>p{font-size:inherit;color:var(--ink3)}
+.mingge-candidate [data-condition-status=missing]{color:var(--ink2)}.mingge-candidate [data-condition-status=pending]{color:var(--ink3)}
+.study-layer-notes{border-left:2px solid var(--jade);background:var(--card2);padding:8px 10px;margin:10px 0;font-size:.75rem;line-height:1.8}.study-layer-notes p{margin:3px 0}.study-layer-notes a{color:var(--jade)}
+@media(max-width:480px){.mingge-locate{min-height:36px}.mingge-candidate>summary{min-height:44px;display:list-item}.mingge-candidate .mingge-row{grid-template-columns:minmax(0,1fr);gap:2px}}

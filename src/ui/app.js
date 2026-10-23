@@ -3654,6 +3654,7 @@ function renderZongHe(zh,name){
   document.getElementById('zh-result').innerHTML=html;
   aiEvidenceMount();
   mountGanZhiRelations(document.getElementById('zh-result'));
+  mountMingGeInteractions(document.getElementById('zh-result'),zh);
   // 时间轴详情条: 初始显示当前年
   try{ if(typeof tlSelect==='function'&&window._tlData) tlSelect(new Date().getFullYear()); }catch(e){}
 }

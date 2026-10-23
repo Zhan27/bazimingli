@@ -50,11 +50,11 @@ function parseStructuredAi(text,chart,options={}){
   try{return {...validateAiResult(JSON.parse(raw.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'')),chart,options),format:'json'};}
   catch(e){if(options.partial)return {format:'json',pending:true,dimensions:[],errors:[]};return {format:'json',ok:false,dimensions:[],errors:[{type:'EXPRESSION_ERROR',path:'root',message:'JSON未完整结束或格式无效'}]};}
 }
-function aiPromptVersion(schoolId){const p=getRuleProfile(schoolId);return 'evidence-'+p.key+'-1.1.0';}
+function aiPromptVersion(schoolId){const p=getRuleProfile(schoolId);return 'evidence-'+p.key+'-1.2.0';}
 function buildEvidencePrompt(chart,schoolId,{dimensionIds=AI_DIM_CONTRACTS.map(d=>d.id),mode='json'}={}){
   const profile=getRuleProfile(schoolId),facts=aiFacts(chart);
   const system='你是传统文化学习助手。计算事实只读，不得改写四柱或应用评分。每项按结论、盘面事实ID、规则ID、解释、不确定性、竞争解释输出。high表示不确定性高，不是高置信度。未核验的典籍引文只作待核验线索，不可说成已核对原文，不强制古籍原文。不得给命运必然结论、医学诊断、财富金额、学历上下限或看似精确的预测分数。仅输出请求的维度，不重复其余维度。\n流派独立配置：'+JSON.stringify(profile)+'\n本流派Prompt版本：'+aiPromptVersion(schoolId)+'\n流派任务：'+profile.focus+'\n输出维度契约：'+JSON.stringify(AI_DIM_CONTRACTS.filter(d=>dimensionIds.includes(d.id)))+'\n'+(mode==='markdown'?'兼容Markdown：每项以【维度ID】开头，保留全部依据字段。此格式不会被程序宣称完成事实与引用校验。':'仅输出符合此JSON Schema的JSON：'+JSON.stringify(aiOutputSchema()));
-  const user=JSON.stringify({schemaVersion:AI_CONTRACT_VERSION,chartId:chartFactId(chart),pillars:chart.pillars.map(p=>p.text),facts,rules:chart.rules,requestedDimensionIds:dimensionIds,knowledge:searchKnowledge('',profile.key).slice(0,20)});
+  const user=JSON.stringify({schemaVersion:AI_CONTRACT_VERSION,chartId:chartFactId(chart),pillars:chart.pillars.map(p=>p.text),facts,rules:chart.rules,requestedDimensionIds:dimensionIds,knowledgeSelection:{version:KNOWLEDGE_SELECTION_VERSION,meaning:'主题与实体相关性，非来源可信度或成格认定'},knowledge:selectEvidenceKnowledge(chart,profile.id,{dimensionIds})});
   return {system,user,version:aiPromptVersion(schoolId),knowledgeVersion:KNOWLEDGE_VERSION};
 }
 function evaluateAiResponse(text,chart,options={}){

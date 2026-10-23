@@ -1,5 +1,5 @@
 /** Deterministic reading layer. Does not change calendar, strength, use-god, AI or chart schemas. */
-const MING_GE_VERSION='1.0.0';
+const MING_GE_VERSION='1.1.0';
 function buildMingGeSummary(zh){
   assertPillars(zh.pillars);
   const ids=['year','month','day','hour'],labels=['年','月','日','时'],dg=zh.pillars[2][0];
@@ -10,8 +10,20 @@ function buildMingGeSummary(zh){
   const main=ZHI_HIDDEN[zh.pillars[1][1]][0],god=tenGod(dg,main),strength=strengthLabel(zh);
   const month={branch:ZHI[zh.pillars[1][1]],gan:GAN[main],god:SHISHEN_NAME[god],exposed:visible.some(n=>n.gan===main),
     candidates:hidden.filter(n=>n.pillar===1).map(n=>({...n,exposed:visible.some(v=>v.gan===n.gan)}))};
-  const pattern=god<2?'比劫月令':month.god+'提纲',paths=[],obstacles=[];
-  const addPath=(id,title,groups,detail)=>{const evidence=groups.flatMap(pick);if(groups.every(g=>pick(g).length))paths.push({id,title,detail,evidence,state:groups.every(g=>exposed(g).some(n=>n.rooted))?'透干有根':groups.every(g=>exposed(g).length)?'透干待根':'藏干配合'});};
+  const pattern=god<2?'比劫月令':month.god+'提纲',paths=[],candidates=[],obstacles=[];
+  const addPath=(id,title,groups,detail)=>{
+    const evidence=groups.flatMap(pick),checks=groups.flatMap((g,i)=>{
+      const all=pick(g),v=exposed(g),name=g.map(n=>SHISHEN_NAME[n]).join('／');
+      return [{id:id+'.'+i+'.present',title:name+'出现',kind:'required',status:all.length?'met':'missing',evidence:all},
+        {id:id+'.'+i+'.exposed',title:name+'明透',kind:'supporting',status:v.length?'met':'missing',evidence:v},
+        {id:id+'.'+i+'.rooted',title:name+'透干有根',kind:'supporting',status:v.length?(v.some(n=>n.rooted)?'met':'missing'):'pending',evidence:v.filter(n=>n.rooted).flatMap(n=>[n,...hidden.filter(h=>GAN_WX[h.gan]===GAN_WX[n.gan])])}];
+    });
+    checks.push({id:id+'.force',title:'日主承受与制化轻重',kind:'review',status:'pending',evidence:[]});
+    const missing=checks.filter(c=>c.kind==='required'&&c.status==='missing').map(c=>c.title);
+    const candidate={id,title,detail,evidence,checks,missing,blocking:[],school:zh.profile?.key||'combined',sourceIds:['pattern','root','rescue'],ruleVersion:MING_GE_VERSION,
+      state:missing.length?'条件未齐':groups.every(g=>exposed(g).some(n=>n.rooted))?'透干有根':groups.every(g=>exposed(g).length)?'透干待根':'藏干配合'};
+    candidates.push(candidate);if(!missing.length)paths.push(candidate);
+  };
   const addObstacle=(id,title,groups,remedyGroups,detail)=>{
     if(!groups.every(g=>exposed(g).length))return;
     const remedies=remedyGroups.map(g=>{const evidence=pick(g),v=exposed(g);return {gods:g,title:g.map(i=>SHISHEN_NAME[i]).join('／'),evidence,state:v.some(n=>n.rooted)?'透干有根':v.length?'透干待根':evidence.length?'藏干待引':'原局未见'};});
@@ -57,6 +69,7 @@ function buildMingGeSummary(zh){
     }
     if(o.resolution==='救应有根'&&!o.remedies.some(r=>r.state==='透干有根'))o.resolution='救应受牵';
   }
+  for(const p of candidates)p.blocking=obstacles.filter(o=>o.evidence.some(n=>p.evidence.some(e=>e.id===n.id))).map(o=>({id:o.id,title:o.title,state:o.resolution,evidence:o.evidence,counterEvidence:o.remedies.flatMap(r=>r.counterEvidence||[])}));
   const strongPaths=paths.filter(p=>p.state==='透干有根'),pending=obstacles.filter(o=>o.resolution!=='救应有根');
   let state=obstacles.length?(pending.length?'制化待察':'救应线索'):strongPaths.length?'配合有根':paths.length?'配合藏支':'配合待察';
   if(strongPaths.length&&pending.length)state='配合与阻力并见';
@@ -72,9 +85,19 @@ function buildMingGeSummary(zh){
     const points=[{label:'运干'+GAN[d.g],gan:d.g},...ZHI_HIDDEN[d.z].map((gan,i)=>({label:'运支'+ZHI[d.z]+'藏'+GAN[gan]+(i===0?'（本气）':''),gan}))];
     const matching=points.filter(p=>GAN_WX[p.gan]===zh.yongShen);
     const triggered=obstacles.flatMap(o=>o.remedies.filter(r=>r.state!=='透干有根'&&points.some(p=>r.gods.includes(tenGod(dg,p.gan)))).map(r=>o.title+'：见'+r.title));
-    return {index,text:GAN[d.g]+ZHI[d.z],age:d.age,endAge:d.endAge,matching:matching.map(p=>p.label),triggered:[...new Set(triggered)]};
+    const events=mingGeLayerEvents(dg,obstacles,d.g,d.z,'dayun');
+    return {index,text:GAN[d.g]+ZHI[d.z],age:d.age,endAge:d.endAge,startYear:zh.date.getFullYear()+d.age,endYear:zh.date.getFullYear()+d.endAge,matching:matching.map(p=>p.label),triggered:[...new Set(triggered)],events};
   }).filter(d=>d.matching.length||d.triggered.length);
   const headline=GAN[dg]+WUXING[GAN_WX[dg]]+'日主，'+strength+'；'+month.branch+'月'+month.god+'提纲，'+(month.exposed?'本气透干':'本气藏支')+'。'+focus;
-  return {version:MING_GE_VERSION,pattern,month,strength,state,headline,focus,visible,hidden,roots,paths,obstacles,relations:relations.map(r=>({name:r.name,positions:r.members.map(n=>n.pillar+n.char)})),useGod,transits,
+  return {version:MING_GE_VERSION,pattern,month,strength,state,headline,focus,visible,hidden,roots,paths,candidates,obstacles,relations:relations.map(r=>({name:r.name,positions:r.members.map(n=>n.pillar+n.char)})),useGod,transits,
     sources:['pattern','rescue','climate','root']};
+}
+function mingGeLayerEvents(dayGan,obstacles,gan,zhi,layer){
+  const label=layer==='annual'?'年':'运',points=[{label:label+'干'+GAN[gan],gan},...ZHI_HIDDEN[zhi].map((g,i)=>({label:label+'支'+ZHI[zhi]+'藏'+GAN[g]+(i===0?'（本气）':''),gan:g}))];
+  const events=[];
+  for(const o of obstacles)for(const r of o.remedies){
+    if(r.state==='透干有根')continue;
+    for(const p of points)if(r.gods.includes(tenGod(dayGan,p.gan)))events.push({layer,participant:p.label,god:SHISHEN_NAME[tenGod(dayGan,p.gan)],target:o.title,natalState:r.state,evidence:r.evidence,sourceIds:['rescue']});
+  }
+  return events;
 }

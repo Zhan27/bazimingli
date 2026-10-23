@@ -1,4 +1,4 @@
-const KNOWLEDGE_VERSION='1.1.0';
+const KNOWLEDGE_VERSION='1.2.0';
 const KNOWLEDGE_ENTRIES=freezeRules([
   {id:'rule.hidden-stems',title:'地支藏干表',book:'应用规则表',chapter:'src/bazi/data.js',original:null,explanation:'按锁定藏干表列出本中余气。',schools:['all'],status:'implementation-verified',source:'tests/calculation-rules.test.cjs'},
   {id:'rule.branch-relations',title:'地支合冲关系',book:'应用规则表',chapter:'src/api/chart.js',original:null,explanation:'六合与六冲关系，解释效果未校准。',schools:['all'],status:'implementation-verified',source:'tests/api.test.cjs'},

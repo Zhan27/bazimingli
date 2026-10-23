@@ -3,7 +3,7 @@ function studyDownload(data,name){
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');
   link.href=url;link.download=name;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-function showStudyWorkspace(chart){
+function showStudyWorkspace(chart,{periodIndex,reading}={}){
   if(document.querySelector('.study-workspace-overlay'))return;
   const facts=chartStudyFacts(chart),previous=document.activeElement,overlay=document.createElement('div'),card=document.createElement('div');
   overlay.className='workspace-dialog study-workspace-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-labelledby','study-title');card.className='workspace-dialog-card study-workspace-card';overlay.appendChild(card);
@@ -31,9 +31,19 @@ function showStudyWorkspace(chart){
   facts.dayun.periods.forEach(p=>{const option=el('option',p.text+' · '+p.startAge+'—'+p.endAge+'岁');option.value=String(p.index);select.appendChild(option);});
   const selectLabel=el('label','大运 ');selectLabel.htmlFor=select.id;selectLabel.appendChild(select);
   timeline.append(el('p',(facts.dayun.forward?'顺行':'逆行')+' · '+facts.dayun.startYears+'年'+facts.dayun.startMonths+'个月起运。年龄沿用本盘时间轴口径：流年公历年减有效出生公历年。','study-note-line'),selectLabel);
-  const years=el('div',undefined,'study-years'),monthHeading=el('h3'),monthNote=el('p','流年干支指该年立春后年柱。以下为立春至下一立春的12个节月；北京时间，含起点、不含终点。','study-note-line'),monthList=el('div',undefined,'study-months');timeline.append(years,monthHeading,monthNote,monthList);
+  const years=el('div',undefined,'study-years'),layerNotes=el('div',undefined,'study-layer-notes'),monthHeading=el('h3'),monthNote=el('p','流年干支指该年立春后年柱。以下为立春至下一立春的12个节月；北京时间，含起点、不含终点。','study-note-line'),monthList=el('div',undefined,'study-months');layerNotes.hidden=!reading;timeline.append(years,layerNotes,monthHeading,monthNote,monthList);
   const renderMonths=year=>{
     monthHeading.textContent=year+'年 · 节气流月';monthList.replaceChildren();
+    if(reading){
+      layerNotes.replaceChildren();const p=facts.dayun.periods[Number(select.value)],d=chart.dayun.dyList[p.index],[g,z]=indexToGZ(year-4);
+      layerNotes.append(el('p','原局 · '+reading.pattern+'，'+reading.state));
+      for(const [layer,title,gan,zhi] of [['dayun','大运 '+p.text,d.g,d.z],['annual','流年 '+year+' '+GAN[g]+ZHI[z],g,z]]){
+        const events=mingGeLayerEvents(chart.pillars[2].ganIndex,reading.obstacles,gan,zhi,layer);
+        const text=events.length?events.map(e=>e.participant+'（'+e.god+'）→ '+e.target+'；原局'+e.natalState).join('；'):'本层未筛到提纲关节所需的救应字';
+        layerNotes.append(el('p',title+' · '+text));
+      }
+      const source=el('a','制化与救应出处 ↗');source.href=READING_SOURCES.rescue.url;source.target='_blank';source.rel='noopener noreferrer';layerNotes.appendChild(source);
+    }
     years.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.studyYear===String(year))));
     try{
       const months=chartStudyMonths(chart,year).months;
@@ -45,7 +55,7 @@ function showStudyWorkspace(chart){
     p.years.forEach(y=>{const button=el('button');button.type='button';button.dataset.studyYear=String(y.year);button.setAttribute('aria-label',y.year+'年 '+y.text+' '+y.age+'岁');button.append(el('span',y.year+' · '+y.age+'岁'),el('b',y.text),el('small',y.tenGod+' / '+y.nayin));button.onclick=()=>renderMonths(y.year);years.appendChild(button);});
     renderMonths(p.years.find(y=>y.year===beijingNow().getFullYear())?.year||p.years[0].year);
   };
-  select.value=String(facts.dayun.periods.find(p=>p.years.some(y=>y.year===beijingNow().getFullYear()))?.index||0);select.onchange=renderYears;renderYears();
+  select.value=String(facts.dayun.periods.some(p=>p.index===periodIndex)?periodIndex:facts.dayun.periods.find(p=>p.years.some(y=>y.year===beijingNow().getFullYear()))?.index||0);select.onchange=renderYears;renderYears();
   const compare=find('panel-compare');compare.innerHTML='<p class="study-note-line">选择已保存的对照JSON，在当前设备比较。文件不会上传，也不会写入排盘记录。两边都不是自动认定的标准答案。</p><label class="study-file-label">导入对照JSON<input type="file" id="study-reference-file" accept=".json,application/json"></label><p id="study-compare-status" role="status" aria-live="polite">支持本项目数据/学习快照、四柱数组及已保存的命名四柱响应；最多2MB。</p><div id="study-comparison-result"></div><button type="button" class="btn btn-ghost" id="study-report-export" disabled>导出对照报告</button>';
   let report=null,readId=0;
   const showReport=()=>{
@@ -71,5 +81,5 @@ function showStudyWorkspace(chart){
     if(event.key==='Escape'){event.preventDefault();event.stopPropagation();close();}
     if(event.key==='Tab'){const controls=[...card.querySelectorAll('button,input,select,textarea,a[href]')].filter(x=>!x.disabled&&x.tabIndex>=0&&x.getClientRects().length),first=controls[0],last=controls.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   };
-  document.body.appendChild(overlay);tabs[0].focus();
+  document.body.appendChild(overlay);if(periodIndex!==undefined){tabs[1].click();tabs[1].focus();}else tabs[0].focus();
 }

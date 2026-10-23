@@ -1,0 +1,33 @@
+const {test,expect}=require('@playwright/test');
+const fs=require('node:fs');
+for(const width of [1440,1024,390,320])test(`condition drill-down, pillar focus and layered transit at ${width}px`,async({page})=>{
+  await page.setViewportSize({width,height:900});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.addInitScript(()=>localStorage.setItem('mingli_view_mode','professional'));
+  await page.goto('/');await page.locator('#workspace-example').click();
+  await expect(page.locator('.compact-chart-name')).toHaveText('学习示例');
+  // Re-render twice to catch stale delegated listeners that point at an earlier chart.
+  await page.evaluate(()=>{document.getElementById('zh-solar').value='1989-01-15';document.getElementById('zh-time').value='12:00';zhCast();});
+  await expect.poll(()=>page.evaluate(()=>serializeChart(lastZh).input.date)).toBe('1989-01-15');
+  const before=await page.evaluate(()=>({chart:JSON.stringify(serializeChart(lastZh)),records:localStorage.getItem('ml_records')}));
+  const summary=page.locator('.mingge-summary');await summary.locator('.mingge-evidence>summary').click();
+  const candidate=summary.locator('.mingge-candidate').first();await candidate.locator('summary').click();
+  await expect(candidate).toContainText('必要条件');await expect(candidate).toContainText('力量复核');await expect(candidate.locator('[data-condition-status=pending]')).not.toHaveCount(0);
+  const locate=candidate.locator('[data-mingge-node]').first(),node=await locate.getAttribute('data-mingge-node');await locate.click();
+  await expect(page.locator(`[data-gz-node="${node}"]`)).toHaveAttribute('aria-pressed','true');
+  expect(await page.locator('.gz-pillar b').allTextContents()).toEqual(['戊','乙','乙','壬','辰','丑','亥','午']);
+  await page.keyboard.press('Escape');await expect(locate).toBeFocused();
+  await summary.locator('.mingge-transits>summary').click();const period=summary.locator('[data-mingge-period]').first(),index=await period.getAttribute('data-mingge-period');await period.click();
+  await expect(page.locator('#study-tab-timeline')).toHaveAttribute('aria-selected','true');await expect(page.locator('#study-period')).toHaveValue(index);
+  await expect(page.locator('.study-layer-notes')).toContainText('原局');await expect(page.locator('.study-layer-notes')).toContainText('大运');await expect(page.locator('.study-layer-notes')).toContainText('流年');
+  await expect(page.locator('.study-layer-notes')).toContainText('→ 比劫与财并透');
+  const firstText=await page.locator('.study-layer-notes').innerText();await page.locator('.study-years button').nth(1).click();expect(await page.locator('.study-layer-notes').innerText()).not.toBe(firstText);
+  await expect(page.locator('.study-layer-notes a')).toHaveAttribute('href',/^https:/);
+  await expect(page.locator('.ui-toast')).toHaveCount(0);await page.locator('.study-layer-notes').scrollIntoViewIfNeeded();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+  fs.mkdirSync('verification/screenshots',{recursive:true});await page.screenshot({path:`verification/screenshots/layered-transit-${width}.png`});
+  await page.keyboard.press('Escape');await expect(period).toBeFocused();
+  if(width===320)await page.evaluate(()=>setTheme('xuanmo'));
+  await expect(page.locator('.ui-toast')).toHaveCount(0);await candidate.scrollIntoViewIfNeeded();await page.screenshot({path:`verification/screenshots/conditions-${width}.png`});
+  expect(await page.evaluate(()=>({chart:JSON.stringify(serializeChart(lastZh)),records:localStorage.getItem('ml_records')}))).toEqual(before);
+  expect(errors).toEqual([]);
+});

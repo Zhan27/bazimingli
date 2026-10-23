@@ -3,6 +3,9 @@
 ## 5.26.0 — 2026-10-23
 - Corrected Ziwei Chang/Qu placement and derived EnGuang/TianGui, HongLuan/TianXi's one-palace offset, and the complete BoShi sequence starting from LuCun. Added twelve-hour/year-branch and both-gender/year-stem regressions against classical starting rules.
 - Fixed annual SiHua to use the named TaiSui year. Added optional `referenceDate` for observations that change at lunar New Year; displayed the actual annual year/stem and linked the classical source. Ziwei rules are independently versioned5.26.0; existing Bazi rules5.20.0, chart IDs and compatible drafts remain unchanged.
+- Added compact, expandable candidate-condition checks: necessary presence, exposed/rooted support, missing conditions, pending strength review and accompanying obstacles. Evidence buttons locate the exact pillar in the existing eight-character relationship workspace.
+- Layered natal, DaYun and selected annual observations in the existing study dialog, with concrete triggering stems/hidden stems, retained natal remedy status, age/year ranges and a source link. Switching periods or years leaves the natal chart unchanged.
+- Replaced identical first20 knowledge items with bounded, deterministic topic/school/chart-aware selection, topic coverage, actual fact references and selection reasons. Knowledge1.2.0/evidence prompts1.2.0 retain output contract1.0.0 and restore old draft metadata; source verification status is preserved. No school template, provider settings, record format, framework or dependency was replaced.
 
 ## 5.25.0 — 2026-10-23
 - Replaced score-tier-as-pattern summaries with a shared, deterministic month-premise reading model: distinct pattern paths, pillar evidence, exposed/hidden/rooted remedies, counterforces, separate climate and balance references, and natal versus transit observations. Overview, pattern detail, closing synthesis and PNG premise use the same model.
