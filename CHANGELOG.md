@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.27.0 — 2026-10-23
+- Corrected Liuyao to three independent coins (1:3:3:1), bottom-up six spirits, explicit month/day/xun-void facts and traditional Meihua year-branch/month/day/hour numbers. Preserved manual sequences and an explicit legacy-number mode; old histories replay in that mode. Added per-line natal/changed NaJia and kinship drill-down, preserving natal-palace kinship.
+- Corrected Hehun six-harm/union/peach-blossom tables and symmetric use-god constraints. All current-period/window observations share the chosen reference year. Added specific cross-pillar relations, compact expandable scoring ledger/deep readings and a keyboard-accessible paired relation workspace.
+- Added paired-input history, exact rule/time-option replay, notes and unified management. Full backups with paired data use v7; selected paired backups use v7-selection. Existing v4/v5/v6-selection data remains compatible; nested fields are sanitized, merges are bounded and multi-store failures roll back.
+- Corrected Qimen FuTou yuan, hidden-Jia旬首 origin, eight-palace star/door rotations, independent star/door destinations and center-carried stems. The engine/API now owns the full plate; click palaces for computed facts and derivation. Renamed the old approximate day-cycle division honestly; a full historical intercalation method is not implemented.
+- Reused month-premise synthesis/condition/evidence and Gan-Zhi interactions in the standalone Bazi page. Added PNG field choices and wrapped export text while preserving the default export. Kept single-HTML delivery, core Bazi rules5.20.0, chart identities, school prompts, provider settings and dependencies; changed modules carry their own rules5.27.0.
+- Added classical numerical examples, 4096 coin sequences, all144 pair relations, FuTou/rotation fixtures, nested paired backups and actual desktop/mobile/dark interaction regressions. See docs/MODULE-RULES.md for exact sources and limits.
+
 ## 5.26.0 — 2026-10-23
 - Corrected Ziwei Chang/Qu placement and derived EnGuang/TianGui, HongLuan/TianXi's one-palace offset, and the complete BoShi sequence starting from LuCun. Added twelve-hour/year-branch and both-gender/year-stem regressions against classical starting rules.
 - Fixed annual SiHua to use the named TaiSui year. Added optional `referenceDate` for observations that change at lunar New Year; displayed the actual annual year/stem and linked the classical source. Ziwei rules are independently versioned5.26.0; existing Bazi rules5.20.0, chart IDs and compatible drafts remain unchanged.

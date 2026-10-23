@@ -33,3 +33,12 @@ Errors use TypeError/RangeError with explanations. Supported Gregorian range rem
 `chartStudyFacts(chart)` returns detailed pillars, natal day-xun void flags, position-aware relations and eight DaYun periods with ten annual entries each. `chartStudyMonths(chart, year)` returns twelve Jie-month intervals with exact Beijing clock boundaries for1900..2099, including the final interval ending at next year's LiChun. These views do not change the original chart JSON or AI identity. Main qi is marked; secondary qi categories/weights are not inferred from array order.
 
 `createStudySnapshot(chart)` wraps the original chart and study facts as `format: 'bazimingli-study', formatVersion: 1`. `compareReferenceChart(chart, savedJSON)` compares supported provided fields, keeps missing fields and spelling-alias markers, and discloses unspecified clock conventions and unequal DaYun coverage. It performs no network requests. See [reference materials and comparison limits](REFERENCE-MATERIALS.md) for CLI usage, supported shapes and the single supplied sample's bounded result.
+
+
+## Module rules5.27.0
+
+`calculateModule('liuyao', {date,time,mode,numStr,yaoSeq,ruleMode,options:{dayBoundary}})` accepts `ruleMode:'standard'|'legacy'` (default standard). Coins are explicitly supplied six counts0..3, from bottom to top; random tossing belongs to the UI. `result.lines` contains natal/changed stems, branches, kinship, movement, spirits and void/month-opposition flags; all kinship uses the natal palace. Exact time overrides hourIdx.
+
+`calculateModule('qimen', {date,time,school:1,options:{dayBoundary}})` returns all nine `palaces`, ground/heaven stems, carried stems, stars, doors, spirits,旬首 origin and separate star/door destinations. Uses Beijing civil clock fields; school0 retains only the old approximate day-cycle yuan division, not a full historical intercalation method. Both modules default to23:00 day turnover and disclose their own rules version.
+
+`comparePair(leftInput,rightInput,referenceYear)` uses the supplied year (1900..2099; default Beijing current year) for all current DaYun and window observations. `comparison.ledger` lists base60 plus every included adjustment, raw total and clamp30..95. Deep observations are not additional score items; `relations` locates exact columns on both charts. Input schemas, existing core Bazi rule5.20.0 and AI identities remain unchanged. See [rule audit](MODULE-RULES.md).

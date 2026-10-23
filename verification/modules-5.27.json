@@ -1,0 +1,66 @@
+{
+  "applicationVersion": "5.27.0",
+  "rules": {
+    "bazi": "5.20.0",
+    "ziwei": "5.26.0",
+    "liuyao": "5.27.0",
+    "qimen": "5.27.0",
+    "hehun": "5.27.0"
+  },
+  "localVerification": {
+    "node": {
+      "passed": 99,
+      "failed": 0
+    },
+    "desktopLauncher": {
+      "passed": 5,
+      "failed": 0
+    },
+    "fullBrowserBeforeFinalPairValidation": {
+      "passed": 59,
+      "failed": 0,
+      "skipped": 0,
+      "flaky": 0
+    },
+    "finalAffectedBrowser": {
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0,
+      "flaky": 0
+    },
+    "scopeNote": "Full59-case browser suite passed, then the final paired-input guard/custom-offset changes and an additional error-state case were checked with all17 app/module tests on the final HTML. Release CI repeats all60 browser cases at the tag.",
+    "frozenBazi": {
+      "passed": 12,
+      "failed": 0
+    },
+    "additionalSymmetrySamples": {
+      "passed": 24,
+      "failed": 0
+    },
+    "lint": {
+      "errors": 0,
+      "existingWarnings": 34,
+      "newWarnings": 0
+    },
+    "viewports": [
+      1440,
+      1024,
+      390,
+      320
+    ],
+    "darkTheme": true
+  },
+  "html": {
+    "bytes": 1814906,
+    "sha256": "b8d29b6f59ca00d2ad7402762bce9dd4a35691a6649e4ff1e83439f0d433c3e0",
+    "docsIdentical": true
+  },
+  "sources": "docs/MODULE-RULES.md",
+  "noNewDependencies": true,
+  "noLiveModelCalls": true,
+  "limits": [
+    "Legacy Qimen day-cycle division is labelled approximate; full historical intercalation is not implemented.",
+    "Published-rule and software regressions do not calibrate predictive accuracy.",
+    "Native desktop self-test covers embedded HTML and loopback lifecycle, not all WebView2 variants."
+  ]
+}

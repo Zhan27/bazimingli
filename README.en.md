@@ -8,6 +8,8 @@ The interface is currently Chinese. This guide explains the main workflow and in
 
 The chart toolbar's “细读与核验” opens detailed pillar facts, DaYun/annual drill-down and twelve exact Jie-month intervals in Beijing time. Import a saved JSON reference for comparison entirely on the current device, or export a versioned learning snapshot. Files may contain birth details; no API settings are included. Missing fields and unspecified conventions remain visible, and another implementation is not treated as an authoritative oracle. See [reference formats and limitations](docs/REFERENCE-MATERIALS.md).
 
+Liuyao lines and Qimen palaces open detailed computed views; Hehun compares specific columns on both charts and stores the reference year. The Bazi page shares the synthesis/evidence view. PNG exports offer optional fields. See [module rule sources and limits](docs/MODULE-RULES.md).
+
 ## Run it
 
 - Online: open the workbench above.
@@ -44,7 +46,7 @@ Choosing an unknown birth time displays candidate intervals and stable/changing 
 
 ## Privacy, records and optional AI
 
-The footer's **统一记录管理** opens one manager for the five existing stores (main Bazi, the Bazi module, Ziwei, Qimen and Liuyao). Search, category filters, sorting and notes are available. Selected backups use `v6-selection` and merge into the corresponding stores, preserving unselected IDs; older versions reject that format. Full v4/v5 backups retain replacement semantics for included categories. AI cards support collapse/copy/single-card JSON export. See [record/backup semantics](docs/RECORDS.md).
+The footer's **统一记录管理** opens one manager for six local stores (main Bazi, the Bazi module, Ziwei, Qimen, Liuyao and paired Hehun inputs). Search, category filters, sorting and notes are available. Selected backups use `v6-selection` for the original modules, or `v7-selection` when paired inputs are included, and merge by category/ID. Full exports containing paired inputs use `v7` (requires5.27+); old v4/v5 backups keep replacement semantics for included categories. AI cards support collapse/copy/single-card JSON export. See [record/backup semantics](docs/RECORDS.md).
 
 Calculations run on your device. Online hosting still receives normal webpage access information. The project has no added analytics or automatic chart upload feature. Names, birth dates, locations and saved records may be personal information; avoid real names when unnecessary.
 

@@ -15,6 +15,8 @@ Global declarations are intentionally assembled in manifest order into one scrip
 
 ## Validation
 
-`npm test` checks original and new pure APIs; `npm run test:e2e` checks actual controls and all six chart modules. `npm run lint` rejects undefined references, unreachable code and new unused-variable warnings. Forty existing unused local-variable warnings are recorded in `tests/fixtures/lint-baseline.json` and the full report; they are not presented as a clean lint suite. Changing the baseline requires an explicit review, not automatic CI acceptance.
+`npm test` checks original and new pure APIs; `npm run test:e2e` checks actual controls and all six chart modules. `npm run lint` rejects undefined references, unreachable code and new unused-variable warnings. Historical unused local-variable warnings are recorded in `tests/fixtures/lint-baseline.json`; `verification/lint.json` reports the current count; they are not presented as a clean lint suite. Changing the baseline requires an explicit review, not automatic CI acceptance.
 
 Frozen historical chart expectations are retained in `tests/fixtures/`. Reports identify independent reference comparisons, internal consistency, software regression and synthetic model fixtures separately. Actual model calls require an operator's endpoint/key; no live model quality result is inferred from fixtures.
+
+Module rules have independent versions: Ziwei5.26.0, Qimen/Liuyao/Hehun5.27.0 and core Bazi5.20.0. The comprehensive view delegates Qimen/Liuyao to their engines rather than rebuilding plates in presentation. `ui/module-workspaces.js` only reads engine facts and manages accessible drill-down views. Paired storage validates/whitelists nested birth inputs independently of UI fields.
