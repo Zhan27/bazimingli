@@ -1,0 +1,44 @@
+{
+  "applicationVersion": "5.28.0",
+  "scope": [
+    "Removed both five-axis radar visualizations",
+    "Shared compact Ziwei reading and expanded palace evidence",
+    "Empty/opposite palace distinction and unchanged star/transform locations",
+    "Natal/annual transformations separated",
+    "Fixed minor-star overview palace labels"
+  ],
+  "readingVersion": "1.0.0",
+  "placementRules": "5.26.0",
+  "baziRules": "5.20.0",
+  "tests": {
+    "node": 102,
+    "desktop": 5,
+    "browser": 64,
+    "total": 171,
+    "failures": 0,
+    "skipped": 0,
+    "retried": 0,
+    "frozenBazi": 12
+  },
+  "lint": {
+    "errors": 0,
+    "existingWarnings": 34,
+    "newWarnings": 0
+  },
+  "viewports": [
+    1440,
+    1024,
+    390,
+    320
+  ],
+  "darkTheme": true,
+  "html": {
+    "bytes": 1815883,
+    "sha256": "1bb44710dacd177dddc4a426cb3a8db0635ffe4b0419d8d48c4e16fbb2acc904",
+    "docsIdentical": true
+  },
+  "sources": "docs/MODULE-RULES.md#紫微提要528",
+  "noNewDependencies": true,
+  "noLiveModelCalls": true,
+  "scopeNote": "Themes are application interpretation of named classical star discussions; tests verify placements, evidence wiring and UI behavior, not life-event predictions."
+}

@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.28.0 — 2026-10-24
+- Removed the five-group energy radar and the similar radar inside the optional legacy-score demonstration. Kept other computed facts, text, existing scores and exports.
+- Added a compact, shared Ziwei reading: actual life/body palaces, wealth/career and relationship/fortune themes, resident versus opposite-palace references, same-palace helpers/tensions, four-palace evidence and separately labelled natal/annual transformations. References point to the Complete Book volumes1/3; star-to-life wording is application interpretation.
+- Both the standalone Ziwei page and optional Bazi reference use the same reading model; the local fallback includes its concrete palace evidence. Local Ziwei guidance now asks for placement-based statements and qualified combination names, replacing forced cross-system confirmation/coverage. Five school templates and AI output contracts remain intact.
+- Fixed missing palace labels in the standalone minor-star overview. Placement algorithms/rules5.26.0, Bazi rules5.20.0, storage and configuration are unchanged. Added empty-palace/transform-position/immutability tests and four-width/dark browser checks.
+
 ## 5.27.0 — 2026-10-23
 - Corrected Liuyao to three independent coins (1:3:3:1), bottom-up six spirits, explicit month/day/xun-void facts and traditional Meihua year-branch/month/day/hour numbers. Preserved manual sequences and an explicit legacy-number mode; old histories replay in that mode. Added per-line natal/changed NaJia and kinship drill-down, preserving natal-palace kinship.
 - Corrected Hehun six-harm/union/peach-blossom tables and symmetric use-god constraints. All current-period/window observations share the chosen reference year. Added specific cross-pillar relations, compact expandable scoring ledger/deep readings and a keyboard-accessible paired relation workspace.
