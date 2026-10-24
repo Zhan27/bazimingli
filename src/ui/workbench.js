@@ -66,7 +66,7 @@ function enhanceWorkbenchChart(){
   const rules=root.querySelector('[data-calculation-basis]');
   if(rules&&first){const details=document.createElement('details');details.className='reference-disclosure rules-disclosure';details.open=workbenchMode()==='professional';const summary=document.createElement('summary');summary.textContent='计算规则与五行统计 · '+(lastZh?.strengthType||'核对依据');details.append(summary,rules);first.after(details);}
   const gsg=root.querySelector('#zh-gsg');if(gsg){const d=document.createElement('details');d.className='reference-disclosure';const summary=document.createElement('summary');summary.textContent='断前事参考与时辰核对';gsg.before(d);d.append(summary,gsg);}
-  if(page){for(const block of page.children){if(block.classList.contains('section-block')&&block!==first&&/命格总断|五维能量雷达|紫微斗数参考/.test(block.querySelector('h3')?.textContent||''))block.classList.add('reader-extra');}}
+  if(page){for(const block of page.children){if(block.classList.contains('section-block')&&block!==first&&/命格总断|紫微斗数参考/.test(block.querySelector('h3')?.textContent||''))block.classList.add('reader-extra');}}
   const reader=document.createElement('div');reader.className='reader-mode';reader.append('阅读视图');for(const [value,label] of [['study','学习'],['professional','专业']]){const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.readerMode=value;b.setAttribute('aria-pressed',String(workbenchMode()===value));b.addEventListener('click',()=>setWorkbenchMode(value));reader.appendChild(b);}if(nav)nav.before(reader);
   if(page){const note=document.createElement('p');note.className='study-note';note.textContent='查阅十神、五行与干支关系，结合月令和大运继续研读。';first?.appendChild(note);}
   compactWorkbenchChart(root,first);

@@ -460,6 +460,7 @@ function renderZW(d){
   html+=`<span>身主：<b>${d.shenZhuStar}</b></span>`;
   html+=`<span>大限：<b>${d.daLim.forward?'顺行':'逆行'}（${d.ju}岁起运）</b></span>`;
   html+=`<span>长生：<b>${d.cs12.forward?'顺行':'逆行'}</b></span></div>`;
+  html+=renderZiweiReading(buildZiweiReading(d));
   // 宫位映射: 地支->宫名
   const zhiToGong={};
   palaceOrder.forEach((g,i)=>{ zhiToGong[gongPos[i]]=g; });
@@ -612,7 +613,7 @@ function renderZW(d){
     ['喜神',ZHI[d.xiShen2]],['伏兵',ZHI[d.fuBing]],['官府',ZHI[d.guanFu2]],['飞廉',ZHI[d.feiLian2]]
   ];
   allStars.forEach(([n,z])=>{
-    const gong=zhiToGong[z]||"";
+    const gong=zhiToGong[ZHI.indexOf(z)]||"";
     html+=`<div class="desc-item"><div class="k">${n}</div><div class="v">${z}·${gong}</div></div>`;
   });
   html+=`</div></div>`;
@@ -1663,22 +1664,6 @@ function zhDingDangHtml(zh){
   html+=item('人生上限',d.lifeHigh,'喜用运全走之顶','');
   html+=item('学历潜力',d.xueQuan,'印星·文昌·官印',bar(d.xueNeng,'var(--red)'),'var(--red)');
   html+='</div>';
-  // 量化雷达图(SVG五维)
-  const radarVal={
-    ge:Math.round(d.score/100*100), cai:Math.round(d.caiNeng/100*100), xue:Math.round(d.xueNeng/100*100),
-    ren:({上乘:95,中上:78,中平:60,平顺:45,多劳:30}[d.lifeHigh]||60),
-    dy:Math.round((d.dyScores||[50]).reduce((a,b)=>a+b,0)/(d.dyScores||[50]).length)
-  };
-  const rv=[radarVal.ge,radarVal.cai,radarVal.xue,radarVal.ren,radarVal.dy];
-  const labels=['格局','财富','学历','人生上限','大运'];
-  const cw=240,chh=190,cx=cw/2,cy=chh/2-8,rad=68;
-  const ang=i=>-Math.PI/2+i*2*Math.PI/5;
-  const pxy=(i,r)=>[cx+r*Math.cos(ang(i)),cy+r*Math.sin(ang(i))];
-  const grid=Array.from({length:4},(_,k)=>{const r=rad*(k+1)/4;return Array.from({length:5},(_,i)=>pxy(i,r).map(v=>v.toFixed(1)).join(',')).join(' ');}).map(g=>`<polygon points="${g}" fill="none" stroke="var(--line)" stroke-width=".8"/>`).join('');
-  const dataPts=rv.map((v,i)=>pxy(i,rad*v/100).map(x=>x.toFixed(1)).join(',')).join(' ');
-  const rl=labels.map((l,i)=>{const [x,y]=pxy(i,rad+14);return `<text x="${x.toFixed(1)}" y="${(y+3).toFixed(1)}" text-anchor="middle" font-size="9.5" fill="var(--ink2)">${l}</text>`;}).join('');
-  const rvTxt=rv.map((v,i)=>{const [x,y]=pxy(i,rad*v/100);return `<text x="${x.toFixed(1)}" y="${(y+3).toFixed(1)}" text-anchor="middle" font-size="9" fill="var(--gold)" font-weight="bold">${v}</text>`;}).join('');
-  html+=`<div style="background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:10px"><div style="font-size:.8rem;color:var(--gold);margin-bottom:2px">📊 命局五维量化</div><svg viewBox="0 0 ${cw} ${chh}" style="width:100%;max-width:280px;display:block;margin:4px auto 0">${grid}<polygon points="${dataPts}" fill="rgba(176,138,62,.18)" stroke="var(--gold)" stroke-width="1.5"/>${rl}${rvTxt}</svg><div style="text-align:center;font-size:.66rem;color:var(--ink3);margin-top:2px">五项量化值(0-100) · 命理潜力区间</div></div>`;
   // 评分依据弹窗按钮(用dataset安全传参,避免onclick属性嵌套反引号模板字符串导致HTML解析断裂)
   const basisHtml=(d.basis||[]).map(b=>`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed var(--line);font-size:.74rem"><span style="color:var(--ink2)">${b.k}</span><b style="color:var(--gold)">${b.v>0?'+':''}${b.v}</b></div>`).join('');
   html+=`<div style="text-align:right;margin-top:8px"><button type="button" class="btn btn-ghost basis-btn" data-basis="${encodeURIComponent(basisHtml)}" data-total="${d.score}" style="font-size:.7rem;padding:4px 10px">🧮 评分依据</button></div>`;
@@ -2729,39 +2714,24 @@ const AI_DIM_NAMES=['旺衰平衡','子平格局','穷通调候','盲派做功',
 /* 按流派生成角色与 dimGuide(18 维解读侧重),返回{role,dimGuide} */
 
 /* 紫微斗数参考摘要(综合排盘勾选"参考紫微斗数"时自动排盘并写入 AI 提示词) */
-function zhZwRefText(zh){
-  if(!zh||!zh.stars) return '';
-  const el=document.getElementById('zh-zw-ref');
-  if(el&&!el.checked) return '';
-  const juNames=['','','水二','木三','金四','土五','火六']; // 索引=局数(2水二~6火六)
-  const hua=['禄','权','科','忌'];
-  const mainNames={ziwei:'紫微',tianji:'天机',taiyang:'太阳',wuqu:'武曲',tiantong:'天同',lianzhen:'廉贞',tianfu:'天府',taiyin:'太阴',tanlang:'贪狼',jumen:'巨门',tianxiang:'天相',tianliang:'天梁',qisha:'七杀',pojun:'破军'};
-  const s=[];
-  s.push('【紫微斗数参考】');
-  const mingMain=zh.mingStars&&zh.mingStars.length?('，坐'+zh.mingStars.map(k=>mainNames[k]||k).join('、')):'（空宫）';
-  s.push('五行局：'+(juNames[zh.ju]||(zh.ju+'局'))+'；命宫：'+GAN[zh.mgGan]+ZHI[zh.mingGong]+mingMain+'；身宫：'+ZHI[zh.shenGong]);
-  const dist=Object.keys(zh.stars).map(k=>(mainNames[k]||k)+'在'+ZHI[zh.stars[k]]+'宫');
-  s.push('十四主星：'+dist.join('、'));
-  if(zh.siHua&&zh.siHua.length) s.push('生年四化：'+zh.siHua.map((x,i)=>x+'化'+hua[i]).join('、'));
-  if(zh.daLim) s.push('大限：'+(zh.daLim.forward?'阳男阴女顺行':'阴男阳女逆行')+'，'+zh.daLim.startAge+'岁起运，每宫十年');
-  return s.join('\n');
+function zhZiweiReading(zh){
+  return buildZiweiReading(calculateZiwei({date:zh.date,hourIdx:zh.hourIdx,gender:zh.gender,referenceYear:beijingNow().getFullYear()}));
 }
-/* 紫微互参指引(勾选"参考紫微斗数"时,让AI把紫微作为第二系统交叉验证八字) */
+function zhZwRefText(zh){
+  if(!zh?.stars||document.getElementById('zh-zw-ref')?.checked===false)return '';
+  const reading=zhZiweiReading(zh),dist=Object.keys(zh.stars).map(k=>ZW_STARS[k].name+'在'+ZHI[zh.stars[k]]+'宫');
+  return '【紫微斗数参考】\n五行局：'+['','','水二','木三','金四','土五','火六'][zh.ju]+'局\n'+ziweiReadingText(reading)+'\n十四主星：'+dist.join('、')+'\n大限：'+(zh.daLim.forward?'顺行':'逆行')+'，'+zh.daLim.startAge+'岁起运，每宫十年';
+}
 function zhZwRefGuide(){
-  const el=document.getElementById('zh-zw-ref');
-  if(el&&!el.checked) return '';
+  if(document.getElementById('zh-zw-ref')?.checked===false)return '';
   return [
     '【紫微互参指引】',
-    '请把上方紫微斗数数据作为八字论断的"第二系统"交叉验证，双系统互参互证：',
-    '1) 性格底色：命宫主星（太阳开朗、武曲刚毅、天同随和、贪狼多才、天机善思等）定气质，与日主十神性情互证，异同处点明；',
-    '2) 事业财富：官禄宫、财帛宫主星及生年四化落宫提示成就倾向与财源性质，与八字财官印互参；',
-    '3) 婚姻感情：夫妻宫主星（含煞星/吉星组合）与八字婚姻宫、婚姻十神对照印证；',
-    '4) 行运节奏：紫微大限（每宫十年、顺逆、起运岁）与八字大运对照——两套行运系统同段同吉凶则加重权重，冲突处单独辩证（如八字走财运而紫微大限逢忌，提示财来财去需守）；',
-    '5) 四化焦点：生年禄权科忌四化星=人生发力点，化入何宫提示精力投注方向（化禄入财帛利聚财、化忌入疾厄须顾健康等）；',
-    '6) 身宫追求：身宫主星=后天人生重心与追求方向（命宫先天、身宫后天），与命宫对照看先后天变化；',
-    '7) 特殊格局：留意本盘是否有紫府同宫、杀破狼（七杀·破军·贪狼）、机月同梁、阳梁昌禄、火贪格等组合，有则按格局断语展开；',
-    '8) 命宫四化：命宫主星若带四化（禄权科忌），该星特质被放大或转化，优先引用其变化后的含义。',
-    '要求：至少8个维度明确写"紫微佐证：…"引用具体星曜（如"紫微佐证：命宫太阳庙主性格开朗外向"），紫微解读约占各段篇幅三成；其余维度可简略带过；若两系统结论相佐，如实指出并给倾向性判断。'
+    '先给命身主线，再分财帛官禄、夫妻福德；每个判断引用本盘的宫位、主星、同宫辅煞与四化。',
+    '命宫空宫时，分别写本宫事实、对宫参看及三方星曜，保留原星实际落宫；命身同宫与分宫分别展开。',
+    '生年四化解释本命关注点；流年四化写明所指年份，大限写明宫位与年龄范围，分层叙述。',
+    '先核对同宫、三合、对照的具体位置和会照条件，再使用紫府同宫等组合名称；以实际命盘支持的条件形成断语。',
+    '星性落到处事、职责、资源配置及相处方式，写出优势、牵制与承接路径；对比八字时分别列依据，异同直接说明。',
+    '断语采用“盘面依据 → 主要倾向 → 进一步看点”的短句，不由单星直接推出婚变、疾病或具体财富金额。'
   ].join('\n');
 }
 function aiBuildSchoolPrompt(schoolIdx, mode){
@@ -2996,39 +2966,6 @@ function zhGeJuZhuangTai(zh){
 }
 function zhMingGeCard(zh){
   return '<div class="section-block mingge-summary"><h3>命格总断 <span>先看提纲，再察配合</span></h3>'+mingGeSummaryBody(zh)+'</div>';
-}
-// ② 五维能量雷达: 十神五组(财/官杀/食伤/印/比劫) → SVG 五轴雷达(借鉴命格宇宙量化法: 透干计2、藏干本气计1)
-function zhWuWeiRadar(zh){
-  try{
-    const groups=[{k:'cai',n:'财富',ts:[4,5]},{k:'quan',n:'权力',ts:[6,7]},{k:'caihua',n:'才华',ts:[2,3]},{k:'zhishi',n:'智识',ts:[8,9]},{k:'yizhi',n:'意志',ts:[0,1]}];
-    const gans=[zh.yearGZ[0],zh.monthGZ[0],zh.dayGZ[0],zh.hourGZ[0]];
-    const zhis=[zh.yearGZ[1],zh.monthGZ[1],zh.dayGZ[1],zh.hourGZ[1]];
-    const rv=groups.map(g=>{
-      let s=0;
-      gans.forEach(gz=>{ if(g.ts.includes(tenGod(zh.dg,gz))) s+=2; });
-      zhis.forEach(z=>{ const hz=ZHI_HIDDEN[z]&&ZHI_HIDDEN[z][0]; if(hz!==undefined&&g.ts.includes(tenGod(zh.dg,hz))) s+=1; });
-      return Math.max(8,Math.min(100,Math.round(s/12*100)));
-    });
-    const labels=groups.map(g=>g.n);
-    const cw=250,chh=195,cx=cw/2,cy=chh/2-6,rad=70;
-    const ang=i=>-Math.PI/2+i*2*Math.PI/5;
-    const pxy=(i,r)=>[cx+r*Math.cos(ang(i)),cy+r*Math.sin(ang(i))];
-    const grid=Array.from({length:4},(_,k)=>{const r=rad*(k+1)/4;return Array.from({length:5},(_,i)=>pxy(i,r).map(v=>v.toFixed(1)).join(',')).join(' ');}).map(g=>`<polygon points="${g}" fill="none" stroke="var(--line)" stroke-width=".8"/>`).join('');
-    const dataPts=rv.map((v,i)=>pxy(i,rad*v/100).map(x=>x.toFixed(1)).join(',')).join(' ');
-    const rl=labels.map((l,i)=>{const [x,y]=pxy(i,rad+15);return `<text x="${x.toFixed(1)}" y="${(y+3.5).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--ink2)" font-weight="600">${l}</text>`;}).join('');
-    const rvTxt=rv.map((v,i)=>{const [x,y]=pxy(i,rad*v/100);return `<text x="${x.toFixed(1)}" y="${(y+3).toFixed(1)}" text-anchor="middle" font-size="9" fill="var(--gold)" font-weight="bold">${v}</text>`;}).join('');
-    const svg=`<svg viewBox="0 0 ${cw} ${chh}" style="width:250px;max-width:100%">${grid}<polygon points="${dataPts}" fill="rgba(176,138,62,.16)" stroke="var(--gold)" stroke-width="1.6" stroke-linejoin="round"/>${rl}${rvTxt}</svg>`;
-    return `<div class="section-block"><h3>⚡ 五维能量雷达 <span style="font-size:.68rem;color:var(--ink3);font-weight:400">（十神五组能量 · 借鉴命格宇宙量化法）</span></h3>
-      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
-        ${svg}
-        <div style="flex:1;min-width:200px;font-size:.75rem;color:var(--ink2);line-height:1.9">
-          <div><b style="color:var(--gold)">财富</b>=财星（聚敛变现）· <b style="color:var(--gold)">权力</b>=官杀（掌控规则）</div>
-          <div><b style="color:var(--gold)">才华</b>=食伤（创造表达）· <b style="color:var(--gold)">智识</b>=印星（沉淀吸收）</div>
-          <div><b style="color:var(--gold)">意志</b>=比劫（自我支撑）——十神本就分五组，直接量化为五维面板。</div>
-          <div style="color:var(--ink3);font-size:.7rem;margin-top:4px">计法：天干透出权重2、地支本气藏干权重1，按十神归类求和归一化（满权12）。</div>
-        </div>
-      </div></div>`;
-  }catch(e){ return ''; }
 }
 // ③ 大运能量净值曲线: 身强喜克泄耗(财官食伤=吉)/身弱喜生扶(印比=吉), 大运地支冲日支减分 → 8步折线(借鉴命格宇宙确定性推演)
 function zhDayunCurve(zh){
@@ -3477,16 +3414,12 @@ function renderZongHe(zh,name){
   html+=`</div></div>`;
   // Presentation-only relation explorer; calculation results remain in zhGanZhiMap.
   html+=renderGanZhiRelations(d);
-  // v3 命格总断卡 + 五维能量雷达(先总后分: 四柱既定先观命骨, 再展十神能量结构)
+  // 命格总断与出生地参考，保持紧凑阅读。
   html+=zhMingGeCard(d);
   html+=zhBirthPlace(d);
-  html+=zhWuWeiRadar(d);
   // 紫微斗数参考(勾选"参考紫微斗数"时自动排盘展示,同源数据亦并入AI提示词)
   try{
-    const zwRef=zhZwRefText(d);
-    if(zwRef){
-      html+=`<div class="section-block" style="border:1px dashed var(--gold2)"><h3>♈ 紫微斗数参考 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">（自动排盘 · 已并入 AI 提示词，可在排盘表单取消勾选）</span></h3><div style="font-size:.78rem;color:var(--ink);line-height:2;white-space:pre-wrap">${zwRef.replace(/【紫微斗数参考】\n?/,'').split('\n').map(l=>l.trim()?('<div>'+l+'</div>'):'').join('')}</div></div>`;
-    }
+    if(document.getElementById('zh-zw-ref')?.checked!==false)html+=renderZiweiReading(zhZiweiReading(d),{embedded:true});
   }catch(e){}
   html+=`</div>`;
   html+=`<div class="sec-page" id="zh-sec-2" style="display:none">`;
@@ -3589,7 +3522,7 @@ function renderZongHe(zh,name){
   // 综合分析(多维度,含三术论据)
   const ana=zhAnalysis(zh);
   const mingStar=d.mingStars.length?d.mingStars.map(k=>ZW_STARS[k].name).join('、'):'主星不现';
-  // 综合定档·总览(先总: 大号打分+雷达+大运曲线+评分依据, AI深度版容器也在内)
+  // 综合定档·总览(先总: 大号打分+大运曲线+评分依据, AI深度版容器也在内)
   html+=`<div id="ai-dim-16" style="border:1px solid var(--gold2);border-radius:14px;padding:14px 16px;margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-family:'Noto Serif SC',serif;color:var(--gold);font-weight:700">🎯 综合参考 · 规则说明</span><span style="font-size:.7rem;color:var(--ink3)">（先核对事实，再审阅传统解释）</span><span class="ai-dim-badge" style="display:none;font-size:.58rem;background:var(--jade);color:#fff;padding:1px 6px;border-radius:8px;white-space:nowrap">AI深度</span></div><div class="dim-local">${zhDingDangHtml(zh)}</div><div class="dim-ai" style="display:none;margin-top:10px;border-top:1px dashed var(--gold2);padding-top:10px"><div style="font-size:.72rem;color:var(--jade);margin-bottom:4px">🤖 AI 传统解释（不能替代计算事实）</div><div class="dim-ai-body" style="font-size:.76rem;line-height:1.7;color:var(--ink)"></div></div></div>`;
   // 三术论据横条
   html+=`<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 16px;font-size:.76rem;color:var(--ink2)">
