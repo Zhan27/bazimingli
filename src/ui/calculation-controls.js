@@ -33,9 +33,9 @@ function renderRuleFacts(zh){
   const momentum=parts.momentum.entries.map(r=>names[r.pillar]+'干'+GAN[r.gan]+(r.rooted?'通根':'虚浮')+' '+r.value).join('、')||'无印比得势项';
   const table=Object.keys(WX_MODES).map(mode=>{const x=countWuXing(zh.pillars,mode);return '<tr><th>'+x.name+'</th><td>'+WUXING.map((w,i)=>w+x.counts[i]).join(' ')+'</td><td>'+x.total+'</td></tr>';}).join('');
   return '<div class="section-block" data-calculation-basis><h3>计算规则与统计依据</h3><p>'+esc0(p.name+' · '+p.version+' · '+p.focus)+'</p><p>'+esc0(dayBoundaryLabel(zh.temporal?.dayBoundary||p.dayBoundary))+'</p>'+
-    '<details><summary>旺衰评分：得令 '+parts.month.value+' ＋ 通根 '+Number(parts.roots.value.toFixed(4))+' ＋ 得势 '+parts.momentum.value+' ＝ '+s.score+'（'+s.type+'）</summary><p>月令本气'+GAN[parts.month.monthMainGan]+'，'+({same:'比劫同类',resource:'印星生扶',output:'食伤泄气',officer:'官杀克身',wealth:'财星耗身'})[parts.month.relation]+'</p><p>'+esc0(roots)+'</p><p>'+esc0(momentum)+'</p><p>每个生扶藏干分别计位置加权；从弱阈值为算法分类，未单独证明真从格。</p></details>'+
+    '<details><summary>旺衰评分：得令 '+parts.month.value+' ＋ 通根 '+Number(parts.roots.value.toFixed(4))+' ＋ 得势 '+parts.momentum.value+' ＝ '+s.score+'（'+s.type+'）</summary><p>月令本气'+GAN[parts.month.monthMainGan]+'，'+({same:'比劫同类',resource:'印星生扶',output:'食伤泄气',officer:'官杀克身',wealth:'财星耗身'})[parts.month.relation]+'</p><p>'+esc0(roots)+'</p><p>'+esc0(momentum)+'</p><p>每个生扶藏干分别计位置加权；从弱一项结合根气与所从之势细读。</p></details>'+
     '<p>展示口径：'+stats.name+'。'+stats.description+'。核心扶抑分析仍用天干＋地支本气，切换展示不改四柱或旺衰。</p>'+wxBar(stats.counts)+
-    '<table><thead><tr><th>统计口径</th><th>木火土金水个数</th><th>总次数</th></tr></thead><tbody>'+table+'</tbody></table><p>这些数字为计数，不代表物理能量或经校准的预测。</p>'+
+    '<table><thead><tr><th>统计口径</th><th>木火土金水个数</th><th>总次数</th></tr></thead><tbody>'+table+'</tbody></table>'+
     (zh.useGod?.conflict?'<p>规则分歧：当前取'+WUXING[zh.yongShen]+'；另一取用路径为'+zh.useGod.alternatives.map(w=>WUXING[w]).join('、')+'。'+esc0(zh.useGod.reason)+'</p>':'')+'</div>';
 }
 function unknownRangeText(ms){

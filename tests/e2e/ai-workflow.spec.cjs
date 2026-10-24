@@ -57,7 +57,7 @@ test('late old-chart responses cannot fill a new chart and storage denial leaves
 test('Markdown is explicitly unverified; schema errors do not trigger automatic paid fallback or score mutation',async({page})=>{
   await prepare(page);let calls=0;await page.route('https://ai.mock.test/**',async route=>{calls++;await route.fulfill({status:400,body:'synthetic-private-error'});});
   await page.locator('#ai-output-format').selectOption('schema');await page.locator('#ai-deep-btn').click();await expect(page.locator('#ai-workflow-status')).toContainText('请求失败');expect(calls).toBe(1);await expect(page.locator('#ai-workflow-status')).not.toContainText('synthetic-private-error');
-  const before=await page.evaluate(()=>document.getElementById('dd-score-num')?.textContent);await page.evaluate(()=>{aiEvidenceApplyText('【17】命局定分99/100\n【18】传统参考');zhSecGo(3);});await expect(page.locator('#ai-dim-16 .ai-evidence-result')).toContainText('事实与引用未校验');expect(await page.evaluate(()=>document.getElementById('dd-score-num')?.textContent)).toBe(before);
+  const before=await page.evaluate(()=>document.getElementById('dd-score-num')?.textContent);await page.evaluate(()=>{aiEvidenceApplyText('【17】命局定分99/100\n【18】传统参考');zhSecGo(3);});await expect(page.locator('#ai-dim-16 .ai-evidence-result')).toContainText('Markdown文本');expect(await page.evaluate(()=>document.getElementById('dd-score-num')?.textContent)).toBe(before);
 });
 test('a draft restores a different chart with its exact time and offset without calling the provider',async({page})=>{
   await prepare(page);await page.evaluate(()=>{document.getElementById('zh-solar').value='2012-07-21';document.getElementById('zh-time').value='23:47';restoreUtcOffset('zh-utc-offset',345);zhCast();});

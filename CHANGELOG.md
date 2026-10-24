@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.29.0 — 2026-10-24
+- Unified strength-first preference groups for both Bazi views, year badges, transit text and the DaYun curve. Removed forced one-element-per-role assignment and automatic “generates the selected use-god = favorable”; displayed profile selection, strength balance and climate separately. Mixed stem/branch preferences stay mixed.
+- Integrated the legacy demonstration into an inspectable structure score1.0.0: balance30, favorable exposure/root25, month-premise support25, remedy10 and climate10. The exact ledger sums to100; future decades do not alter the natal score, and roots of excessive peers/resources do not automatically earn support points. Replaced count-to-money/degree bands with these component scores.
+- Rounded displayed term intervals to two decimals without changing stored precision. Added directional WuXing arrows ending outside node circles, natural text alignment/wrapping in all reading cards, and concise page copy. Kept data/privacy, payment behavior and actionable error messages.
+- Preserved the single HTML architecture, five school prompt templates, API/settings/history schemas and calendar/strength/use-selection rules5.20.0. New preference/score logic has its own version.
+
 ## 5.28.0 — 2026-10-24
 - Removed the five-group energy radar and the similar radar inside the optional legacy-score demonstration. Kept other computed facts, text, existing scores and exports.
 - Added a compact, shared Ziwei reading: actual life/body palaces, wealth/career and relationship/fortune themes, resident versus opposite-palace references, same-palace helpers/tensions, four-palace evidence and separately labelled natal/annual transformations. References point to the Complete Book volumes1/3; star-to-life wording is application interpretation.

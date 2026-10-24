@@ -1,0 +1,444 @@
+{
+  "application": "5.29.0",
+  "scoreRule": "1.0.0",
+  "calendarRules": "5.20.0",
+  "scope": "Deterministic structural rule scoring and UI consistency; weights are application rules, not fitted life-outcome probabilities.",
+  "examples": [
+    {
+      "state": "从弱",
+      "expectedState": "从弱",
+      "pillars": [
+        [
+          9,
+          3
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          6,
+          0
+        ]
+      ],
+      "preferences": {
+        "version": "1.0.0",
+        "strong": "从弱",
+        "cong": true,
+        "yong": 4,
+        "balance": 4,
+        "climate": 1,
+        "favorable": [
+          2,
+          3,
+          4
+        ],
+        "adverse": [
+          1,
+          0
+        ],
+        "selectedIsClimate": false,
+        "note": "从弱·观察财官食伤顺势，印比回扶时重看根气"
+      },
+      "structure": {
+        "version": "1.0.0",
+        "score": 88,
+        "geJu": "配合较全",
+        "basis": [
+          {
+            "id": "balance",
+            "k": "扶抑配合",
+            "v": 30,
+            "max": 30,
+            "detail": "按从弱方向，八字本气见4位承接；3位达本项上限"
+          },
+          {
+            "id": "support",
+            "k": "喜用透根",
+            "v": 25,
+            "max": 25,
+            "detail": "扶抑所需五行透干有根"
+          },
+          {
+            "id": "pattern",
+            "k": "提纲承接",
+            "v": 25,
+            "max": 25,
+            "detail": "按「杀印相生」的出现、明透、有根条件逐项计分"
+          },
+          {
+            "id": "rescue",
+            "k": "关节制化",
+            "v": 8,
+            "max": 10,
+            "detail": "财杀并透：救应受牵"
+          },
+          {
+            "id": "climate",
+            "k": "寒暖配合",
+            "v": 0,
+            "max": 10,
+            "detail": "火调候：原局未见；扶抑与调候分看"
+          }
+        ],
+        "note": "从弱；七杀提纲。配合较全，重点看关节制化、寒暖配合。"
+      }
+    },
+    {
+      "state": "身弱",
+      "expectedState": "身弱",
+      "pillars": [
+        [
+          9,
+          3
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "preferences": {
+        "version": "1.0.0",
+        "strong": "身弱",
+        "cong": false,
+        "yong": 0,
+        "balance": 0,
+        "climate": 1,
+        "favorable": [
+          0,
+          1
+        ],
+        "adverse": [
+          2,
+          3,
+          4
+        ],
+        "selectedIsClimate": false,
+        "note": "身弱宜扶·印比为先，财官食伤看承受"
+      },
+      "structure": {
+        "version": "1.0.0",
+        "score": 94,
+        "geJu": "配合较全",
+        "basis": [
+          {
+            "id": "balance",
+            "k": "扶抑配合",
+            "v": 30,
+            "max": 30,
+            "detail": "按身弱方向，八字本气见4位承接；3位达本项上限"
+          },
+          {
+            "id": "support",
+            "k": "喜用透根",
+            "v": 25,
+            "max": 25,
+            "detail": "扶抑所需五行透干有根"
+          },
+          {
+            "id": "pattern",
+            "k": "提纲承接",
+            "v": 25,
+            "max": 25,
+            "detail": "按「官印相生」的出现、明透、有根条件逐项计分"
+          },
+          {
+            "id": "rescue",
+            "k": "关节制化",
+            "v": 10,
+            "max": 10,
+            "detail": "未见当前提纲路径对应的明透阻力"
+          },
+          {
+            "id": "climate",
+            "k": "寒暖配合",
+            "v": 4,
+            "max": 10,
+            "detail": "火调候：支中有藏"
+          }
+        ],
+        "note": "身弱；正官提纲。配合较全，重点看寒暖配合。"
+      }
+    },
+    {
+      "state": "中和",
+      "expectedState": "中和",
+      "pillars": [
+        [
+          9,
+          3
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          4,
+          4
+        ]
+      ],
+      "preferences": {
+        "version": "1.0.0",
+        "strong": "中和",
+        "cong": false,
+        "yong": 1,
+        "balance": 4,
+        "climate": 1,
+        "favorable": [],
+        "adverse": [],
+        "selectedIsClimate": true,
+        "note": "中和·按提纲、制化与寒暖取用"
+      },
+      "structure": {
+        "version": "1.0.0",
+        "score": 68,
+        "geJu": "已有承接",
+        "basis": [
+          {
+            "id": "balance",
+            "k": "扶抑配合",
+            "v": 20,
+            "max": 30,
+            "detail": "日主中和，本项取20；细分由提纲与制化承接"
+          },
+          {
+            "id": "support",
+            "k": "喜用透根",
+            "v": 25,
+            "max": 25,
+            "detail": "扶抑所需五行透干有根"
+          },
+          {
+            "id": "pattern",
+            "k": "提纲承接",
+            "v": 13,
+            "max": 25,
+            "detail": "按「官杀生印」的出现、明透、有根条件逐项计分"
+          },
+          {
+            "id": "rescue",
+            "k": "关节制化",
+            "v": 10,
+            "max": 10,
+            "detail": "未见当前提纲路径对应的明透阻力"
+          },
+          {
+            "id": "climate",
+            "k": "寒暖配合",
+            "v": 0,
+            "max": 10,
+            "detail": "火调候：原局未见"
+          }
+        ],
+        "note": "中和；正印提纲。已有承接，重点看扶抑配合、提纲承接、寒暖配合。"
+      }
+    },
+    {
+      "state": "身强",
+      "expectedState": "身强",
+      "pillars": [
+        [
+          9,
+          3
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "preferences": {
+        "version": "1.0.0",
+        "strong": "身强",
+        "cong": false,
+        "yong": 1,
+        "balance": 2,
+        "climate": 1,
+        "favorable": [
+          1,
+          2,
+          3
+        ],
+        "adverse": [
+          0,
+          4
+        ],
+        "selectedIsClimate": true,
+        "note": "身强宜抑·财官食伤承接，印比再增需疏泄"
+      },
+      "structure": {
+        "version": "1.0.0",
+        "score": 23,
+        "geJu": "着重补配",
+        "basis": [
+          {
+            "id": "balance",
+            "k": "扶抑配合",
+            "v": 0,
+            "max": 30,
+            "detail": "按身强方向，八字本气见0位承接；3位达本项上限"
+          },
+          {
+            "id": "support",
+            "k": "喜用透根",
+            "v": 0,
+            "max": 25,
+            "detail": "扶抑所需五行原局未见"
+          },
+          {
+            "id": "pattern",
+            "k": "提纲承接",
+            "v": 13,
+            "max": 25,
+            "detail": "按「官杀生印」的出现、明透、有根条件逐项计分"
+          },
+          {
+            "id": "rescue",
+            "k": "关节制化",
+            "v": 10,
+            "max": 10,
+            "detail": "未见当前提纲路径对应的明透阻力"
+          },
+          {
+            "id": "climate",
+            "k": "寒暖配合",
+            "v": 0,
+            "max": 10,
+            "detail": "火调候：原局未见"
+          }
+        ],
+        "note": "身强；正印提纲。着重补配，重点看扶抑配合、喜用透根、提纲承接、寒暖配合。"
+      }
+    },
+    {
+      "state": "身极强",
+      "expectedState": "身极强",
+      "pillars": [
+        [
+          3,
+          7
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          4,
+          4
+        ]
+      ],
+      "preferences": {
+        "version": "1.0.0",
+        "strong": "身极强",
+        "cong": false,
+        "yong": 4,
+        "balance": 4,
+        "climate": 4,
+        "favorable": [
+          3,
+          4,
+          0
+        ],
+        "adverse": [
+          2,
+          1
+        ],
+        "selectedIsClimate": false,
+        "note": "身极强宜抑·财官食伤承接，印比再增需疏泄"
+      },
+      "structure": {
+        "version": "1.0.0",
+        "score": 41,
+        "geJu": "局部承接",
+        "basis": [
+          {
+            "id": "balance",
+            "k": "扶抑配合",
+            "v": 0,
+            "max": 30,
+            "detail": "按身极强方向，八字本气见0位承接；3位达本项上限"
+          },
+          {
+            "id": "support",
+            "k": "喜用透根",
+            "v": 10,
+            "max": 25,
+            "detail": "扶抑所需五行藏支，待透干承接"
+          },
+          {
+            "id": "pattern",
+            "k": "提纲承接",
+            "v": 17,
+            "max": 25,
+            "detail": "按「比劫月令、食伤泄秀」的出现、明透、有根条件逐项计分"
+          },
+          {
+            "id": "rescue",
+            "k": "关节制化",
+            "v": 10,
+            "max": 10,
+            "detail": "未见当前提纲路径对应的明透阻力"
+          },
+          {
+            "id": "climate",
+            "k": "寒暖配合",
+            "v": 4,
+            "max": 10,
+            "detail": "水调候：支中有藏"
+          }
+        ],
+        "note": "身极强；比劫月令。局部承接，重点看扶抑配合、喜用透根、提纲承接、寒暖配合。"
+      }
+    }
+  ],
+  "html": {
+    "bytes": 1801709,
+    "sha256": "b6103e31fc430bc69f7dc9b3b967b22e8ee6bf00d568a58d25ce11adbbe41fc1"
+  },
+  "verification": {
+    "node": 109,
+    "python": 5,
+    "browser": 68,
+    "finalAffectedWidths": 4,
+    "lint": {
+      "errors": 0,
+      "existingWarnings": 32,
+      "newWarnings": 0
+    },
+    "frozenCharts": "12/12 unchanged",
+    "screenshots": [
+      1440,
+      1024,
+      390,
+      320
+    ],
+    "dark": true
+  }
+}

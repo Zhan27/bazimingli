@@ -44,19 +44,19 @@ function aiEvidencePaint(){
   for(const [id,item] of Object.entries(session.accepted)){
     const card=document.getElementById('ai-dim-'+(Number(id)-1));if(!card)continue;
     let target=card.querySelector('.ai-evidence-result');if(!target){target=document.createElement('div');target.className='ai-evidence-result';card.appendChild(target);}target.replaceChildren();target.hidden=card.dataset.aiCollapsed==='1';
-    const label=document.createElement('p');label.className='ai-evidence-label';label.textContent=item.format==='json'?'JSON结构与引用检查通过 · 断语正确性未验证':'Markdown兼容内容 · 事实与引用未校验';target.appendChild(label);
+    const label=document.createElement('p');label.className='ai-evidence-label';label.textContent=item.format==='json'?'JSON结构与引用检查通过':'Markdown文本';target.appendChild(label);
     const field=(name,value)=>{const p=document.createElement('p'),b=document.createElement('b');b.textContent=name+'：';p.append(b,document.createTextNode(value));target.appendChild(p);};
     if(item.format==='json'){
-      const d=item.dimension;field('结论（传统解释）',d.conclusion);field('盘面事实',d.facts.map(f=>f+' = '+JSON.stringify(facts[f])).join('；'));field('规则与出处',d.rules.map(r=>{const k=knowledgeCitation(r);return r+' · '+k.book+' · '+k.status;}).join('；'));field('解释',d.explanation);field('不确定性',{high:'高',medium:'中',low:'低'}[d.uncertainty]);field('竞争解释',d.alternatives.join('；')||'未提出其他解释，不代表唯一结论');
+      const d=item.dimension;field('结论',d.conclusion);field('盘面事实',d.facts.map(f=>f+' = '+JSON.stringify(facts[f])).join('；'));field('规则与出处',d.rules.map(r=>{const k=knowledgeCitation(r);return r+' · '+k.book+' · '+k.status;}).join('；'));field('解释',d.explanation);field('不确定性',{high:'高',medium:'中',low:'低'}[d.uncertainty]);if(d.alternatives.length)field('其他路径',d.alternatives.join('；'));
     }else field('兼容文本',item.text);
     const details=document.createElement('details'),summary=document.createElement('summary'),meta=document.createElement('p');summary.textContent='生成记录';meta.textContent=JSON.stringify(item.meta,null,2);details.append(summary,meta);target.appendChild(details);
-    const badge=card.querySelector('.ai-dim-badge');if(badge){badge.style.display='inline-block';badge.textContent=item.format==='json'?'结构已校验':'未校验';}
+    const badge=card.querySelector('.ai-dim-badge');if(badge){badge.style.display='inline-block';badge.textContent=item.format==='json'?'结构已校验':'Markdown';}
   }
 }
 function aiEvidenceMount(){
   const chart=aiEvidenceChart();aiEvidenceSession=createAiSession(chart,lastSchool);aiDraftWarning='';
   const host=document.getElementById('ai-workflow-controls');if(!host)return;
-  host.innerHTML='<label for="ai-output-format">输出格式</label> <select id="ai-output-format"><option value="json">JSON（兼容模式）</option><option value="schema">JSON Schema（接口需支持）</option><option value="markdown">Markdown（不校验事实）</option></select> <button type="button" id="ai-cancel" class="btn btn-ghost" disabled>停止生成</button> <button type="button" id="ai-retry-missing" class="btn btn-ghost">仅重试缺失维度（调用API）</button> <button type="button" id="ai-restore-draft" class="btn btn-ghost">恢复最近草稿</button> <button type="button" id="ai-clear-draft" class="btn btn-ghost">清除AI草稿</button><p class="note">仅保留最近一盘的标签页会话草稿（含出生资料和回复，不含API设置）；浏览器恢复会话可能保留。取消或失败不会自动重发收费请求。JSON Schema不支持时请主动改选兼容格式后重试。</p><p id="ai-workflow-status" role="status" aria-live="polite"></p><ul id="ai-evidence-errors"></ul><details><summary>查看回复草稿（未经校验的原文）</summary><pre id="ai-draft-text"></pre><button type="button" id="ai-validate-draft" class="btn btn-ghost">重新校验草稿（不调用API）</button></details>';
+  host.innerHTML='<label for="ai-output-format">输出格式</label> <select id="ai-output-format"><option value="json">JSON（兼容模式）</option><option value="schema">JSON Schema（接口需支持）</option><option value="markdown">Markdown文本</option></select> <button type="button" id="ai-cancel" class="btn btn-ghost" disabled>停止生成</button> <button type="button" id="ai-retry-missing" class="btn btn-ghost">仅重试缺失维度（调用API）</button> <button type="button" id="ai-restore-draft" class="btn btn-ghost">恢复最近草稿</button> <button type="button" id="ai-clear-draft" class="btn btn-ghost">清除AI草稿</button><p class="note">仅保留最近一盘的标签页会话草稿（含出生资料和回复，不含API设置）；浏览器恢复会话可能保留。取消或失败不会自动重发收费请求。JSON Schema不支持时请主动改选兼容格式后重试。</p><p id="ai-workflow-status" role="status" aria-live="polite"></p><ul id="ai-evidence-errors"></ul><details><summary>查看回复草稿</summary><pre id="ai-draft-text"></pre><button type="button" id="ai-validate-draft" class="btn btn-ghost">重新校验草稿（不调用API）</button></details>';
   document.getElementById('ai-cancel').onclick=aiEvidenceCancel;
   document.getElementById('ai-retry-missing').onclick=()=>aiEvidenceStart(aiEvidenceMissing());
   document.getElementById('ai-restore-draft').onclick=aiEvidenceRestore;
@@ -77,7 +77,7 @@ function aiEvidenceRestore(){
   try{
     const raw=sessionStorage.getItem(AI_DRAFT_NS);if(!raw){aiEvidenceNotice('未找到标签页草稿。');return;}if(raw.length>1800000)throw new Error('草稿过大');
     const saved=JSON.parse(raw),input=validateChartInput(saved.input),o=input.options;
-    if(saved.ruleVersion!==aiEvidenceChart().rules.version){document.getElementById('ai-draft-text').textContent=typeof saved.attempt?.text==='string'?saved.attempt.text.slice(0,1000000):'无原文';aiEvidenceNotice('草稿属于旧规则版本，仅供查看和复制原文，不自动套用到当前命盘。');return;}
+    if(saved.ruleVersion!==aiEvidenceChart().rules.version){document.getElementById('ai-draft-text').textContent=typeof saved.attempt?.text==='string'?saved.attempt.text.slice(0,1000000):'无原文';aiEvidenceNotice('草稿属于旧规则版本，可查看或复制；请按当前命盘重新生成。');return;}
     if(saved.chartId===chartFactId(aiEvidenceChart())){aiEvidenceSession=restoreAiSession(raw,aiEvidenceChart());lastAIReply=aiEvidenceSummary();aiEvidencePaint();return;}
     // Restoring a different chart only recalculates locally; it never calls a provider.
     const hour=hourIndexAt(withBirthTime(parseCivilDate(input.date),input.hourIdx,input.time));

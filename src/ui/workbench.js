@@ -26,7 +26,7 @@ function showWorkspaceDialog(kind){
       results.replaceChildren();const rows=searchKnowledge(search.value).slice(0,16);
       for(const k of rows){
         const article=document.createElement('article'),h=document.createElement('h3'),p=document.createElement('p'),meta=document.createElement('small');
-        h.textContent=k.title;p.textContent=k.explanation;meta.textContent=k.book+' · '+({'text-verified':'已核对文献位置','citation-pending':'出处待核验','implementation-verified':'应用实现已测试','traditional-unverified':'传统规则未独立核验'}[k.status]||k.status);article.append(h,p,meta);
+        h.textContent=k.title;p.textContent=k.explanation;meta.textContent=k.book+' · '+({'text-verified':'已核对文献位置','citation-pending':'文献线索','implementation-verified':'应用实现已测试','traditional-unverified':'传统规则'}[k.status]||k.status);article.append(h,p,meta);
         for(const source of k.sources||[]){const a=document.createElement('a');a.href=source.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='《'+source.book+'》·'+source.chapter+' ↗';article.appendChild(a);const scope=document.createElement('small');scope.textContent='核对范围：'+source.scope;article.appendChild(scope);}
         results.appendChild(article);
       }

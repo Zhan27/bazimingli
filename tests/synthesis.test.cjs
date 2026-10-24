@@ -33,9 +33,9 @@ test('synthesis is deterministic, does not mutate charts or alter existing calcu
   const card=e.run(`zhMingGeCard(zhCompute(new Date(2024,1,10),6,1,''))`);
   assert.match(card,/总断依据/);assert.match(card,/典籍与规则出处/);assert.doesNotMatch(card,/质地断|根基完整、中正平和/);
 });
-test('legacy score ledger matches the unchanged score across twelve months',()=>{
+test('integrated structure score equals its complete ledger across twelve months',()=>{
   const rows=e.json(`Array.from({length:12},(_,m)=>{const z=zhCompute(new Date(2024,m,15),6,1,'');const d=zhDingDang(z);return {score:d.score,sum:d.basis.reduce((a,b)=>a+b.v,0)};})`);
-  for(const row of rows)assert.equal(Math.round(Math.max(20,Math.min(95,row.sum))),row.score);
+  for(const row of rows)assert.equal(row.sum,row.score);
 });
 test('counterforces stay explicit and transits cannot turn a natal hidden remedy into a rooted one',()=>{
   const s=summary([[4,4],[8,8],[0,0],[6,4]]);

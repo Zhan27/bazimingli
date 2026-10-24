@@ -1,4 +1,19 @@
 function mingGeEscape(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function renderUsePreferences(zh){
+  const p=buildUsePreferences(zh),esc=mingGeEscape,dw=GAN_WX[zh.dg],groups=['比劫','食伤','财星','官杀','印星'];
+  const label=w=>WUXING[w]+'·'+groups[(w-dw+5)%5];
+  const list=items=>items.length?items.map(label).join('、'):'随提纲与制化细分';
+  const row=(k,v)=>'<div class="use-preference-row"><b>'+k+'</b><span>'+v+'</span></div>';
+  const strength=zh.strength?.parts;
+  let html='<section class="use-preferences"><h3>喜用神 <small>先辨旺衰，再看取用</small></h3>';
+  html+=row('旺衰',esc(p.strong)+(Number.isFinite(zh.strengthScore)?' · '+zh.strengthScore.toFixed(1)+'分':'')+(strength?' <small>得令 '+strength.month.value+' / 通根 '+Number(strength.roots.value.toFixed(2))+' / 得势 '+strength.momentum.value+'</small>':''));
+  html+=row('扶抑喜向',list(p.favorable))+row('增势需察',list(p.adverse));
+  html+=row('当前取用',esc(zh.profile?.name||SCHOOLS[zh.school??0])+' · <strong>'+label(p.yong)+'</strong>'+(p.selectedIsClimate?'（调候优先）':''));
+  html+=row('扶抑取用',label(p.balance));
+  if(p.climate>=0)html+=row('寒暖调候',label(p.climate)+' · '+(p.climate===1?'冬月温暖':'夏月润燥')+(p.adverse.includes(p.climate)?'；需兼顾日主承受':p.favorable.includes(p.climate)?'，与扶抑同向':''));
+  html+='<p class="use-preference-note">'+esc(p.note)+'</p>'+readingCitations(['root','pattern','climate'])+'</section>';
+  return html;
+}
 function readingCitations(keys){
   return '<details class="reading-citations"><summary>典籍与规则出处</summary>'+[...new Set(keys)].map(key=>{
     const s=READING_SOURCES[key];return '<div><a target="_blank" rel="noopener noreferrer" href="'+mingGeEscape(s.url)+'">《'+mingGeEscape(s.book)+'》·'+mingGeEscape(s.chapter)+' ↗</a>'+(s.quote?'<q>'+mingGeEscape(s.quote)+'</q>':'')+'<small>核对范围：'+mingGeEscape(s.scope)+'</small></div>';
