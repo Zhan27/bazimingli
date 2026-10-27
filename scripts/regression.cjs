@@ -13,16 +13,19 @@ function differences(expected,actual,prefix=''){
 }
 function runRegression(write=true){
   const fixture=JSON.parse(fs.readFileSync(path.join(root,'tests/fixtures/charts-v5.16.json'),'utf8'));
+  const amendments=JSON.parse(fs.readFileSync(path.join(root,'tests/fixtures/use-god-v5.31.json'),'utf8'));
   const e=loadEngine({ui:true});
   const cases=fixture.cases.map(row=>{
     e.context.input=row.input;
     try{
       const z=e.run(`(()=>{const d=withBirthTime(parseCivilDate(input.date),0,input.time);return zhCompute(d,hourIndexAt(d),input.gender,input.place,input.options);})()`);
-      const actual=JSON.parse(JSON.stringify(chartFacts(z,e))),mismatches=differences(row.expected,actual);
-      return {id:row.id,input:row.input,ruleVersion:e.run('RULE_VERSION'),reference:fixture.source,expected:row.expected,actual,status:mismatches.length?'fail':'pass',mismatches};
+      const actual=JSON.parse(JSON.stringify(chartFacts(z,e))),amendment=amendments.cases.find(a=>a.id===row.id);
+      if(amendment&&(row.expected.strengthType!=='中和'||row.expected.yongShen!==amendment.previous))throw new Error('Use-god amendment does not match its historical baseline');
+      const expected=amendment?{...row.expected,yongShen:amendment.expected}:row.expected,mismatches=differences(expected,actual);
+      return {id:row.id,input:row.input,ruleVersion:e.run('RULE_VERSION'),reference:fixture.source,expected,actual,status:mismatches.length?'fail':'pass',mismatches,...(amendment?{previousExpected:row.expected,amendment}: {})};
     }catch(err){return {id:row.id,input:row.input,status:'fail',error:err.message};}
   });
-  const result={version:e.run('RULE_VERSION'),baseline:fixture.version,scope:'All frozen chart cases, including four pillars, lunar date, solar term, DaYun, wuxing, strength and use-god. New rules additionally covered by calculation-rules and browser tests.',total:cases.length,passed:cases.filter(c=>c.status==='pass').length,failed:cases.filter(c=>c.status!=='pass').length,cases};
+  const result={version:e.run('RULE_VERSION'),baseline:fixture.version,amendments:amendments.version,scope:'Original frozen calendar/strength facts plus three explicitly reviewed neutral use-god amendments. Original fixture retained unchanged; previous expectations and reasons are included per amended case.',total:cases.length,passed:cases.filter(c=>c.status==='pass').length,failed:cases.filter(c=>c.status!=='pass').length,cases};
   if(write){fs.mkdirSync(path.join(root,'verification'),{recursive:true});fs.writeFileSync(path.join(root,'verification/regression.json'),JSON.stringify(result,null,2)+'\n');}
   return result;
 }

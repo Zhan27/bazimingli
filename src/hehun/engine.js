@@ -1,5 +1,5 @@
 /* Extracted without calculation changes. See docs/ARCHITECTURE.md. */
-const HEHUN_RULE_VERSION='5.30.0';
+const HEHUN_RULE_VERSION='5.31.0';
 const HH_LIUHE={0:1,1:0,2:11,11:2,3:10,10:3,4:9,9:4,5:8,8:5,6:7,7:6};
 
 const HH_CHONG={0:6,1:7,2:8,3:9,4:10,5:11,6:0,7:1,8:2,9:3,10:4,11:5};

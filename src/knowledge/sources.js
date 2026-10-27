@@ -1,5 +1,6 @@
 /** Text locations checked on 2026-10-23. Verification covers the stated text only. */
 const READING_SOURCES=freezeRules({
+  spouse:{book:'子平真诠',chapter:'二十四、论妻子',url:'https://github.com/china-testing/bazi/blob/33b18354d5407727640e545c3aaec0efb4bf5282/books/zipingzhenquan.md#二十四论妻子',scope:'妻星与妻宫合看，并配月令喜忌；该章节位置核对于2026-10-27'},
   gods:{book:'渊海子平',chapter:'基础、论日为主',url:'https://zh.wikisource.org/wiki/淵海子平#论日为主',quote:'以日为主，年为本，月为提纲，时为辅佐。',scope:'十神生克、阴阳定义与日干坐标'},
   hidden:{book:'渊海子平',chapter:'又地支藏遁歌',url:'https://zh.wikisource.org/wiki/淵海子平#又地支藏遁歌',quote:'子宫癸水在其中',scope:'藏干成员；不核定本中余气权重'},
   pattern:{book:'子平真诠',chapter:'八、论用神',url:'https://github.com/china-testing/bazi/blob/33b18354d5407727640e545c3aaec0efb4bf5282/books/zipingzhenquan.md#八论用神',quote:'八字用神,专求月令',scope:'月令定分析起点；此处用神与扶抑五行取用分列'},

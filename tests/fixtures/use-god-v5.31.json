@@ -1,0 +1,25 @@
+{
+  "version": "5.31.0",
+  "baseline": "charts-v5.16.json",
+  "scope": "Reviewed neutral-only use-god amendments. All other frozen facts retain their original expectations.",
+  "cases": [
+    {
+      "id": "legacy-01",
+      "previous": 4,
+      "expected": 1,
+      "reason": "甲辰 丙寅 甲辰 庚午：寅月比肩，中和；丙透月干，寅中丙及午中丁承接，取食伤泄秀火。"
+    },
+    {
+      "id": "legacy-03",
+      "previous": 4,
+      "expected": 1,
+      "reason": "甲辰 丙寅 乙巳 丙子：寅月劫财，中和；丙透月时，寅巳藏丙，取食伤泄秀火。"
+    },
+    {
+      "id": "legacy-04",
+      "previous": 1,
+      "expected": 3,
+      "reason": "乙巳 己丑 己酉 丙寅：丑月比肩，中和；酉本气辛食神、丑藏辛及巳藏庚承接，取食伤泄秀金；年乙七杀不计正官明透，火调候另列。"
+    }
+  ]
+}

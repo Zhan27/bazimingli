@@ -40,10 +40,10 @@ test('annual labels use their own TaiSui while dated observations follow lunar N
   }
   for(const referenceDate of ['2024-02-30','bad',4])assert.throws(()=>api.calculateModule('ziwei',{...input,referenceDate}));
 });
-test('both Ziwei entry points share versioned rules and explicit annual labels without changing Bazi identities',()=>{
+test('both Ziwei entry points share versioned rules and explicit annual labels with independently versioned Bazi identities',()=>{
   const z=api.calculateModule('ziwei',{date:'2024-02-10',time:'00:00',referenceYear:2026}).result;
   e.context.zwFixture=z;
-  assert.equal(e.run('RULE_VERSION'),'5.20.0');assert.equal(z.rules.version,'5.26.0');assert.equal(z.rules.leapMonth,'same-month');
+  assert.equal(e.run('RULE_VERSION'),'5.31.0');assert.equal(z.rules.version,'5.26.0');assert.equal(z.rules.leapMonth,'same-month');
   const result={innerHTML:''};e.context.document.getElementById=()=>result;e.run('renderZW(zwFixture)');
   assert.match(result.innerHTML,/流年四化（2026 丙午）/);
   assert.equal(e.run(`JSON.stringify(calculateZiwei({date:parseCivilDate('2024-02-10'),hourIdx:0,gender:1,referenceYear:2026}))`),JSON.stringify(z));

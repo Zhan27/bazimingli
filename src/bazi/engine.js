@@ -285,6 +285,8 @@ function zhCompute(date,hourIdx,gender,place,options={}){
     opts.sort((a,b)=>b.n-a.n);
     yongShen=opts[0].w;
   }
+  const neutralUse=strengthType==='中和'?selectNeutralUseGod(pillars):null;
+  if(neutralUse)yongShen=neutralUse.element;
   const balancedYongShen=yongShen;
   // 调候优先: 冬夏生且调候五行可用时以调候为第一用神参考
   // 修复: 调候五行若恰为"克日主"(官杀=忌神阵营)则不覆盖,避免用神=忌神之矛盾(冬生金命用火调候却火克金)
@@ -299,6 +301,7 @@ function zhCompute(date,hourIdx,gender,place,options={}){
     }
   }
   const useGod=selectProfileUseGod({balanced:balancedYongShen,climateElement:tiaoHouWX,climateCandidate:yongShen},null,profile);
+  if(neutralUse){useGod.neutral=neutralUse;useGod.reason=neutralUse.reason+'；'+useGod.reason;}
   yongShen=useGod.element;
   // 财星信息
   const caiZheng=tsCount[5], caiPian=tsCount[4];

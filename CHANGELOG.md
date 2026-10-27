@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.31.0 — 2026-10-27
+- Replaced the neutral-strength resource fallback with explicit month-command and exposed-obstacle routes, ranked by separate positional stem/root evidence. Existing calendar, strength thresholds, non-neutral use-god paths and school climate strategies remain unchanged. Annual prose and local decade replies use the shared stem/branch preferences so neutral charts are not relabelled as weak. Bazi and marriage rules are versioned5.31.0; three reviewed neutral use-god amendments retain their original fixture alongside the new expectations.
+- Structure score2.0.0 weights stem position, month main qi and root depth; excludes day-stem self credit, removes three-occurrence saturation and single-root full credit, and provides clickable positional evidence in the existing compact score breakdown.
+- Local wealth, career and relationship readings now use actual exposed/hidden stems, synthesis routes and spouse-palace relations. Repeated characters retain their individual positions, citations expand in place, and marriage pairing/history entry points remain available.
+- Old-rule AI drafts expose accepted report sections, the final raw attempt and completed/interrupted followups for copying without applying them to a changed chart. AI templates, contract and stored record/config formats are preserved.
+
 ## 5.30.0 — 2026-10-27
 - Unified punishment rules used by natal, annual and pairwise marriage checks. Corrected false same-branch pair punishments, replaced the mistaken Mao self-punishment with Chen, distinguished two-member from complete three-member groups and corrected the two classical punishment names in local readings. Relation rules1.1.0 carry their own version.
 - Updated marriage rules5.30.0 to use the shared five-state strength preferences. Listed beneficial support, adverse reinforcement, climate contribution and missing-element direction separately; missing an element no longer guarantees a bonus. DaYun stem and branch use the same mixed/neutral classification as the individual chart, with a complete scoring ledger and additive preference evidence in JSON.

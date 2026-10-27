@@ -25,7 +25,7 @@ test('full requests have topic coverage with stable citations and no fabricated 
   const result=e.json(`JSON.parse(buildEvidencePrompt(adoptionChart,0).user)`),topics=new Set(result.knowledge.flatMap(k=>k.selection.dimensionIds));
   for(let id=1;id<=18;id++)assert.ok(topics.has(id),'topic '+id);
   for(const k of result.knowledge)assert.equal(k.status,e.run(`knowledgeCitation(${JSON.stringify(k.id)}).status`));
-  assert.equal(result.schemaVersion,'1.0.0');assert.equal(result.rules.version,'5.20.0');
+  assert.equal(result.schemaVersion,'1.0.0');assert.equal(result.rules.version,'5.31.0');
 });
 test('old knowledge/prompt draft metadata remains readable, while new attempts carry updated versions',()=>{
   const result=e.json(`(()=>{let s=beginAiAttempt(createAiSession(adoptionChart,0),{ids:[2],model:'synthetic',base:'https://mock.invalid'});s.attempt.meta.promptVersion='evidence-combined-1.1.0';s.attempt.meta.knowledgeVersion='1.1.0';const value={schemaVersion:AI_CONTRACT_VERSION,chartId:chartFactId(adoptionChart),pillars:adoptionChart.pillars.map(p=>p.text),dimensions:[{id:2,title:'子平格局',conclusion:'合成参考',facts:['pillar.month'],rules:['rule.hidden-stems'],explanation:'提纲与透藏分列',uncertainty:'high',alternatives:[]}]};s=finishAiAttempt(s,adoptionChart,JSON.stringify(value));const old=restoreAiSession(JSON.stringify(s),adoptionChart);return {old:old.accepted[2].meta,next:beginAiAttempt(old,{ids:[3],model:'synthetic',base:'https://mock.invalid'}).attempt.meta}})()`);

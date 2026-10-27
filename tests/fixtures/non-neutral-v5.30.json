@@ -1,0 +1,440 @@
+{
+  "source": "Captured from v5.30.0 commit 4c735ca7c2a589c92d5317e5a2d81a38e2c09b1b before v5.31 edits; synthetic dates, one case per available non-neutral state and school.",
+  "cases": [
+    {
+      "input": {
+        "year": 2026,
+        "m": 10,
+        "hour": 6,
+        "schoolId": 0
+      },
+      "pillars": [
+        [
+          2,
+          6
+        ],
+        [
+          5,
+          11
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          4,
+          6
+        ]
+      ],
+      "strengthScore": 5.75,
+      "strengthType": "身弱",
+      "yongShen": 3
+    },
+    {
+      "input": {
+        "year": 2026,
+        "m": 10,
+        "hour": 6,
+        "schoolId": 1
+      },
+      "pillars": [
+        [
+          2,
+          6
+        ],
+        [
+          5,
+          11
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          4,
+          6
+        ]
+      ],
+      "strengthScore": 5.75,
+      "strengthType": "身弱",
+      "yongShen": 3
+    },
+    {
+      "input": {
+        "year": 2026,
+        "m": 10,
+        "hour": 6,
+        "schoolId": 2
+      },
+      "pillars": [
+        [
+          2,
+          6
+        ],
+        [
+          5,
+          11
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          4,
+          6
+        ]
+      ],
+      "strengthScore": 5.75,
+      "strengthType": "身弱",
+      "yongShen": 3
+    },
+    {
+      "input": {
+        "year": 2026,
+        "m": 10,
+        "hour": 6,
+        "schoolId": 3
+      },
+      "pillars": [
+        [
+          2,
+          6
+        ],
+        [
+          5,
+          11
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          4,
+          6
+        ]
+      ],
+      "strengthScore": 5.75,
+      "strengthType": "身弱",
+      "yongShen": 3
+    },
+    {
+      "input": {
+        "year": 2026,
+        "m": 10,
+        "hour": 6,
+        "schoolId": 4
+      },
+      "pillars": [
+        [
+          2,
+          6
+        ],
+        [
+          5,
+          11
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          4,
+          6
+        ]
+      ],
+      "strengthScore": 5.75,
+      "strengthType": "身弱",
+      "yongShen": 1
+    },
+    {
+      "input": {
+        "year": 2026,
+        "m": 9,
+        "hour": 6,
+        "schoolId": 0
+      },
+      "pillars": [
+        [
+          2,
+          6
+        ],
+        [
+          4,
+          10
+        ],
+        [
+          8,
+          10
+        ],
+        [
+          2,
+          6
+        ]
+      ],
+      "strengthScore": -0.8,
+      "strengthType": "从弱",
+      "yongShen": 1
+    },
+    {
+      "input": {
+        "year": 2026,
+        "m": 9,
+        "hour": 6,
+        "schoolId": 1
+      },
+      "pillars": [
+        [
+          2,
+          6
+        ],
+        [
+          4,
+          10
+        ],
+        [
+          8,
+          10
+        ],
+        [
+          2,
+          6
+        ]
+      ],
+      "strengthScore": -0.8,
+      "strengthType": "从弱",
+      "yongShen": 1
+    },
+    {
+      "input": {
+        "year": 2026,
+        "m": 9,
+        "hour": 6,
+        "schoolId": 2
+      },
+      "pillars": [
+        [
+          2,
+          6
+        ],
+        [
+          4,
+          10
+        ],
+        [
+          8,
+          10
+        ],
+        [
+          2,
+          6
+        ]
+      ],
+      "strengthScore": -0.8,
+      "strengthType": "从弱",
+      "yongShen": 1
+    },
+    {
+      "input": {
+        "year": 2026,
+        "m": 9,
+        "hour": 6,
+        "schoolId": 3
+      },
+      "pillars": [
+        [
+          2,
+          6
+        ],
+        [
+          4,
+          10
+        ],
+        [
+          8,
+          10
+        ],
+        [
+          2,
+          6
+        ]
+      ],
+      "strengthScore": -0.8,
+      "strengthType": "从弱",
+      "yongShen": 1
+    },
+    {
+      "input": {
+        "year": 2026,
+        "m": 9,
+        "hour": 6,
+        "schoolId": 4
+      },
+      "pillars": [
+        [
+          2,
+          6
+        ],
+        [
+          4,
+          10
+        ],
+        [
+          8,
+          10
+        ],
+        [
+          2,
+          6
+        ]
+      ],
+      "strengthScore": -0.8,
+      "strengthType": "从弱",
+      "yongShen": 1
+    },
+    {
+      "input": {
+        "year": 2026,
+        "m": 11,
+        "hour": 0,
+        "schoolId": 0
+      },
+      "pillars": [
+        [
+          2,
+          6
+        ],
+        [
+          6,
+          0
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          8,
+          0
+        ]
+      ],
+      "strengthScore": 10.1,
+      "strengthType": "身强",
+      "yongShen": 1
+    },
+    {
+      "input": {
+        "year": 2026,
+        "m": 11,
+        "hour": 0,
+        "schoolId": 1
+      },
+      "pillars": [
+        [
+          2,
+          6
+        ],
+        [
+          6,
+          0
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          8,
+          0
+        ]
+      ],
+      "strengthScore": 10.1,
+      "strengthType": "身强",
+      "yongShen": 1
+    },
+    {
+      "input": {
+        "year": 2026,
+        "m": 11,
+        "hour": 0,
+        "schoolId": 2
+      },
+      "pillars": [
+        [
+          2,
+          6
+        ],
+        [
+          6,
+          0
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          8,
+          0
+        ]
+      ],
+      "strengthScore": 10.1,
+      "strengthType": "身强",
+      "yongShen": 1
+    },
+    {
+      "input": {
+        "year": 2026,
+        "m": 11,
+        "hour": 0,
+        "schoolId": 3
+      },
+      "pillars": [
+        [
+          2,
+          6
+        ],
+        [
+          6,
+          0
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          8,
+          0
+        ]
+      ],
+      "strengthScore": 10.1,
+      "strengthType": "身强",
+      "yongShen": 1
+    },
+    {
+      "input": {
+        "year": 2026,
+        "m": 11,
+        "hour": 0,
+        "schoolId": 4
+      },
+      "pillars": [
+        [
+          2,
+          6
+        ],
+        [
+          6,
+          0
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          8,
+          0
+        ]
+      ],
+      "strengthScore": 10.1,
+      "strengthType": "身强",
+      "yongShen": 1
+    }
+  ]
+}

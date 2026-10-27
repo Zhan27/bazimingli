@@ -82,7 +82,7 @@ function aiEvidenceRestore(){
   try{
     const raw=sessionStorage.getItem(AI_DRAFT_NS);if(!raw){aiEvidenceNotice('未找到标签页草稿。');return;}if(raw.length>1800000)throw new Error('草稿过大');
     const saved=JSON.parse(raw),input=validateChartInput(saved.input),o=input.options;
-    if(saved.ruleVersion!==aiEvidenceChart().rules.version){document.getElementById('ai-draft-text').textContent=typeof saved.attempt?.text==='string'?saved.attempt.text.slice(0,1000000):'无原文';aiEvidenceNotice('草稿属于旧规则版本，可查看或复制；请按当前命盘重新生成。');return;}
+    if(saved.ruleVersion!==aiEvidenceChart().rules.version){const archive=document.getElementById('ai-draft-text');archive.textContent=aiArchivedDraftText(saved);archive.parentElement.open=true;aiEvidenceNotice('草稿属于旧规则版本，报告和追问原文可查看或复制；请按当前命盘重新生成。');return;}
     if(saved.chartId===chartFactId(aiEvidenceChart())){aiEvidenceSession=restoreAiSession(raw,aiEvidenceChart());lastAIReply=aiEvidenceSummary();aiEvidencePaint();return;}
     // Restoring a different chart only recalculates locally; it never calls a provider.
     const hour=hourIndexAt(withBirthTime(parseCivilDate(input.date),input.hourIdx,input.time));

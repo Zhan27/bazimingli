@@ -1,6 +1,6 @@
 {
   "fixtureVersion": "synthetic-contract-v1",
-  "ruleVersion": "5.20.0",
+  "ruleVersion": "5.31.0",
   "promptVersions": [
     "evidence-combined-1.2.0",
     "evidence-balance-1.2.0",
@@ -16,7 +16,7 @@
       "expectedError": null,
       "matches": true,
       "contractVersion": "1.0.0",
-      "chartId": "chart-9e34409a",
+      "chartId": "chart-3c515b40",
       "complete": true,
       "pass": true,
       "errorCounts": {
@@ -35,7 +35,7 @@
       "expectedError": "FACT_ERROR",
       "matches": true,
       "contractVersion": "1.0.0",
-      "chartId": "chart-9e34409a",
+      "chartId": "chart-3c515b40",
       "complete": true,
       "pass": false,
       "errorCounts": {
@@ -60,7 +60,7 @@
       "expectedError": "REASONING_GAP",
       "matches": true,
       "contractVersion": "1.0.0",
-      "chartId": "chart-9e34409a",
+      "chartId": "chart-3c515b40",
       "complete": false,
       "pass": false,
       "errorCounts": {
@@ -85,7 +85,7 @@
       "expectedError": "RULE_INCONSISTENCY",
       "matches": true,
       "contractVersion": "1.0.0",
-      "chartId": "chart-9e34409a",
+      "chartId": "chart-3c515b40",
       "complete": true,
       "pass": false,
       "errorCounts": {
@@ -110,7 +110,7 @@
       "expectedError": "RULE_INCONSISTENCY",
       "matches": true,
       "contractVersion": "1.0.0",
-      "chartId": "chart-9e34409a",
+      "chartId": "chart-3c515b40",
       "complete": true,
       "pass": false,
       "errorCounts": {
@@ -135,7 +135,7 @@
       "expectedError": "EXPRESSION_ERROR",
       "matches": true,
       "contractVersion": "1.0.0",
-      "chartId": "chart-9e34409a",
+      "chartId": "chart-3c515b40",
       "complete": false,
       "pass": false,
       "errorCounts": {

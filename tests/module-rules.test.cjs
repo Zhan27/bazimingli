@@ -34,7 +34,7 @@ test('pair branch tables are symmetric for all144 combinations and agree with kn
 test('pair API is DOM-free, deterministic by target year, symmetric in score and exposes its complete ledger',()=>{
   const a={date:'1990-05-17',time:'12:00',gender:1},b={date:'1992-01-15',time:'20:00',gender:0};
   const r=api.comparePair(a,b,2024).comparison,swap=api.comparePair(b,a,2024).comparison;
-  assert.equal(r.score,swap.score);assert.equal(r.referenceYear,2024);assert.equal(r.rules.version,'5.30.0');
+  assert.equal(r.score,swap.score);assert.equal(r.referenceYear,2024);assert.equal(r.rules.version,'5.31.0');
   assert.equal(r.rawScore,r.ledger.base+r.ledger.items.reduce((sum,i)=>sum+i.delta,0));assert.equal(r.score,Math.max(30,Math.min(95,r.rawScore)));
   assert.equal(JSON.stringify(r),JSON.stringify(api.comparePair(a,b,2024).comparison));assert.notEqual(r.deep[2].html,api.comparePair(a,b,2034).comparison.deep[2].html);
   assert.throws(()=>api.comparePair(a,b,NaN));

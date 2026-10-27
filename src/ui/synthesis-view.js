@@ -9,10 +9,20 @@ function renderUsePreferences(zh){
   html+=row('旺衰',esc(p.strong)+(Number.isFinite(zh.strengthScore)?' · '+zh.strengthScore.toFixed(1)+'分':'')+(strength?' <small>得令 '+strength.month.value+' / 通根 '+Number(strength.roots.value.toFixed(2))+' / 得势 '+strength.momentum.value+'</small>':''));
   html+=row('扶抑喜向',list(p.favorable))+row('增势需察',list(p.adverse));
   html+=row('当前取用',esc(zh.profile?.name||SCHOOLS[zh.school??0])+' · <strong>'+label(p.yong)+'</strong>'+(p.selectedIsClimate?'（调候优先）':''));
-  html+=row('扶抑取用',label(p.balance));
+  html+=row(p.neutral?'提纲取用':'扶抑取用',label(p.balance));
+  if(p.neutral)html+=row('取用路线',esc(p.neutral.path)+(p.neutral.available?' · 原局已有承接':' · 待运中补入')+'<details class="neutral-evidence"><summary>取用柱位</summary>'+readingEvidenceButtons([...p.neutral.triggers,...p.neutral.evidence])+'</details>');
   if(p.climate>=0)html+=row('寒暖调候',label(p.climate)+' · '+(p.climate===1?'冬月温暖':'夏月润燥')+(p.adverse.includes(p.climate)?'；需兼顾日主承受':p.favorable.includes(p.climate)?'，与扶抑同向':''));
   html+='<p class="use-preference-note">'+esc(p.note)+'</p>'+readingCitations(['root','pattern','climate'])+'</section>';
   return html;
+}
+function readingEvidenceButtons(rows){
+  return [...new Map(rows.map(n=>[n.id||n.lane+'-'+n.pillar+'-'+n.gan,n])).values()].map(n=>'<button type="button" class="mingge-locate" data-mingge-node="'+(n.lane||(n.id.includes('.hidden.')?'zhi':'gan'))+'-'+n.pillar+'">'+mingGeEscape(n.label)+(Number.isInteger(n.god)?'·'+mingGeEscape(SHISHEN_NAME[n.god]):'')+' ↗</button>').join('；');
+}
+function renderDomainReading(zh,domain){
+  const d=buildDomainReadings(zh)[domain];
+  const evidence=[...new Map(d.evidence.map(n=>[n.id,n])).values()];
+  const extras='<details class="domain-extras"><summary>藏干与行运补充</summary>'+d.notes.map(n=>'<p>'+mingGeEscape(n)+'</p>').join('')+d.transits.map(t=>'<p><button type="button" class="mingge-locate" data-mingge-period="'+t.index+'">'+mingGeEscape(t.text)+' ↗</button> 运干'+mingGeEscape(SHISHEN_NAME[t.god])+'，干支取向'+mingGeEscape(t.preference)+'</p>').join('')+'</details>';
+  return '<div class="domain-reading" data-reading-domain="'+domain+'"><p>'+mingGeEscape(d.text)+'</p><details class="domain-evidence"><summary>对应柱位 · '+evidence.length+'条线索</summary>'+readingEvidenceButtons(evidence)+'</details>'+extras+readingCitations(d.sources)+'</div>';
 }
 function readingCitations(keys){
   return '<details class="reading-citations"><summary>典籍与规则出处</summary>'+[...new Set(keys)].map(key=>{

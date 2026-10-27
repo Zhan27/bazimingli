@@ -55,3 +55,44 @@ function selectProfileUseGod(base,climate,profile){
   if(profile.climatePriority)return {element:climateCandidate,reason:'扶抑与调候综合',alternatives:[balanced],conflict:balanced!==climateCandidate};
   return {element:balanced,reason:profile.focus,alternatives:climateElement>=0?[climateElement]:[],conflict:false};
 }
+// Application weights: exposed position and root depth are separate ledgers.
+// Each branch contributes its deepest matching qi once; the day stem never supports itself.
+function structurePresence(pillars,elements){
+  assertPillars(pillars);
+  const names=['年','月','日','时'],ids=['year','month','day','hour'];
+  const stemWeights=[1,1.25,0,1],branchWeights=[1,2,1.25,1],rootWeights=[1,1.5,1.25,1],qiWeights=[1,.5,.25];
+  let exposed=0,roots=0,coverage=0;const entries=[];
+  pillars.forEach(([g,z],pillar)=>{
+    if(pillar!==2&&elements.includes(GAN_WX[g])){
+      exposed+=stemWeights[pillar];coverage+=stemWeights[pillar];
+      entries.push({id:'pillar.'+ids[pillar]+'.gan',pillar,lane:'gan',gan:g,label:names[pillar]+'干'+GAN[g],weight:stemWeights[pillar]});
+    }
+    const matched=ZHI_HIDDEN[z].flatMap((gan,qi)=>elements.includes(GAN_WX[gan])?[{id:'pillar.'+ids[pillar]+'.hidden.'+gan,pillar,lane:'zhi',gan,qi,label:names[pillar]+'支'+ZHI[z]+'藏'+GAN[gan]+(qi===0?'（本气）':''),weight:rootWeights[pillar]*qiWeights[qi]}]:[]);
+    roots+=Math.max(0,...matched.map(x=>x.weight));entries.push(...matched);
+    if(elements.includes(GAN_WX[ZHI_HIDDEN[z][0]]))coverage+=branchWeights[pillar];
+  });
+  return {exposed,roots,coverage,maxExposed:3.25,maxRoots:4.75,maxCoverage:8.5,entries};
+}
+function selectNeutralUseGod(pillars){
+  assertPillars(pillars);const dg=pillars[2][0],monthGod=tenGod(dg,ZHI_HIDDEN[pillars[1][1]][0]);
+  const gods=groups=>[...new Set(Array.from({length:10},(_,g)=>g).filter(g=>groups.includes(tenGod(dg,g))).map(g=>GAN_WX[g]))];
+  const has=groups=>pillars.some(([g],i)=>i!==2&&groups.includes(tenGod(dg,g)));
+  let routes=monthGod===7?[[[4,5],'财生官'],[[8,9],'官印相生']]:monthGod===6?[[[2],'食神制杀'],[[8,9],'杀印相生']]:[4,5].includes(monthGod)?[[[2,3],'食伤生财'],[[7],'官星护财']]:[8,9].includes(monthGod)?[[[6,7],'官杀生印']]:monthGod===2?[[[4,5],'食神生财']]:monthGod===3?[[[4,5],'伤官生财']]:[[[7],'官星约束比劫'],[[2,3],'食伤泄秀']];
+  let triggerGods=[];
+  if([3,7].includes(monthGod)&&has([3])&&has([7])){routes=[[[8,9],'印制伤护官'],[[4,5],'财星通关']];triggerGods=[3,7];}
+  if(monthGod===2&&has([8])&&has([2])){routes=[[[4,5],'财制枭护食']];triggerGods=[8,2];}
+  if([8,9].includes(monthGod)&&has([4,5])&&has([8,9])){routes=[[[0,1],'比劫护印']];triggerGods=[4,5,8,9];}
+  if([4,5,0,1].includes(monthGod)&&has([0,1])&&has([4,5])){routes=[[[2,3],'食伤转劫生财'],[[7],'官星约束比劫']];triggerGods=[0,1,4,5];}
+  const candidates=routes.flatMap(([group,path])=>gods(group).map(element=>{
+    const presence=structurePresence(pillars,[element]);
+    // Route names refer to exact ten-gods; a yin/yang counterpart is not an exposed member.
+    // Roots may share an element, but cannot fabricate an absent route member.
+    const members=presence.entries.filter(x=>group.includes(tenGod(dg,x.gan))),available=members.length>0;
+    const evidence=available?presence.entries.filter(x=>x.lane==='zhi'||group.includes(tenGod(dg,x.gan))):[];
+    const exposed=members.filter(x=>x.lane==='gan').reduce((n,x)=>n+x.weight,0);
+    return {element,path,gods:group,weight:available?exposed/presence.maxExposed+presence.roots/presence.maxRoots:0,evidence,available};
+  })).sort((a,b)=>b.weight-a.weight);
+  const chosen=candidates[0],triggers=pillars.flatMap(([g],pillar)=>pillar!==2&&triggerGods.includes(tenGod(dg,g))?[{pillar,lane:'gan',gan:g,label:['年','月','日','时'][pillar]+'干'+GAN[g]}]:[]);
+  return {version:'neutral-use-v1',monthGod,monthBranch:pillars[1][1],...chosen,candidates,triggers,
+    reason:ZHI[pillars[1][1]]+'月'+SHISHEN_NAME[monthGod]+'提纲，'+chosen.path+'；'+(chosen.available?'结合明透位置与本中余气择取'+WUXING[chosen.element]:'原局承接待补，取'+WUXING[chosen.element]+'看行运补入'),sources:['pattern','rescue','root']};
+}

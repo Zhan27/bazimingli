@@ -1,13 +1,14 @@
-/* Strength-first presentation and rule scoring. Calendar and profile use-god selection stay unchanged. */
-const STRUCTURE_SCORE_VERSION='1.0.0';
+/* Strength-first presentation and rule scoring. Month-command neutral selection and position-weighted structure scoring. */
+const STRUCTURE_SCORE_VERSION='2.0.0';
 function buildUsePreferences(zh){
   const dw=GAN_WX[zh.dg],state=strengthLabel(zh),following=state==='从弱',strong=['身强','身极强'].includes(state);
-  const favorable=state==='中和'?[]:following||strong?[(dw+1)%5,(dw+2)%5,(dw+3)%5]:[(dw+4)%5,dw];
+  const neutral=state==='中和'?(zh.useGod?.neutral||(zh.pillars?selectNeutralUseGod(zh.pillars):null)):null;
+  const favorable=state==='中和'?(neutral?[neutral.element]:[]):following||strong?[(dw+1)%5,(dw+2)%5,(dw+3)%5]:[(dw+4)%5,dw];
   const adverse=state==='中和'?[]:following||strong?[dw,(dw+4)%5]:[(dw+1)%5,(dw+2)%5,(dw+3)%5];
   const balance=zh.profile?.climatePriority?(zh.useGod?.alternatives?.[0]??zh.yongShen):zh.yongShen;
-  const note=following?'从弱·观察财官食伤顺势，印比回扶时重看根气':strong?state+'宜抑·财官食伤承接，印比再增需疏泄':state==='中和'?'中和·按提纲、制化与寒暖取用':'身弱宜扶·印比为先，财官食伤看承受';
+  const note=following?'从弱·观察财官食伤顺势，印比回扶时重看根气':strong?state+'宜抑·财官食伤承接，印比再增需疏泄':state==='中和'?'中和·'+(neutral?.reason||'按提纲、制化与寒暖取用'):'身弱宜扶·印比为先，财官食伤看承受';
   const yong=zh.yongShen,climate=zh.tiaoHouWX??-1;
-  return {version:STRUCTURE_SCORE_VERSION,strong:state,cong:following,yong,balance,climate,favorable,adverse,
+  return {version:STRUCTURE_SCORE_VERSION,strong:state,cong:following,yong,balance,climate,favorable,adverse,neutral,
     selectedIsClimate:climate>=0&&yong===climate&&(balance!==yong||zh.profile?.useStrategy==='climate-first'),note};
 }
 function elementPreference(zh,wx){
@@ -20,14 +21,10 @@ function transitPreference(zh,g,z){
 function buildStructureScore(zh){
   const p=buildUsePreferences(zh),s=buildMingGeSummary(zh),basis=[];
   // Fixed maxima add to 100. No base bonus, outcome bands, decade bonus or relation-count penalty.
-  const add=(id,k,v,max,detail)=>basis.push({id,k,v:Math.round(Math.max(0,Math.min(max,v))),max,detail});
-  const favored=p.favorable,shown=zh.pillars.flatMap(([g,z])=>[GAN_WX[g],GAN_WX[ZHI_HIDDEN[z][0]]]);
-  const n=shown.filter(w=>favored.includes(w)).length;
-  add('balance','扶抑配合',favored.length?30*Math.min(1,n/3):20,30,favored.length?'按'+p.strong+'方向，八字本气见'+n+'位承接；3位达本项上限':'日主中和，本项取20；细分由提纲与制化承接');
-  const target=favored.length?favored:[p.balance];
-  const visible=s.visible.filter(x=>target.includes(GAN_WX[x.gan])),hidden=zh.pillars.flatMap(([,z])=>ZHI_HIDDEN[z]).filter(g=>target.includes(GAN_WX[g]));
-  const rooted=visible.some(x=>x.rooted);
-  add('support','喜用透根',rooted?25:visible.length?15:hidden.length?10:0,25,rooted?'扶抑所需五行透干有根':visible.length?'扶抑所需五行已透，支中待根':hidden.length?'扶抑所需五行藏支，待透干承接':'扶抑所需五行原局未见');
+  const add=(id,k,v,max,detail,evidence=[])=>basis.push({id,k,v:Math.round(Math.max(0,Math.min(max,v))),max,detail,evidence});
+  const target=p.favorable.length?p.favorable:[p.balance],presence=structurePresence(zh.pillars,target);
+  add('balance','扶抑配合',30*presence.coverage/presence.maxCoverage,30,'按'+p.strong+'取向；年/月/时干权重1/1.25/1，四支本气1/2/1.25/1，日干不自加分。命中权重'+Number(presence.coverage.toFixed(2))+'/'+presence.maxCoverage,presence.entries.filter(x=>x.lane==='gan'||x.qi===0));
+  add('support','喜用透根',12*presence.exposed/presence.maxExposed+13*presence.roots/presence.maxRoots,25,'明透12分：'+presence.exposed+'/'+presence.maxExposed+'；根气13分：'+Number(presence.roots.toFixed(2))+'/'+presence.maxRoots+'。根位年/月/日/时1/1.5/1.25/1，本/中/余气1/0.5/0.25；每支取最深一根。',presence.entries);
   const candidates=s.candidates.map(c=>{const checks=c.checks.filter(x=>x.kind!=='review');return {title:c.title,ratio:checks.length?checks.filter(x=>x.status==='met').length/checks.length:0};}).sort((a,b)=>b.ratio-a.ratio);
   add('pattern','提纲承接',25*(candidates[0]?.ratio||0),25,candidates[0]?'按「'+candidates[0].title+'」的出现、明透、有根条件逐项计分':'月令配合路径待补');
   const relief={透干有根:10,救应受牵:8,透干待根:6,藏干待引:3,原局未见:0};

@@ -63,3 +63,15 @@ function restoreAiSession(raw,chart){
   restored.followup=restoreAiFollowup(saved.followup);
   restored.updatedAt=String(saved.updatedAt||'').slice(0,40);return restored;
 }
+// Old-rule drafts remain readable, including accepted sections and interrupted followups.
+// They are never validated or applied against a chart with a different rule version.
+function aiArchivedDraftText(saved){
+  const parts=[];
+  for(const [id,item] of Object.entries(saved.accepted||{}).slice(0,18)){
+    parts.push('【旧报告 '+id+'】\n'+(item?.format==='markdown'?String(item.text||''):JSON.stringify(item?.dimension||{})));
+  }
+  if(saved.attempt?.text)parts.push('【最后一次原文】\n'+String(saved.attempt.text));
+  const followup=saved.followup,turns=Array.isArray(followup?.turns)?followup.turns.slice(-10):[];
+  for(const t of [...turns,...(followup?.draft?[followup.draft]:[])])parts.push('【追问 · '+String(t.status||'')+'】\n'+String(t.question||'')+'\n'+String(t.answer||''));
+  return parts.join('\n\n').slice(0,1800000)||'无原文';
+}

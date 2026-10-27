@@ -1,7 +1,8 @@
 {
-  "version": "5.20.0",
+  "version": "5.31.0",
   "baseline": "v5.16",
-  "scope": "All frozen chart cases, including four pillars, lunar date, solar term, DaYun, wuxing, strength and use-god. New rules additionally covered by calculation-rules and browser tests.",
+  "amendments": "5.31.0",
+  "scope": "Original frozen calendar/strength facts plus three explicitly reviewed neutral use-god amendments. Original fixture retained unchanged; previous expectations and reasons are included per amended case.",
   "total": 12,
   "passed": 12,
   "failed": 0,
@@ -17,7 +18,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.20.0",
+      "ruleVersion": "5.31.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -103,7 +104,7 @@
         ],
         "strengthScore": 8.7,
         "strengthType": "中和",
-        "yongShen": 4
+        "yongShen": 1
       },
       "actual": {
         "pillars": [
@@ -189,10 +190,102 @@
         ],
         "strengthScore": 8.7,
         "strengthType": "中和",
-        "yongShen": 4
+        "yongShen": 1
       },
       "status": "pass",
-      "mismatches": []
+      "mismatches": [],
+      "previousExpected": {
+        "pillars": [
+          [
+            0,
+            4
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            0,
+            4
+          ],
+          [
+            6,
+            6
+          ]
+        ],
+        "lunar": {
+          "year": 2024,
+          "month": 1,
+          "day": 1,
+          "isLeap": false
+        },
+        "term": 2,
+        "dayun": {
+          "startAge": 8,
+          "startYears": 7,
+          "startMonths": 11,
+          "forward": true,
+          "days": 23.932465277777776,
+          "list": [
+            [
+              3,
+              3,
+              8
+            ],
+            [
+              4,
+              4,
+              18
+            ],
+            [
+              5,
+              5,
+              28
+            ],
+            [
+              6,
+              6,
+              38
+            ],
+            [
+              7,
+              7,
+              48
+            ],
+            [
+              8,
+              8,
+              58
+            ],
+            [
+              9,
+              9,
+              68
+            ],
+            [
+              0,
+              10,
+              78
+            ]
+          ]
+        },
+        "wxCount": [
+          3,
+          2,
+          2,
+          1,
+          0
+        ],
+        "strengthScore": 8.7,
+        "strengthType": "中和",
+        "yongShen": 4
+      },
+      "amendment": {
+        "id": "legacy-01",
+        "previous": 4,
+        "expected": 1,
+        "reason": "甲辰 丙寅 甲辰 庚午：寅月比肩，中和；丙透月干，寅中丙及午中丁承接，取食伤泄秀火。"
+      }
     },
     {
       "id": "legacy-02",
@@ -205,7 +298,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.20.0",
+      "ruleVersion": "5.31.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -393,7 +486,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.20.0",
+      "ruleVersion": "5.31.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -479,7 +572,7 @@
         ],
         "strengthScore": 7.45,
         "strengthType": "中和",
-        "yongShen": 4
+        "yongShen": 1
       },
       "actual": {
         "pillars": [
@@ -565,10 +658,102 @@
         ],
         "strengthScore": 7.45,
         "strengthType": "中和",
-        "yongShen": 4
+        "yongShen": 1
       },
       "status": "pass",
-      "mismatches": []
+      "mismatches": [],
+      "previousExpected": {
+        "pillars": [
+          [
+            0,
+            4
+          ],
+          [
+            2,
+            2
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            2,
+            0
+          ]
+        ],
+        "lunar": {
+          "year": 2024,
+          "month": 1,
+          "day": 1,
+          "isLeap": false
+        },
+        "term": 2,
+        "dayun": {
+          "startAge": 8,
+          "startYears": 7,
+          "startMonths": 9,
+          "forward": true,
+          "days": 23.453298611111112,
+          "list": [
+            [
+              3,
+              3,
+              8
+            ],
+            [
+              4,
+              4,
+              18
+            ],
+            [
+              5,
+              5,
+              28
+            ],
+            [
+              6,
+              6,
+              38
+            ],
+            [
+              7,
+              7,
+              48
+            ],
+            [
+              8,
+              8,
+              58
+            ],
+            [
+              9,
+              9,
+              68
+            ],
+            [
+              0,
+              10,
+              78
+            ]
+          ]
+        },
+        "wxCount": [
+          3,
+          3,
+          1,
+          0,
+          1
+        ],
+        "strengthScore": 7.45,
+        "strengthType": "中和",
+        "yongShen": 4
+      },
+      "amendment": {
+        "id": "legacy-03",
+        "previous": 4,
+        "expected": 1,
+        "reason": "甲辰 丙寅 乙巳 丙子：寅月劫财，中和；丙透月时，寅巳藏丙，取食伤泄秀火。"
+      }
     },
     {
       "id": "legacy-04",
@@ -581,7 +766,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.20.0",
+      "ruleVersion": "5.31.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -667,7 +852,7 @@
         ],
         "strengthScore": 8.85,
         "strengthType": "中和",
-        "yongShen": 1
+        "yongShen": 3
       },
       "actual": {
         "pillars": [
@@ -753,10 +938,102 @@
         ],
         "strengthScore": 8.85,
         "strengthType": "中和",
-        "yongShen": 1
+        "yongShen": 3
       },
       "status": "pass",
-      "mismatches": []
+      "mismatches": [],
+      "previousExpected": {
+        "pillars": [
+          [
+            1,
+            5
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        "lunar": {
+          "year": 2025,
+          "month": 12,
+          "day": 17,
+          "isLeap": false
+        },
+        "term": 1,
+        "dayun": {
+          "startAge": 10,
+          "startYears": 9,
+          "startMonths": 9,
+          "forward": false,
+          "days": 29.485300925925927,
+          "list": [
+            [
+              4,
+              0,
+              10
+            ],
+            [
+              3,
+              11,
+              20
+            ],
+            [
+              2,
+              10,
+              30
+            ],
+            [
+              1,
+              9,
+              40
+            ],
+            [
+              0,
+              8,
+              50
+            ],
+            [
+              9,
+              7,
+              60
+            ],
+            [
+              8,
+              6,
+              70
+            ],
+            [
+              7,
+              5,
+              80
+            ]
+          ]
+        },
+        "wxCount": [
+          2,
+          2,
+          3,
+          1,
+          0
+        ],
+        "strengthScore": 8.85,
+        "strengthType": "中和",
+        "yongShen": 1
+      },
+      "amendment": {
+        "id": "legacy-04",
+        "previous": 1,
+        "expected": 3,
+        "reason": "乙巳 己丑 己酉 丙寅：丑月比肩，中和；酉本气辛食神、丑藏辛及巳藏庚承接，取食伤泄秀金；年乙七杀不计正官明透，火调候另列。"
+      }
     },
     {
       "id": "legacy-05",
@@ -769,7 +1046,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.20.0",
+      "ruleVersion": "5.31.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -957,7 +1234,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.20.0",
+      "ruleVersion": "5.31.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -1145,7 +1422,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.20.0",
+      "ruleVersion": "5.31.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -1333,7 +1610,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.20.0",
+      "ruleVersion": "5.31.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -1521,7 +1798,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.20.0",
+      "ruleVersion": "5.31.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -1709,7 +1986,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.20.0",
+      "ruleVersion": "5.31.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -1897,7 +2174,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.20.0",
+      "ruleVersion": "5.31.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [
@@ -2085,7 +2362,7 @@
           "preciseTime": true
         }
       },
-      "ruleVersion": "5.20.0",
+      "ruleVersion": "5.31.0",
       "reference": "Validated local v5.16 release SHA256 45653ccb70ac53fc0eb0408dae9334a80eb7e088008b20b97b514c1894569f17. Software regression baseline, not independent astronomical evidence.",
       "expected": {
         "pillars": [

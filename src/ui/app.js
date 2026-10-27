@@ -1406,51 +1406,9 @@ function zhXingGe(zh){
   else s+=`仪表：五行平和，气色端凝，风度自然。`;
   return s;
 }
-function zhCaiFu(zh){
-  const caiTotal=zh.caiZheng+zh.caiPian;
-  let s=`命局财星：正财${zh.caiZheng}位、偏财${zh.caiPian}位，${zh.caiWei.length?'财星见于'+zh.caiWei.join('、'):'财星不显于四柱'}。`;
-  if(zh.strong) s+=`日主身强，能任财官，财来可担、能赚能守，是发家之基；`;
-  else if(strengthLabel(zh)==='中和') s+=`日主中和，财星承受与取用须结合格局及行运，不按身弱套用；`;
-  else if(zh.congGe) s+=`日主从弱，财官食伤按从势规则考察；`;
-  else if(caiTotal>=3) s+=`身弱财多，如弱水浮舟，财重压身，劳心费力，宜合作分财、借力生财，勿独吞独扛；`;
-  else if(caiTotal===0) s+=`财星不显，财缘淡泊，反宜精进本事、以技养财，待大运引出财星自然渐旺；`;
-  else s+=`身弱而有财，财星有制，宜稳中求进，先以印比护身再图财；`;
-  if(zh.caiPian>zh.caiZheng) s+=`偏财旺于正财，主机遇之财：来财偏快、嗅觉敏锐，善抓风口，然大起大落，忌贪多求快、见好即收；`;
-  else if(zh.caiZheng>0) s+=`正财为体，收入稳定、细水长流，宜储蓄理财、实业深耕，财不露白；`;
-  if(zh.tsCount[2]+zh.tsCount[3]>0) s+=`且食伤生财，可凭一技之长生财——专业技能、手艺创意皆是您的财源，胜过守株待兔；`;
-  if(zh.caiKu.length) s+=`命中带财库（${zh.caiKu.map(z=>ZHI[z]).join('、')}），财有库藏，中年后聚财之力渐显，逢冲库之大运财源大开；`;
-  else s+=`财无库藏，得财易散，宜养成定投储蓄之习，量入为出；`;
-  // 赚钱特质(王家荣: 主星赚钱特征)
-  const earn=[];
-  if(zh.tsCount[4]>0) earn.push('偏财主星，善抓机会、大小钱皆有心，财路广开');
-  if(zh.tsCount[3]>0) earn.push('伤官主星，有危机意识、肯学第二专长，凭本事增值');
-  if(zh.tsCount[0]>0) earn.push('比肩主星，勤劳务实、钱多钱少皆肯做，脚踏实地');
-  if(earn.length) s+=`赚钱特质：${earn.join('；')}。`;
-  // 经典断语
-  if(zh.caiZheng>=2) s+=`《渊海子平》云'身财俱旺，一生乐守'，正财有力而身强，守成积富之象；`;
-  if(zh.tsCount[2]>0&&zh.caiTotal>=1) s+=`又云'财藏官透，家道兴隆'，财官有气，家业可期。`;
-  const caiDy=zh.dy.dyList.find(dy=>[4,5].includes(tenGod(zh.dg,dy.g)));
-  if(caiDy) s+=`大运中${GAN[caiDy.g]}${ZHI[caiDy.z]}（${caiDy.age}-${caiDy.endAge}岁）为财星运，是求财之最佳窗口，宜早布局、大胆落地。`;
-  return s;
-}
+function zhCaiFu(zh){return renderDomainReading(zh,'wealth');}
 function zhHunYin(zh){
-  const isMale=zh.gender===1;
-  let s=isMale?`男命以财为妻，妻星${zh.hunCount}位；`:`女命以官杀为夫，夫星${zh.hunCount}位；`;
-  if(zh.hunCount===0) s+=`夫妻星不显，感情宜晚成，早恋多波折，配偶多来自远缘或经人介绍，缘到自然成，莫强求；`;
-  else if(zh.hunCount<=2) s+=`夫妻星得位，姻缘有定，宜把握适婚之龄，主动则不误；`;
-  else s+=`夫妻星多现，异性缘佳，然多则惑，须防感情多扰，择一而定方安；`;
-  s+=`夫妻宫坐${ZHI[zh.fuQiGong]}，主气${SHISHEN_NAME[zh.fqTs]}，`;
-  const fqWX=ZHI_WX[zh.fuQiGong], dayWX=GAN_WX[zh.dg];
-  if(fqWX===dayWX) s+=`配偶与己性情相近、志趣相投，相互懂得，然同气相求亦易同病相争，相处宜留空间；`;
-  else if((dayWX+4)%5===fqWX) s+=`配偶具护持之性，关怀体贴、包容付出，是能旺己之人；`;
-  else if((dayWX+1)%5===fqWX) s+=`配偶才情外露、活泼有艺，相处有情有趣，唯防其异性缘亦佳；`;
-  else s+=`配偶个性与己互补，一刚一柔、一急一缓，磨合中见深情，包容为上；`;
-  if(zh.taoHua>=0&&[zh.yearGZ[1],zh.monthGZ[1],zh.dayGZ[1],zh.hourGZ[1]].includes(zh.taoHua)) s+=`命带桃花（${ZHI[zh.taoHua]}），魅力人缘佳，婚前多选择，婚后须自律；桃花若落夫妻宫，反主夫妻情深。`;
-  if(isMale && zh.caiZheng>0 && zh.caiPian>0) s+=`正偏财并透，感情丰富，婚恋宜专一，防情债缠身；`;
-  if(isMale && zh.fqTs===5) s+=`日坐正财，妻贤持家有方，婚姻安稳之象；`;
-  if(isMale && zh.fqTs===4) s+=`日坐偏财，妻善经营、旺夫之象，然防感情多向外；`;
-  if(!isMale && (zh.fqTs===7||zh.fqTs===6)) s+=`日坐官杀，夫缘在身，然官杀为夫亦为压力，宜择刚柔相济之配；`;
-  s+=`婚配宜选${WUXING[(dayWX+2)%5]}或${WUXING[(dayWX+3)%5]}五行之人，性格相济、气场合拍。`;
+  let s=renderDomainReading(zh,'relationship');
   // v5.10 合婚配对入口 + 最近合婚摘要(填入婚姻感情卡片)
   try{
     const hhInfo=JSON.parse(localStorage.getItem('mingli_hh_last')||'null');
@@ -1462,26 +1420,7 @@ function zhHunYin(zh){
   }catch(e){}
   return s;
 }
-function zhXueYe(zh){
-  const yin=zh.tsCount[8]+zh.tsCount[9], shi=zh.tsCount[2]+zh.tsCount[3], guan=zh.tsCount[6]+zh.tsCount[7], cai=zh.tsCount[4]+zh.tsCount[5];
-  let s=`学业事业，观印食官财四象：`;
-  s+=`印星${yin}位主吸收与学问，${yin>=2?'印旺，记忆与理解俱佳，深造考试皆宜，读书是您的捷径':yin===0?'印星不现，宜实践出真知，边做边学胜于死读':'印星中平，学贵有恒，善用方法可补'}；`;
-  s+=`食伤${shi}位主才华输出，${shi>=2?'食伤吐秀，思维活跃、创意出众，技术、艺术、策划类最能发光':shi===0?'才华内敛，宜沉淀积累，厚积薄发':''}`;
-  s+=`官杀${guan}位主事业格局，${guan>=2?'官杀有力，利管理仕途、体制内发展，规则之内反而游刃有余':'官杀平，事业求稳，宜深耕专业成专家'}；`;
-  s+=`财星${cai}位主商业头脑，${cai>=2?'财星透旺，有经商之智，实业金融可图':'财星平，宜以职养财、副业添彩'}。`;
-  const dy0=zh.dy.dyList[0];
-  s+=`${zh.dy.startAge}岁起运，首运${GAN[dy0.g]}${ZHI[dy0.z]}（${SHISHEN_NAME[tenGod(zh.dg,dy0.g)]}运）定少年基调：`;
-  const tg0=tenGod(zh.dg,dy0.g);
-  if([8,9].includes(tg0)) s+=`印运护持，少年学业顺遂，宜趁势深造；`;
-  else if([2,3].includes(tg0)) s+=`食伤运聪明外显，然心猿意马，宜引导专注；`;
-  else if([6,7].includes(tg0)) s+=`官杀运早熟自律，压力中成长，扛得住则成器；`;
-  else s+=`比劫财运平顺，筑基为要，勿虚掷光阴。`;
-  // 四柱论官运断语
-  if(zh.tsCount[7]>=2) s+=`《四柱论官运》：'官临旺地，光宗耀祖'，正官有力而透，仕途有望；`;
-  if(zh.tsCount[6]>=1) s+=`'杀居太岁，居安思危'，七杀临旺须防是非，居安常思危；`;
-  if(zh.tsCount[8]+zh.tsCount[9]>=2) s+=`'印绶无伤生身，门庭光彩'，印旺无财破，学业功名可期。`;
-  return s;
-}
+function zhXueYe(zh){return renderDomainReading(zh,'career');}
 function zhJianKang(zh){
   const sorted=[...zh.wxCount].map((c,i)=>({c,i})).sort((a,b)=>b.c-a.c);
   const ts=sorted[0], tw=sorted[sorted.length-1];
@@ -1512,7 +1451,7 @@ function zhJianKang(zh){
 function zhDingDang(zh){return buildStructureScore(zh);}
 function zhDingDangHtml(zh){
   const d=zhDingDang(zh),esc=mingGeEscape;
-  return '<div class="structure-score" data-score-version="'+d.version+'"><div class="structure-score-heading"><div><b id="dd-score-num">'+d.score+'</b><small> / 100</small></div><div><strong>'+d.geJu+'</strong><p>扶抑 → 透根 → 提纲 → 制化 → 寒暖</p></div></div><div class="structure-score-parts">'+d.basis.map(b=>'<div><span>'+esc(b.k)+'</span><b>'+b.v+' / '+b.max+'</b><progress value="'+b.v+'" max="'+b.max+'" aria-label="'+esc(b.k)+'"></progress></div>').join('')+'</div><details class="score-basis"><summary>评分依据 · 分项与权重</summary>'+d.basis.map(b=>'<p><b>'+esc(b.k)+' '+b.v+'/'+b.max+'</b> · '+esc(b.detail)+'</p>').join('')+'<p>分项合计 '+d.score+' / 100 · 评分规则 '+d.version+'</p></details></div><div class="mingge-reference">'+mingGeSummaryBody(zh)+'</div>';
+  return '<div class="structure-score" data-score-version="'+d.version+'"><div class="structure-score-heading"><div><b id="dd-score-num">'+d.score+'</b><small> / 100</small></div><div><strong>'+d.geJu+'</strong><p>扶抑 → 透根 → 提纲 → 制化 → 寒暖</p></div></div><div class="structure-score-parts">'+d.basis.map(b=>'<div><span>'+esc(b.k)+'</span><b>'+b.v+' / '+b.max+'</b><progress value="'+b.v+'" max="'+b.max+'" aria-label="'+esc(b.k)+'"></progress></div>').join('')+'</div><details class="score-basis"><summary>评分依据 · 分项与权重</summary>'+d.basis.map(b=>'<p><b>'+esc(b.k)+' '+b.v+'/'+b.max+'</b> · '+esc(b.detail)+(b.evidence?.length?'<br>'+readingEvidenceButtons(b.evidence):'')+'</p>').join('')+'<p>分项合计 '+d.score+' / 100 · 评分规则 '+d.version+'</p></details></div><div class="mingge-reference">'+mingGeSummaryBody(zh)+'</div>';
 }
 /* ============ 术语即点即译 ============ */
 /* 渲染工具: 术语名包成可点击 span(有词条才包, 无则原文) */
@@ -1695,7 +1634,7 @@ function zhLiuNianDetail(zh){
   const nowYear=new Date().getFullYear();
   const ni=((nowYear-4)%60+60)%60; const [cg,cz]=indexToGZ(ni);
   const ctg=tenGod(zh.dg,cg);
-  const wxTxt=GAN_WX[cg]===zh.yongShen||ZHI_WX[cz]===zh.yongShen?'值喜用，运势顺遂':'非喜用，宜守正蓄力';
+  const wxTxt='干支取向'+transitPreference(zh,cg,cz).kind;
   const zzC=ZHI_HIDDEN[cz]?ZHI_HIDDEN[cz][0]:-1;
   const tzC=zzC>=0?tenGod(zh.dg,zzC):-1;
   let s=`行运有节，知时而动。当前${nowYear}年（${GAN[cg]}${ZHI[cz]}年，干${SHISHEN_NAME[ctg]}${tzC>=0?'·支'+SHISHEN_NAME[tzC]:''}流年，${wxTxt}）。`;
@@ -1707,18 +1646,18 @@ function zhLiuNianDetail(zh){
     const tg=tenGod(zh.dg,g);
     const zz=ZHI_HIDDEN[z]?ZHI_HIDDEN[z][0]:-1;
     const tz=zz>=0?tenGod(zh.dg,zz):-1;
-    const isGood=GAN_WX[g]===zh.yongShen||ZHI_WX[z]===zh.yongShen;
-    s+=`${yy}年${GAN[g]}${ZHI[z]}（干${SHISHEN_NAME[tg]}·支${tz>=0?SHISHEN_NAME[tz]:''}，${isGood?'喜用之年，可进':'平顺之年，宜守'}）；`;
+    const direction=transitPreference(zh,g,z);
+    s+=`${yy}年${GAN[g]}${ZHI[z]}（干${SHISHEN_NAME[tg]}·支${tz>=0?SHISHEN_NAME[tz]:''}，干支取向${direction.kind}）；`;
   }
   const d0=zh.dy.dyList[0];
   const d0g=tenGod(zh.dg,d0.g);
   const d1=zh.dy.dyList[1];
   const d1g=tenGod(zh.dg,d1.g);
-  const d0good=(zh.strong&&[2,3,4,5,6,7].includes(d0g))||(!zh.strong&&[0,1,8,9].includes(d0g));
-  const d1good=(zh.strong&&[2,3,4,5,6,7].includes(d1g))||(!zh.strong&&[0,1,8,9].includes(d1g));
-  s+=`大运十年一轮：${zh.dy.startAge}岁起运，首运${GAN[d0.g]}${ZHI[d0.z]}（${SHISHEN_NAME[d0g]}运）${d0good?'为喜用，根基顺遂、宜打基础':'(印比或克泄耗)，平稳蓄力、宜学宜练'}；`;
-  s+=`次运${GAN[d1.g]}${ZHI[d1.z]}（${SHISHEN_NAME[d1g]}运）${d1good?'渐入佳境，事业财运上扬，宜提前布局、大胆落地':'转折调整之运，宜稳中求变'}。`;
-  s+='运势如潮，有起有落，喜用之年进、忌神之年守，顺势者昌。';
+  const d0kind=transitPreference(zh,d0.g,d0.z).kind;
+  const d1kind=transitPreference(zh,d1.g,d1.z).kind;
+  s+=`大运十年一轮：${zh.dy.startAge}岁起运，首运${GAN[d0.g]}${ZHI[d0.z]}（${SHISHEN_NAME[d0g]}运）干支取向${d0kind}；`;
+  s+=`次运${GAN[d1.g]}${ZHI[d1.z]}（${SHISHEN_NAME[d1g]}运）干支取向${d1kind}。`;
+  s+='沿原局取用看承接，干支两向相反时分开细读。';
   // 盲派应期法
   const rels=zhGanZhiMap(zh);
   const chongY=rels.filter(r=>r.cls==='chong').map(r=>r.name.slice(0,2));
@@ -3377,7 +3316,7 @@ function aPersonality(zh,q){
 function aLuck(zh,q){
   const nl=nowLiuNian(zh);
   let s='<div style="margin-bottom:6px"><b style="color:var(--gold)"> '+nl.year+'年（'+GAN[nl.g]+ZHI[nl.z]+'年）运势</b><br><span style="font-size:.82rem">值<b>'+nl.name+'</b>流年。'+([0,1].includes(nl.tg)?'比劫之年，人缘旺、合作多，但防竞争破财，忌合伙轻率':[2,3].includes(nl.tg)?'食伤之年，才华显露、想法多，利创作输出，但忌口舌是非':[4,5].includes(nl.tg)?'财星之年，财机显现，宜积极求财，稳中进取':[6,7].includes(nl.tg)?'官杀之年，事业压力与机遇并存，守规则、扛压力则有进益':'印星之年，利学习进修、贵人提携，宜沉淀积累')+'。</span></div>';
-  s+='<div style="margin-bottom:6px"><b style="color:var(--gold)"> 与您的喜忌</b><br><span style="font-size:.82rem">'+(GAN_WX[nl.g]===zh.yongShen||ZHI_WX[nl.z]===zh.yongShen?'流年值用神'+WUXING[zh.yongShen]+'，为喜用之年，运势顺遂，宜把握良机':'流年'+WUXING[GAN_WX[nl.g]]+'、'+WUXING[ZHI_WX[nl.z]]+'，非用神之年，宜守成审慎，蓄势待发')+'。</span></div>';
+  s+='<div style="margin-bottom:6px"><b style="color:var(--gold)"> 与您的喜忌</b><br><span style="font-size:.82rem">'+('流年干支取向'+transitPreference(zh,nl.g,nl.z).kind+'，结合'+strengthLabel(zh)+'与原局承接细读')+'。</span></div>';
   s+='<div><b style="color:var(--gold)"> 行动提示</b><br><span style="font-size:.82rem">'+(strengthText(zh,'身强逢忌神年亦能扛事，主动化解即可','身弱之年更宜低调蓄力，广结善缘、借势而行'))+'。</span></div>';
   return s;
 }
@@ -3386,8 +3325,8 @@ function aDayun(zh,q){
   s+='<div style="margin-bottom:6px;font-size:.82rem">';
   zh.dy.dyList.slice(0,5).forEach((dy,i)=>{
     const tg=tenGod(zh.dg,dy.g);
-    const good=(zh.strong&&[2,3,4,5,6,7].includes(tg))||(!zh.strong&&[0,1,8,9].includes(tg));
-    s+='<div style="padding:3px 0">'+(i+1)+'. <b>'+GAN[dy.g]+ZHI[dy.z]+'</b>（'+SHISHEN_NAME[tg]+'运，'+dy.age+'-'+dy.endAge+'岁）：'+(good?'喜用大运，顺遂得助':'平稳之运，宜守宜学')+'</div>';
+    const direction=transitPreference(zh,dy.g,dy.z);
+    s+='<div style="padding:3px 0">'+(i+1)+'. <b>'+GAN[dy.g]+ZHI[dy.z]+'</b>（'+SHISHEN_NAME[tg]+'运，'+dy.age+'-'+dy.endAge+'岁）：'+('干支取向'+direction.kind)+'</div>';
   });
   s+='</div>';
   s+='<div><b style="color:var(--gold)"> 提示</b><br><span style="font-size:.82rem">大运十年一轮，喜用神大运宜进取，忌神大运宜守成。当前'+SHISHEN_NAME[tenGod(zh.dg,zh.dy.dyList[0].g)]+'运区间，'+(strengthText(zh,'行克泄耗之事正合身强之需','宜以印比助身为要'))+'。</span></div>';
