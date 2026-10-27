@@ -144,3 +144,5 @@ body[data-theme=xuanmo] .gz-explorer{--gz-he:#d8b276;--gz-chong:#e0a99b;--gz-san
 @media(max-width:600px){.structure-score-parts{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 8px}.structure-score-heading{gap:10px;align-items:flex-start}.structure-score-heading>div{min-width:0}.use-preferences{padding:10px}.use-preference-row{grid-template-columns:5em minmax(0,1fr);gap:6px}}
 
 .structure-score-heading>div:first-child{white-space:nowrap;flex:0 0 auto}
+
+#ai-follow-input{min-width:0!important;flex:1 1 200px!important}#ai-follow-box{overflow-wrap:anywhere;white-space:pre-wrap}.ai-follow-turn{padding:8px 0;border-bottom:1px solid var(--line)}.ai-follow-turn:last-child{border-bottom:0}.ai-follow-turn p{margin:4px 0;text-align:start}.ai-follow-question{color:var(--jade);font-weight:600}.ai-follow-turn small{color:var(--ink3);font-size:.7rem}

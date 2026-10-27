@@ -8,7 +8,7 @@ function aiDimensionIds(ids){
 function createAiSession(chart,schoolId,now=new Date().toISOString()){
   aiFacts(chart);
   if(getRuleProfile(schoolId).key!==chart.rules.profile)throw new TypeError('流派与计算规则不一致，请重新排盘');
-  return {version:AI_SESSION_VERSION,chartId:chartFactId(chart),input:JSON.parse(JSON.stringify(chart.input)),schoolId:getRuleProfile(schoolId).id,ruleVersion:chart.rules.version,accepted:{},history:[],attempt:null,updatedAt:now};
+  return {version:AI_SESSION_VERSION,chartId:chartFactId(chart),input:JSON.parse(JSON.stringify(chart.input)),schoolId:getRuleProfile(schoolId).id,ruleVersion:chart.rules.version,accepted:{},history:[],attempt:null,followup:emptyAiFollowup(),updatedAt:now};
 }
 function beginAiAttempt(session,{ids,model,base,format='json',now=new Date().toISOString()}){
   aiDimensionIds(ids);if(!['json','markdown'].includes(format))throw new TypeError('输出格式无效');
@@ -60,5 +60,6 @@ function restoreAiSession(raw,chart){
   const a=saved.attempt;
   if(a){aiDimensionIds(a.ids);if(!['json','markdown'].includes(a.format)||typeof a.text!=='string'||a.text.length>1000000)throw new TypeError('草稿内容无效');restored.attempt={ids:a.ids,format:a.format,text:a.text,status:a.status==='running'?'interrupted':String(a.status).slice(0,30),errors:[],meta:cleanMeta(a.meta)};}
   if(Array.isArray(saved.history))restored.history=saved.history.slice(-10).map(h=>({ids:aiDimensionIds(h.ids),status:String(h.status).slice(0,30),meta:cleanMeta(h.meta)}));
+  restored.followup=restoreAiFollowup(saved.followup);
   restored.updatedAt=String(saved.updatedAt||'').slice(0,40);return restored;
 }

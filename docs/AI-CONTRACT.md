@@ -23,3 +23,12 @@ The optional legacy `/v1/divine` server-template route still accepts full Markdo
 Tests use synthetic charts, intentionally malformed replies, mocked HTTP/SSE streams and explicit cancellation. Real paid model comparisons, cross-provider JSON Schema compatibility trials and a complete classic-quotation audit remain unfinished.
 
 `node scripts/check-ai-fixtures.cjs` reruns the fixed `synthetic-contract-v1` fixtures and emits `verification/ai-contract-evaluation.json`, also produced by `npm test` and uploaded by verification CI. Positive cases are generated protocol examples, negative cases are declared fault injections. Counts report contract expectations and injected faults rejected; they are not model accuracy, cost, latency or experimental prediction results. Invalid/truncated JSON correctly reports incomplete coverage.
+
+
+## 连续追问（5.30）
+
+追问沿用当前命盘与原始报告，后续请求按顺序携带已完成的问答。原始报告最多取末12000字符，历史上下文最多32000字符，当前问题最多4000字符；本地会话保留最多10轮、历史问答合计最多180000字符，单次回答最多60000字符。较早记录超出上限时从最早一轮起移除。
+
+追问与最近一盘的v1草稿一起保存在sessionStorage，记录绑定chartId，兼容没有追问字段的旧草稿。重载后可点击“恢复最近草稿”恢复命盘、报告和追问；仍在运行的原始草稿恢复为中断状态，不自动发送请求。正常离开页面复用既有pagehide取消机制，强制保存最后收到的部分内容。浏览器被强制结束时只能恢复最后已保存的片段。
+
+“清空追问”只清除追问，保留报告与排盘；“清除AI草稿”清除报告与追问，记录和API设置独立。已停止/失败的部分回答仍可查看，重新发送时只把已完成问答作为历史上下文。每次运行同时核对请求对象与命盘ID，旧回包不能填入新命盘或清空后的新对话。草稿重建仅接收已知字段，不保存API配置，文本通过textContent显示。

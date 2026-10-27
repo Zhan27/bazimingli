@@ -9,7 +9,11 @@ function aiEvidenceSave(force=false){
   catch(e){aiDraftWarning='草稿无法写入会话存储，仅当前页面保留。';}
 }
 function aiEvidenceCancel(){
-  if(aiFollowActive){const follow=aiFollowActive;aiFollowActive=null;follow.abort();}
+  if(aiFollowActive){
+    const follow=aiFollowActive;aiFollowActive=null;
+    if(aiEvidenceSession?.chartId===follow.chartId&&aiEvidenceSession.followup?.draft){aiEvidenceSession=updateAiFollowup(aiEvidenceSession,aiEvidenceSession.followup.draft.answer,'canceled');aiEvidenceSave(true);}
+    follow.handle?.abort();if(lastZh)aiEvidencePaint();
+  }
   const run=aiEvidenceActive;if(!run)return;aiEvidenceActive=null;run.handle?.abort();
   if(aiEvidenceSession?.attempt){aiEvidenceSession=updateAiAttempt(aiEvidenceSession,aiEvidenceSession.attempt.text,'canceled');aiEvidenceSave(true);}
   if(lastZh&&chartFactId(aiEvidenceChart())===run.chartId)aiEvidencePaint();
@@ -52,11 +56,12 @@ function aiEvidencePaint(){
     const details=document.createElement('details'),summary=document.createElement('summary'),meta=document.createElement('p');summary.textContent='生成记录';meta.textContent=JSON.stringify(item.meta,null,2);details.append(summary,meta);target.appendChild(details);
     const badge=card.querySelector('.ai-dim-badge');if(badge){badge.style.display='inline-block';badge.textContent=item.format==='json'?'结构已校验':'Markdown';}
   }
+  aiFollowPaint();
 }
 function aiEvidenceMount(){
   const chart=aiEvidenceChart();aiEvidenceSession=createAiSession(chart,lastSchool);aiDraftWarning='';
   const host=document.getElementById('ai-workflow-controls');if(!host)return;
-  host.innerHTML='<label for="ai-output-format">输出格式</label> <select id="ai-output-format"><option value="json">JSON（兼容模式）</option><option value="schema">JSON Schema（接口需支持）</option><option value="markdown">Markdown文本</option></select> <button type="button" id="ai-cancel" class="btn btn-ghost" disabled>停止生成</button> <button type="button" id="ai-retry-missing" class="btn btn-ghost">仅重试缺失维度（调用API）</button> <button type="button" id="ai-restore-draft" class="btn btn-ghost">恢复最近草稿</button> <button type="button" id="ai-clear-draft" class="btn btn-ghost">清除AI草稿</button><p class="note">仅保留最近一盘的标签页会话草稿（含出生资料和回复，不含API设置）；浏览器恢复会话可能保留。取消或失败不会自动重发收费请求。JSON Schema不支持时请主动改选兼容格式后重试。</p><p id="ai-workflow-status" role="status" aria-live="polite"></p><ul id="ai-evidence-errors"></ul><details><summary>查看回复草稿</summary><pre id="ai-draft-text"></pre><button type="button" id="ai-validate-draft" class="btn btn-ghost">重新校验草稿（不调用API）</button></details>';
+  host.innerHTML='<label for="ai-output-format">输出格式</label> <select id="ai-output-format"><option value="json">JSON（兼容模式）</option><option value="schema">JSON Schema（接口需支持）</option><option value="markdown">Markdown文本</option></select> <button type="button" id="ai-cancel" class="btn btn-ghost" disabled>停止生成</button> <button type="button" id="ai-retry-missing" class="btn btn-ghost">仅重试缺失维度（调用API）</button> <button type="button" id="ai-restore-draft" class="btn btn-ghost">恢复最近草稿</button> <button type="button" id="ai-clear-draft" class="btn btn-ghost">清除AI草稿</button><p class="note">仅保留最近一盘的标签页会话草稿（含出生资料、回复及追问记录，不含API设置）；浏览器恢复会话可能保留。取消或失败不会自动重发收费请求。JSON Schema不支持时请主动改选兼容格式后重试。</p><p id="ai-workflow-status" role="status" aria-live="polite"></p><ul id="ai-evidence-errors"></ul><details><summary>查看回复草稿</summary><pre id="ai-draft-text"></pre><button type="button" id="ai-validate-draft" class="btn btn-ghost">重新校验草稿（不调用API）</button></details>';
   document.getElementById('ai-cancel').onclick=aiEvidenceCancel;
   document.getElementById('ai-retry-missing').onclick=()=>aiEvidenceStart(aiEvidenceMissing());
   document.getElementById('ai-restore-draft').onclick=aiEvidenceRestore;
@@ -70,7 +75,7 @@ function aiEvidenceMount(){
 function aiEvidenceClear(){
   if(aiEvidenceActive||aiFollowActive)return;
   try{sessionStorage.removeItem(AI_DRAFT_NS);}catch(e){aiEvidenceNotice('浏览器拒绝删除存储，请清除站点数据。');return;}
-  aiEvidenceSession=createAiSession(aiEvidenceChart(),lastSchool);lastAIReply='';document.querySelectorAll('.ai-evidence-result').forEach(el=>el.remove());document.querySelectorAll('[id^="ai-dim-"] .ai-dim-badge').forEach(el=>{el.style.display='none';});aiEvidencePaint();aiEvidenceNotice('已清除AI草稿；排盘记录和API设置各自保留。');
+  aiEvidenceSession=createAiSession(aiEvidenceChart(),lastSchool);lastAIReply='';const followInput=document.getElementById('ai-follow-input');if(followInput)followInput.value='';document.querySelectorAll('.ai-evidence-result').forEach(el=>el.remove());document.querySelectorAll('[id^="ai-dim-"] .ai-dim-badge').forEach(el=>{el.style.display='none';});aiEvidencePaint();aiEvidenceNotice('已清除AI草稿；排盘记录和API设置各自保留。');
 }
 function aiEvidenceRestore(){
   if(aiEvidenceActive||aiFollowActive)return;

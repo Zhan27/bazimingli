@@ -1,4 +1,11 @@
 /** Existing relation rules and pillar-aware presentation data; no network or DOM. */
+const BRANCH_PUNISHMENT_RULES=freezeRules({version:'1.1.0',groups:[[[2,5,8],'寅巳申三刑'],[[1,10,7],'丑戌未三刑'],[[0,3],'子卯相刑']],self:[4,6,9,11]});
+function branchPunishment(a,b){
+  if(![a,b].every(z=>Number.isInteger(z)&&z>=0&&z<12))throw new RangeError('地支参数无效');
+  if(a===b)return BRANCH_PUNISHMENT_RULES.self.includes(a)?{kind:'self',name:ZHI[a]+ZHI[a]+'自刑',group:[a],version:BRANCH_PUNISHMENT_RULES.version}:null;
+  const hit=BRANCH_PUNISHMENT_RULES.groups.find(([group])=>group.includes(a)&&group.includes(b));
+  return hit?{kind:'pair',name:hit[0].filter(z=>z===a||z===b).map(z=>ZHI[z]).join('')+'相刑',group:[...hit[0]],version:BRANCH_PUNISHMENT_RULES.version}:null;
+}
 // 干支合冲刑害图示
 function zhGanZhiMap(zh){
   const gans=[['年',zh.yearGZ[0]],['月',zh.monthGZ[0]],['日',zh.dayGZ[0]],['时',zh.hourGZ[0]]];
@@ -38,13 +45,13 @@ function zhGanZhiMap(zh){
     const present=set.filter(z=>zhis.some(x=>x[1]===z));
     if(present.length>=2) rels.push({t:'地支三合',name:name+(present.length===3?'（三合全）':'（半合）'),from:present.map(z=>ZHI[z]).join(''),to:'',cls:'sanhe'});
   });
-  const xings=[[[2,5,8],'寅巳申三刑'],[[1,10,7],'丑戌未三刑'],[[0,3],'子卯相刑']];
+  const xings=BRANCH_PUNISHMENT_RULES.groups;
   xings.forEach(([set,name])=>{
     const present=set.filter(z=>zhis.some(x=>x[1]===z));
-    if(present.length>=2) rels.push({t:'地支相刑',name:name,from:present.map(z=>ZHI[z]).join(''),to:'',cls:'xing'});
+    if(present.length>=2) rels.push({t:'地支相刑',name:present.length===set.length?name:present.map(z=>ZHI[z]).join('')+'相刑（两支）',from:present.map(z=>ZHI[z]).join(''),to:'',cls:'xing',complete:present.length===set.length});
   });
   // 自刑(辰辰/午午/酉酉/亥亥 需同支双见)
-  const ziXingZhi=[4,6,9,11];
+  const ziXingZhi=BRANCH_PUNISHMENT_RULES.self;
   ziXingZhi.forEach(z=>{
     const hit=zhis.filter(x=>x[1]===z);
     if(hit.length>=2) rels.push({t:'地支自刑',name:ZHI[z]+ZHI[z]+'自刑',from:hit.map(x=>x[0]+ZHI[z]).join('·'),to:'',cls:'xing'});

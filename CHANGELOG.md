@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.30.0 — 2026-10-27
+- Unified punishment rules used by natal, annual and pairwise marriage checks. Corrected false same-branch pair punishments, replaced the mistaken Mao self-punishment with Chen, distinguished two-member from complete three-member groups and corrected the two classical punishment names in local readings. Relation rules1.1.0 carry their own version.
+- Updated marriage rules5.30.0 to use the shared five-state strength preferences. Listed beneficial support, adverse reinforcement, climate contribution and missing-element direction separately; missing an element no longer guarantees a bonus. DaYun stem and branch use the same mixed/neutral classification as the individual chart, with a complete scoring ledger and additive preference evidence in JSON.
+- Added continuous AI followup context, bounded conversation history, partial-response recovery and a separate clear-history action. Kept v1 drafts compatible, isolated late callbacks by request and chart, preserved the original report on followup failure/clear, and kept all transcript text inert. No automatic paid retries.
+- Kept single-HTML delivery, calendar/strength/use-selection rules5.20.0, five school templates, existing record/API configuration and main AI output contracts. Added exhaustive branch-pair, scoring, draft compatibility and desktop/mobile/dark regressions.
+
 ## 5.29.0 — 2026-10-24
 - Unified strength-first preference groups for both Bazi views, year badges, transit text and the DaYun curve. Removed forced one-element-per-role assignment and automatic “generates the selected use-god = favorable”; displayed profile selection, strength balance and climate separately. Mixed stem/branch preferences stay mixed.
 - Integrated the legacy demonstration into an inspectable structure score1.0.0: balance30, favorable exposure/root25, month-premise support25, remedy10 and climate10. The exact ledger sums to100; future decades do not alter the natal score, and roots of excessive peers/resources do not automatically earn support points. Replaced count-to-money/degree bands with these component scores.

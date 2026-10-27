@@ -1,12 +1,11 @@
 /* Extracted without calculation changes. See docs/ARCHITECTURE.md. */
-const HEHUN_RULE_VERSION='5.27.0';
+const HEHUN_RULE_VERSION='5.30.0';
 const HH_LIUHE={0:1,1:0,2:11,11:2,3:10,10:3,4:9,9:4,5:8,8:5,6:7,7:6};
 
 const HH_CHONG={0:6,1:7,2:8,3:9,4:10,5:11,6:0,7:1,8:2,9:3,10:4,11:5};
 
 const HH_HAI={0:7,7:0,1:6,6:1,2:5,5:2,3:4,4:3,8:11,11:8,9:10,10:9};
 
-const HH_TRI=[[2,5,8],[1,7,10],[0,3]];
 
 const HH_GAN_HE_PAIRS=[['甲','己','土'],['乙','庚','金'],['丙','辛','水'],['丁','壬','木'],['戊','癸','火']];
 
@@ -29,7 +28,7 @@ function hhRel(a,b){
   if(HH_HAI[a]===b) return {k:'hai',name:'六害',score:-6,desc:'暗耗之象，相处中易有细碎摩擦与消耗，忌积怨'};
   const d=Math.abs(a-b);
   if(d===4||d===8) return {k:'he3',name:'三合半合',score:8,desc:'半合有情的拱合之象，气场协调，互助有余'};
-  if(a!==b&&HH_TRI.some(t=>t.includes(a)&&t.includes(b))) return {k:'xing',name:'相刑',score:-8,desc:'相刑关系，观察双方表达、边界与相处节奏'};
+  if(branchPunishment(a,b)?.kind==='pair') return {k:'xing',name:'相刑',score:-8,desc:'相刑关系，观察双方表达、边界与相处节奏'};
   return {k:'none',name:'平',score:0,desc:'中性之遇，相处平稳，亲疏多看经营'};
 }
 
@@ -136,19 +135,21 @@ function heHunCompute(z1,z2,n1,n2,referenceYear=beijingNow().getFullYear()){
   const f12=fixTxt(t12,g2), f21=fixTxt(t21,g1);
   aspects.push({icon:'⚖️',k:'日主互看（'+(n1||'甲')+' → '+(n2||'乙')+'）',name:f12.name,score:Math.round(f12.score*0.5),desc:f12.desc});
   aspects.push({icon:'⚖️',k:'日主互看（'+(n2||'乙')+' → '+(n1||'甲')+'）',name:f21.name,score:Math.round(f21.score*0.5),desc:f21.desc});
-  // 9. 用神互补
-  let bu=0,buDesc=[];
-  if(z1.yongShen!==undefined&&(z2.wxCount[z1.yongShen]||0)>=2){bu+=9;buDesc.push((n1||'甲方')+'之用神('+WUXING[z1.yongShen]+')在'+(n2||'乙方')+'命中成势，对方补我之所需');}
-  if(z2.yongShen!==undefined&&(z1.wxCount[z2.yongShen]||0)>=2){bu+=9;buDesc.push((n2||'乙方')+'之用神('+WUXING[z2.yongShen]+')在'+(n1||'甲方')+'命中成势，对方补其之所需');}
-  for(const [a,b,an,bn] of [[z1,z2,n1,n2],[z2,z1,n2,n1]])if(a.yongShen!==undefined&&(b.wxCount[(a.yongShen+3)%5]||0)>=3){bu-=5;buDesc.push((bn||'对方')+'命中'+WUXING[(a.yongShen+3)%5]+'较多，克'+(an||'本方')+'之用神'+WUXING[a.yongShen]+'，互补与牵制并看');}
-  aspects.push({icon:'🔋',k:'用神 · 能量互补',name:bu>0?'互补有助':bu<0?'互有牵制':'中性',score:bu,desc:buDesc.join('；')||'双方五行配置互无特别增益或损耗，相处平实'});
-  // 10. 五行补缺
-  const lack1=z1.wxCount.map((v,i)=>v===0?i:-1).filter(i=>i>=0);
-  const lack2=z2.wxCount.map((v,i)=>v===0?i:-1).filter(i=>i>=0);
-  let lack=0,lackDesc=[];
-  lack1.forEach(w=>{if((z2.wxCount[w]||0)>=2){lack+=5;lackDesc.push((n1||'甲方')+'缺'+WUXING[w]+'而'+(n2||'乙方')+'有之');}});
-  lack2.forEach(w=>{if((z1.wxCount[w]||0)>=2){lack+=5;lackDesc.push((n2||'乙方')+'缺'+WUXING[w]+'而'+(n1||'甲方')+'有之');}});
-  if(lackDesc.length) aspects.push({icon:'🧩',k:'五行 · 补缺',name:'互补长短',score:Math.min(lack,10),desc:lackDesc.join('；')+'——五行互补，在一起后气场更完整'});
+  // 9. Strength-first complementarity; profile climate selection is described separately.
+  const preferences={version:STRUCTURE_SCORE_VERSION,directions:[],missing:[],climate:[],dayun:[]};
+  for(const [receiver,donor,rn,dn] of [[z1,z2,n1||'甲方',n2||'乙方'],[z2,z1,n2||'乙方',n1||'甲方']]){
+    const p=buildUsePreferences(receiver),help=p.favorable.filter(w=>(donor.wxCount[w]||0)>=2).map(element=>({element,count:donor.wxCount[element]})),burden=p.adverse.filter(w=>(donor.wxCount[w]||0)>=3).map(element=>({element,count:donor.wxCount[element]}));
+    preferences.directions.push({receiver:rn,donor:dn,strength:p.strong,help,burden,score:(help.length?9:0)-(burden.length?5:0)});
+    receiver.wxCount.forEach((count,element)=>{if(count===0&&(donor.wxCount[element]||0)>=2)preferences.missing.push({receiver:rn,donor:dn,element,preference:elementPreference(receiver,element),rewarded:elementPreference(receiver,element)===1});});
+    if(p.climate>=0&&(donor.wxCount[p.climate]||0)>=2)preferences.climate.push({receiver:rn,donor:dn,element:p.climate,preference:elementPreference(receiver,p.climate)});
+  }
+  const bu=preferences.directions.reduce((sum,d)=>sum+d.score,0);
+  const buDesc=preferences.directions.map(d=>d.receiver+'（'+d.strength+'）看'+d.donor+'：'+(d.strength==='中和'?'中和按提纲与调候细分':d.help.length?'扶抑喜向'+d.help.map(x=>WUXING[x.element]+x.count+'位').join('、')+'可承接':'扶抑补益项未达2位')+(d.burden.length?'；增势方向'+d.burden.map(x=>WUXING[x.element]+x.count+'位').join('、')+'需制化':'')+'（'+(d.score>0?'+':'')+d.score+'）').join('；');
+  aspects.push({icon:'🔋',k:'用神 · 扶抑互补',name:bu>0?'扶抑有助':bu<0?'增势需察':'随局配合',score:bu,desc:buDesc});
+  // 10. A missing element earns points only when it is a strength-balance preference.
+  const rewards=preferences.missing.filter(x=>x.rewarded);
+  if(preferences.missing.length)aspects.push({icon:'🧩',k:'五行 · 补缺',name:rewards.length?'喜向补缺':'分布差异',score:Math.min(rewards.length*5,10),desc:preferences.missing.map(x=>x.receiver+'缺'+WUXING[x.element]+'、'+x.donor+'有之（'+(x.rewarded?'扶抑喜向':x.preference<0?'增势需察':'随提纲细分')+'）').join('；')});
+  if(preferences.climate.length)aspects.push({icon:'🌤️',k:'调候 · 命局配合',name:'寒暖分看',score:0,desc:preferences.climate.map(x=>x.donor+'见'+WUXING[x.element]+'，对应'+x.receiver+'调候需求；'+(x.preference>0?'与扶抑同向':x.preference<0?'兼看日主承受':'合看提纲与制化')).join('；')});
   // 11. 九星命卦配宫(八宅合婚)
   const g1gua=getMingGua(z1.date.getFullYear(),z1.gender).replace(/\(.*?\)/,'');
   const g2gua=getMingGua(z2.date.getFullYear(),z2.gender).replace(/\(.*?\)/,'');
@@ -173,14 +174,13 @@ function heHunCompute(z1,z2,n1,n2,referenceYear=beijingNow().getFullYear()){
   const dy2=z2.dy.dyList.find(d=>age2>=d.age&&age2<=d.endAge);
   let dyScore=0,dyTxt='';
   if(dy1&&dy2){
-    const dg1=tenGod(z1.dg,dy1.g), dg2=tenGod(z2.dg,dy2.g);
-    const good1=(z1.strong&&[2,3,4,5,6,7].includes(dg1))||(!z1.strong&&[0,1,8,9].includes(dg1));
-    const good2=(z2.strong&&[2,3,4,5,6,7].includes(dg2))||(!z2.strong&&[0,1,8,9].includes(dg2));
-    if(good1&&good2){ dyScore=4; dyTxt='当前大运同属喜用（'+GAN[dy1.g]+ZHI[dy1.z]+'运 / '+GAN[dy2.g]+ZHI[dy2.z]+'运），同频顺遂，互相成就'; }
-    else if(!good1&&!good2){ dyScore=-3; dyTxt='当前大运同在低谷（'+GAN[dy1.g]+ZHI[dy1.z]+'运 / '+GAN[dy2.g]+ZHI[dy2.z]+'运），共渡时艰，相扶更贵'; }
-    else dyTxt='大运节奏一升一平，错位期需多体谅（'+GAN[dy1.g]+ZHI[dy1.z]+'运 / '+GAN[dy2.g]+ZHI[dy2.z]+'运）';
+    preferences.dayun=[transitPreference(z1,dy1.g,dy1.z),transitPreference(z2,dy2.g,dy2.z)];
+    const [p1,p2]=preferences.dayun;
+    if(p1.kind==='喜用'&&p2.kind==='喜用')dyScore=4;
+    else if(p1.kind==='忌神'&&p2.kind==='忌神')dyScore=-3;
+    dyTxt='当前大运：'+GAN[dy1.g]+ZHI[dy1.z]+'（'+strengthLabel(z1)+'·'+p1.kind+'）；'+GAN[dy2.g]+ZHI[dy2.z]+'（'+strengthLabel(z2)+'·'+p2.kind+'）。干支分别按扶抑喜向判断。';
   } else dyTxt='大运数据不全，暂不作同步评估';
-  aspects.push({icon:'🛤️',k:'大运 · 行运同步',name:dyScore===4?'同频顺遂':dyScore===-3?'共渡低谷':'节奏错位',score:dyScore,desc:dyTxt});
+  aspects.push({icon:'🛤️',k:'大运 · 行运同步',name:dyScore===4?'喜向同频':dyScore===-3?'共同承压':'分看节奏',score:dyScore,desc:dyTxt});
   // 14. 调候气候互补(出生地地气补对方调候之需)
   let thScore=0,thDesc=[];
   if(z1.tiaoHouWX>=0&&z2.placeWx===z1.tiaoHouWX){ thScore+=4; thDesc.push((n2||'乙方')+'出生地('+WUXING[z2.placeWx]+'地)正补'+(n1||'甲方')+'调候之需（'+(z1.tiaoHouWX===1?'冬寒需火暖':'夏燥需水润')+'）'); }
@@ -205,7 +205,7 @@ function heHunCompute(z1,z2,n1,n2,referenceYear=beijingNow().getFullYear()){
     if(he)relations.push({id:'gan-'+a+'-'+b,lane:'gan',name:he,left:{column:a,label:positions[a]+'干'+GAN[ag]},right:{column:b,label:positions[b]+'干'+GAN[bg]}});
     if(rel.k!=='none')relations.push({id:'zhi-'+a+'-'+b,lane:'zhi',name:ZHI[az]+ZHI[bz]+rel.name,left:{column:a,label:positions[a]+'支'+ZHI[az]},right:{column:b,label:positions[b]+'支'+ZHI[bz]}});
   }
-  return {rules:{version:HEHUN_RULE_VERSION},referenceYear,score,rawScore:60+aspects.reduce((sum,a)=>sum+a.score,0),ledger:{base:60,items:aspects.map(a=>({label:a.k,delta:a.score})),min:30,max:95,deepIncluded:false},relations,aspects,summary,highlights,deep};
+  return {rules:{version:HEHUN_RULE_VERSION},preferences,referenceYear,score,rawScore:60+aspects.reduce((sum,a)=>sum+a.score,0),ledger:{base:60,items:aspects.map(a=>({label:a.k,delta:a.score})),min:30,max:95,deepIncluded:false},relations,aspects,summary,highlights,deep};
 }
 
 function hhDeepText(r){

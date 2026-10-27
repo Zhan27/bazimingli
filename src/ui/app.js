@@ -1831,7 +1831,7 @@ const QX_ALL={
   '申子辰合水':'智局，主聪慧善谋，聚智成事','亥卯未合木':'仁局，主仁慈宽厚，人缘聚和','寅午戌合火':'礼局，主热情明理，事业聚气','巳酉丑合金':'义局，主刚毅果决，团体凝聚',
   '子午相冲':'水火交战，主劳心费神、情绪起伏','丑未相冲':'土冲而动，主家宅变动、工作更迭','寅申相冲':'金木交战，主奔波劳碌、驿马之动',
   '卯酉相冲':'成败交争，主成败起伏、纠葛反复','辰戌相冲':'墓库冲开，主变革之机，财库冲开聚散皆宜','巳亥相冲':'水火冲激，主远行劳心、心思多变',
-  '寅巳申三刑':'恃势之刑，主恃强凌弱，防官非是非','丑戌未三刑':'无恩之刑，主恩将仇报，防六亲刑伤','子卯相刑':'无礼之刑，主口舌是非，防失礼失德',
+  '寅巳申三刑':'无恩之刑，主恃强凌弱，防官非是非','丑戌未三刑':'恃势之刑，主恩将仇报，防六亲刑伤','子卯相刑':'无礼之刑，主口舌是非，防失礼失德',
   '辰辰自刑':'自刑，主自寻烦恼、自我折磨','午午自刑':'自刑，主心高气傲、自视过高','酉酉自刑':'自刑，主固执己见、自伤自怜','亥亥自刑':'自刑，主多思多虑、自我设限',
   '甲庚相冲':'东西对冲，主远行变动、性格刚烈、防筋骨之伤','乙辛相冲':'主心思变动、言行反复、防口舌','丙壬相冲':'南北对冲，主劳心奔波、情绪起伏','丁癸相冲':'主暗耗忧烦、心绪不宁',
   '子未相害':'势家相害，主六亲不睦、防暗损','丑午相害':'官鬼相害，主多疑善感、防小人','寅巳相害':'临官相害，主防人暗算、慎出行',
@@ -2020,8 +2020,6 @@ function zhSchoolContrast(zh){
 const LN_HE_NAME={0:'甲己合',1:'乙庚合',2:'丙辛合',3:'丁壬合',4:'戊癸合'};
 const LN_ZHE_NAME=['子丑合','寅亥合','卯戌合','辰酉合','巳申合','午未合'];
 const LN_ZCHONG_NAME=['子午冲','丑未冲','寅申冲','卯酉冲','辰戌冲','巳亥冲'];
-const LN_XING_GRP=[[2,5,8],[1,10,7],[0,3]];
-const LN_XING_NAME=['寅巳申三刑','丑戌未三刑','子卯刑'];
 const LN_HAI_GRP=[[0,7],[1,6],[2,5],[3,4],[8,11],[9,10]];
 const LN_HAI_NAME=['子未害','丑午害','寅巳害','卯辰害','申亥害','酉戌害'];
 function liuNianRel(zh,g,z){
@@ -2039,8 +2037,11 @@ function liuNianRel(zh,g,z){
     if(zh2) rels.push({type:'六合',name:LN_ZHE_NAME[zhiHe.indexOf(zh2)],pillar:pn,power:1.5});
     const zc=zhiChong.find(([x,y])=>(x===z&&y===pzz)||(x===pzz&&y===z));
     if(zc) rels.push({type:'六冲',name:LN_ZCHONG_NAME[zhiChong.indexOf(zc)],pillar:pn,power:3});
-    LN_XING_GRP.forEach((gr,i)=>{ if(gr.includes(z)&&gr.includes(pzz)) rels.push({type:'三刑',name:LN_XING_NAME[i],pillar:pn,power:2.5}); });
-    if(z===pzz&&[3,6,9,11].includes(z)) rels.push({type:'自刑',name:ZHI[z]+ZHI[z]+'自刑',pillar:pn,power:2});
+    const punishment=branchPunishment(z,pzz);
+    if(punishment){
+      const complete=punishment.group.every(member=>member===z||pillars.some(([,gz])=>gz[1]===member));
+      rels.push({type:punishment.kind==='self'?'自刑':'三刑',name:punishment.name+(punishment.group.length===3?(complete?'（三刑全）':'（两支）'):''),pillar:pn,power:punishment.kind==='self'?2:2.5,complete,ruleVersion:punishment.version});
+    }
     const lh=LN_HAI_GRP.find(([x,y])=>(x===z&&y===pzz)||(x===pzz&&y===z));
     if(lh) rels.push({type:'六害',name:LN_HAI_NAME[LN_HAI_GRP.indexOf(lh)],pillar:pn,power:2});
   });
@@ -3266,7 +3267,7 @@ function renderZongHe(zh,name){
   html+=`<div class="section-block" style="border:1px solid var(--jade)"><h3>🤖 AI 深度解读 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">（计算事实只读；解读需核对依据；当前流派：<b style="color:var(--jade)">${SCHOOLS[lastSchool]}</b>，可回排盘表单顶部下拉切换）</span></h3>`;
   html+=`<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px"><button class="btn btn-primary" id="ai-deep-btn" onclick="aiDeepAnalyze()" style="border-color:var(--jade);background:var(--jade);color:#fff">🤖 一键 AI 深化 18 维</button><button class="btn btn-ghost" onclick="aiExtractPrompt()" style="font-size:.78rem;border-color:var(--gold);color:var(--gold)">📋 提取 Prompt（无 Key 用）</button><span style="font-size:.72rem;color:var(--ink3)">方式一：配置 API Key 一键生成；方式二：提取 Prompt 复制到任意 AI 对话，回复粘回回填</span></div>`;
   html+=`<div id="ai-workflow-controls" class="ai-workflow-controls"></div><div id="ai-deep-box" style="background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;max-height:420px;overflow-y:auto;font-size:.85rem;line-height:1.9;color:var(--ink)"><span style="color:var(--ink3);font-size:.78rem">JSON回复完整结束后逐维检查四柱身份、字段与引用；错误维度保留草稿，已有结果不被无效回复覆盖。检查不证明自由文本正确或传统预测有效。</span></div>`;
-  html+=`<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)"><div style="font-size:.8rem;color:var(--gold);margin-bottom:6px;font-weight:700">💬 AI 追问 <span style="font-size:.68rem;color:var(--ink3);font-weight:400">（先生成解读，再针对任一维度或年份深挖）</span></div><div style="display:flex;gap:8px;flex-wrap:wrap"><input id="ai-follow-input" placeholder="如：第14维里2032年为什么是喜用？展开讲讲" style="flex:1;min-width:220px;background:var(--card2);border:1px solid var(--line);color:var(--ink);padding:8px 12px;border-radius:10px;font-size:.82rem;font-family:inherit" onkeydown="if(event.key==='Enter')aiFollowUp()"><button class="btn btn-primary" onclick="aiFollowUp()" id="ai-follow-btn" style="font-size:.78rem;padding:7px 16px">发送追问</button></div><div id="ai-follow-box" style="margin-top:8px;font-size:.82rem;line-height:1.8;color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;max-height:320px;overflow-y:auto;display:none"></div></div>`;
+  html+=`<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)"><div style="font-size:.8rem;color:var(--gold);margin-bottom:6px;font-weight:700">💬 AI 追问 <span style="font-size:.68rem;color:var(--ink3);font-weight:400">（先生成解读，再针对任一维度或年份深挖）</span></div><div style="display:flex;gap:8px;flex-wrap:wrap"><input id="ai-follow-input" maxlength="4000" aria-label="连续追问" placeholder="如：第14维里2032年为什么是喜用？展开讲讲" style="flex:1;min-width:220px;background:var(--card2);border:1px solid var(--line);color:var(--ink);padding:8px 12px;border-radius:10px;font-size:.82rem;font-family:inherit" onkeydown="if(event.key==='Enter')aiFollowUp()"><button class="btn btn-primary" onclick="aiFollowUp()" id="ai-follow-btn" style="font-size:.78rem;padding:7px 16px">发送追问</button><button type="button" class="btn btn-ghost" id="ai-follow-clear" onclick="aiFollowClear()">清空追问</button></div><div id="ai-follow-box" role="log" aria-label="追问记录" style="margin-top:8px;font-size:.82rem;line-height:1.8;color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;max-height:320px;overflow-y:auto;display:none"></div></div>`;
   html+=`</div>`;
   html+=`<div class="note">说明：八字以节气定月、子时换日；紫微以农历定命身宫；奇门以时辰定局；六爻以时间起卦。四术共享同一出生时刻基准，分别展示各自取法。典籍佐证与十神心法已并入 AI 深度解读的提示词（知识库参考）中。</div>`;
   html+=`</div>`;
@@ -3615,24 +3616,6 @@ function hhAiDeep(){
 }
 
 /* ======================== AI 追问（多轮对话式深挖） ======================== */
-function aiFollowUp(){
-  const c=aiGetConfig(),inp=document.getElementById('ai-follow-input'),box=document.getElementById('ai-follow-box'),btn=document.getElementById('ai-follow-btn'),q=inp?.value.trim();
-  if(!q||!lastZh||!c.key||!lastAIReply){aiEvidenceNotice('追问需要当前命盘、API设置及已接收的解读。');return;}
-  if(aiEvidenceActive||aiFollowActive)return;
-  const chart=aiEvidenceChart(),id=chartFactId(chart);
-  const current=()=>lastZh&&chartFactId(aiEvidenceChart())===id;
-  if(btn)btn.disabled=true;if(box){box.style.display='block';box.textContent='正在生成追问回复…';}
-  const system='你是传统文化学习助手。计算事实只读，不得改写四柱或应用评分。不得给财富金额、学历上下限、医学诊断或命运必然结论。区分传统解释与事实，说明条件和不确定性，未核验原文不得当成已核对引文。针对追问用简洁文字回答。当前计算事实：'+JSON.stringify({chartId:id,pillars:chart.pillars,facts:aiFacts(chart),rules:chart.rules});
-  const payload={model:c.model,messages:[{role:'system',content:system},{role:'assistant',content:lastAIReply.slice(-12000)},{role:'user',content:q}],stream:true,temperature:0.4};
-  aiFollowActive=aiStreamChat(aiEndpoint(c),{method:'POST',headers:aiHeaders(c),body:JSON.stringify(payload)},{
-    idleMs:90000,totalMs:180000,
-    onDelta:(d,all)=>{if(current()&&box)box.textContent=all;},
-    onDone:full=>{if(current()){if(box)box.textContent=full;if(inp)inp.value='';}aiFollowActive=null;if(btn)btn.disabled=false;aiEvidencePaint();},
-    onError:()=>{if(current()&&box)box.textContent+='\n请求中断；不会自动重发。';aiFollowActive=null;if(btn)btn.disabled=false;if(lastZh)aiEvidencePaint();}
-  });aiEvidencePaint();
-}
-/* ======================== 命盘导出（图片 + 记录备份） ======================== */
-// canvas 绘制命盘速览卡并下载 PNG
 function exportChartPng(options){
   const zh=options?.chart||lastZh,name=options?.name??lastName;
   if(!zh){alert(lastCandidates?'时辰未知，请先核对时分；候选模式不导出确定命盘图':'请先排盘');return;}

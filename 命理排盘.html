@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="application-version" content="5.29.0">
+<meta name="application-version" content="5.30.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="description" content="玄机命理排盘：八字四柱、紫微斗数、奇门遁甲、六爻卜筮在线排盘工具，支持 AI 深度解读与多流派分析。">
 <meta name="keywords" content="八字排盘,紫微斗数,奇门遁甲,六爻,合婚,真太阳时,命理排盘,AI命理解读">
@@ -427,6 +427,8 @@ body[data-theme=xuanmo] .gz-explorer{--gz-he:#d8b276;--gz-chong:#e0a99b;--gz-san
 @media(max-width:600px){.structure-score-parts{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 8px}.structure-score-heading{gap:10px;align-items:flex-start}.structure-score-heading>div{min-width:0}.use-preferences{padding:10px}.use-preference-row{grid-template-columns:5em minmax(0,1fr);gap:6px}}
 
 .structure-score-heading>div:first-child{white-space:nowrap;flex:0 0 auto}
+
+#ai-follow-input{min-width:0!important;flex:1 1 200px!important}#ai-follow-box{overflow-wrap:anywhere;white-space:pre-wrap}.ai-follow-turn{padding:8px 0;border-bottom:1px solid var(--line)}.ai-follow-turn:last-child{border-bottom:0}.ai-follow-turn p{margin:4px 0;text-align:start}.ai-follow-question{color:var(--jade);font-weight:600}.ai-follow-turn small{color:var(--ink3);font-size:.7rem}
 
 </style>
 </head>
@@ -10425,14 +10427,13 @@ let upGua,downGua,dongYao=0,dayGan=null,sixYao,changedSix,dongMarks=[];
 
 /* Source: src/hehun/engine.js */
 /* Extracted without calculation changes. See docs/ARCHITECTURE.md. */
-const HEHUN_RULE_VERSION='5.27.0';
+const HEHUN_RULE_VERSION='5.30.0';
 const HH_LIUHE={0:1,1:0,2:11,11:2,3:10,10:3,4:9,9:4,5:8,8:5,6:7,7:6};
 
 const HH_CHONG={0:6,1:7,2:8,3:9,4:10,5:11,6:0,7:1,8:2,9:3,10:4,11:5};
 
 const HH_HAI={0:7,7:0,1:6,6:1,2:5,5:2,3:4,4:3,8:11,11:8,9:10,10:9};
 
-const HH_TRI=[[2,5,8],[1,7,10],[0,3]];
 
 const HH_GAN_HE_PAIRS=[['甲','己','土'],['乙','庚','金'],['丙','辛','水'],['丁','壬','木'],['戊','癸','火']];
 
@@ -10455,7 +10456,7 @@ function hhRel(a,b){
   if(HH_HAI[a]===b) return {k:'hai',name:'六害',score:-6,desc:'暗耗之象，相处中易有细碎摩擦与消耗，忌积怨'};
   const d=Math.abs(a-b);
   if(d===4||d===8) return {k:'he3',name:'三合半合',score:8,desc:'半合有情的拱合之象，气场协调，互助有余'};
-  if(a!==b&&HH_TRI.some(t=>t.includes(a)&&t.includes(b))) return {k:'xing',name:'相刑',score:-8,desc:'相刑关系，观察双方表达、边界与相处节奏'};
+  if(branchPunishment(a,b)?.kind==='pair') return {k:'xing',name:'相刑',score:-8,desc:'相刑关系，观察双方表达、边界与相处节奏'};
   return {k:'none',name:'平',score:0,desc:'中性之遇，相处平稳，亲疏多看经营'};
 }
 
@@ -10562,19 +10563,21 @@ function heHunCompute(z1,z2,n1,n2,referenceYear=beijingNow().getFullYear()){
   const f12=fixTxt(t12,g2), f21=fixTxt(t21,g1);
   aspects.push({icon:'⚖️',k:'日主互看（'+(n1||'甲')+' → '+(n2||'乙')+'）',name:f12.name,score:Math.round(f12.score*0.5),desc:f12.desc});
   aspects.push({icon:'⚖️',k:'日主互看（'+(n2||'乙')+' → '+(n1||'甲')+'）',name:f21.name,score:Math.round(f21.score*0.5),desc:f21.desc});
-  // 9. 用神互补
-  let bu=0,buDesc=[];
-  if(z1.yongShen!==undefined&&(z2.wxCount[z1.yongShen]||0)>=2){bu+=9;buDesc.push((n1||'甲方')+'之用神('+WUXING[z1.yongShen]+')在'+(n2||'乙方')+'命中成势，对方补我之所需');}
-  if(z2.yongShen!==undefined&&(z1.wxCount[z2.yongShen]||0)>=2){bu+=9;buDesc.push((n2||'乙方')+'之用神('+WUXING[z2.yongShen]+')在'+(n1||'甲方')+'命中成势，对方补其之所需');}
-  for(const [a,b,an,bn] of [[z1,z2,n1,n2],[z2,z1,n2,n1]])if(a.yongShen!==undefined&&(b.wxCount[(a.yongShen+3)%5]||0)>=3){bu-=5;buDesc.push((bn||'对方')+'命中'+WUXING[(a.yongShen+3)%5]+'较多，克'+(an||'本方')+'之用神'+WUXING[a.yongShen]+'，互补与牵制并看');}
-  aspects.push({icon:'🔋',k:'用神 · 能量互补',name:bu>0?'互补有助':bu<0?'互有牵制':'中性',score:bu,desc:buDesc.join('；')||'双方五行配置互无特别增益或损耗，相处平实'});
-  // 10. 五行补缺
-  const lack1=z1.wxCount.map((v,i)=>v===0?i:-1).filter(i=>i>=0);
-  const lack2=z2.wxCount.map((v,i)=>v===0?i:-1).filter(i=>i>=0);
-  let lack=0,lackDesc=[];
-  lack1.forEach(w=>{if((z2.wxCount[w]||0)>=2){lack+=5;lackDesc.push((n1||'甲方')+'缺'+WUXING[w]+'而'+(n2||'乙方')+'有之');}});
-  lack2.forEach(w=>{if((z1.wxCount[w]||0)>=2){lack+=5;lackDesc.push((n2||'乙方')+'缺'+WUXING[w]+'而'+(n1||'甲方')+'有之');}});
-  if(lackDesc.length) aspects.push({icon:'🧩',k:'五行 · 补缺',name:'互补长短',score:Math.min(lack,10),desc:lackDesc.join('；')+'——五行互补，在一起后气场更完整'});
+  // 9. Strength-first complementarity; profile climate selection is described separately.
+  const preferences={version:STRUCTURE_SCORE_VERSION,directions:[],missing:[],climate:[],dayun:[]};
+  for(const [receiver,donor,rn,dn] of [[z1,z2,n1||'甲方',n2||'乙方'],[z2,z1,n2||'乙方',n1||'甲方']]){
+    const p=buildUsePreferences(receiver),help=p.favorable.filter(w=>(donor.wxCount[w]||0)>=2).map(element=>({element,count:donor.wxCount[element]})),burden=p.adverse.filter(w=>(donor.wxCount[w]||0)>=3).map(element=>({element,count:donor.wxCount[element]}));
+    preferences.directions.push({receiver:rn,donor:dn,strength:p.strong,help,burden,score:(help.length?9:0)-(burden.length?5:0)});
+    receiver.wxCount.forEach((count,element)=>{if(count===0&&(donor.wxCount[element]||0)>=2)preferences.missing.push({receiver:rn,donor:dn,element,preference:elementPreference(receiver,element),rewarded:elementPreference(receiver,element)===1});});
+    if(p.climate>=0&&(donor.wxCount[p.climate]||0)>=2)preferences.climate.push({receiver:rn,donor:dn,element:p.climate,preference:elementPreference(receiver,p.climate)});
+  }
+  const bu=preferences.directions.reduce((sum,d)=>sum+d.score,0);
+  const buDesc=preferences.directions.map(d=>d.receiver+'（'+d.strength+'）看'+d.donor+'：'+(d.strength==='中和'?'中和按提纲与调候细分':d.help.length?'扶抑喜向'+d.help.map(x=>WUXING[x.element]+x.count+'位').join('、')+'可承接':'扶抑补益项未达2位')+(d.burden.length?'；增势方向'+d.burden.map(x=>WUXING[x.element]+x.count+'位').join('、')+'需制化':'')+'（'+(d.score>0?'+':'')+d.score+'）').join('；');
+  aspects.push({icon:'🔋',k:'用神 · 扶抑互补',name:bu>0?'扶抑有助':bu<0?'增势需察':'随局配合',score:bu,desc:buDesc});
+  // 10. A missing element earns points only when it is a strength-balance preference.
+  const rewards=preferences.missing.filter(x=>x.rewarded);
+  if(preferences.missing.length)aspects.push({icon:'🧩',k:'五行 · 补缺',name:rewards.length?'喜向补缺':'分布差异',score:Math.min(rewards.length*5,10),desc:preferences.missing.map(x=>x.receiver+'缺'+WUXING[x.element]+'、'+x.donor+'有之（'+(x.rewarded?'扶抑喜向':x.preference<0?'增势需察':'随提纲细分')+'）').join('；')});
+  if(preferences.climate.length)aspects.push({icon:'🌤️',k:'调候 · 命局配合',name:'寒暖分看',score:0,desc:preferences.climate.map(x=>x.donor+'见'+WUXING[x.element]+'，对应'+x.receiver+'调候需求；'+(x.preference>0?'与扶抑同向':x.preference<0?'兼看日主承受':'合看提纲与制化')).join('；')});
   // 11. 九星命卦配宫(八宅合婚)
   const g1gua=getMingGua(z1.date.getFullYear(),z1.gender).replace(/\(.*?\)/,'');
   const g2gua=getMingGua(z2.date.getFullYear(),z2.gender).replace(/\(.*?\)/,'');
@@ -10599,14 +10602,13 @@ function heHunCompute(z1,z2,n1,n2,referenceYear=beijingNow().getFullYear()){
   const dy2=z2.dy.dyList.find(d=>age2>=d.age&&age2<=d.endAge);
   let dyScore=0,dyTxt='';
   if(dy1&&dy2){
-    const dg1=tenGod(z1.dg,dy1.g), dg2=tenGod(z2.dg,dy2.g);
-    const good1=(z1.strong&&[2,3,4,5,6,7].includes(dg1))||(!z1.strong&&[0,1,8,9].includes(dg1));
-    const good2=(z2.strong&&[2,3,4,5,6,7].includes(dg2))||(!z2.strong&&[0,1,8,9].includes(dg2));
-    if(good1&&good2){ dyScore=4; dyTxt='当前大运同属喜用（'+GAN[dy1.g]+ZHI[dy1.z]+'运 / '+GAN[dy2.g]+ZHI[dy2.z]+'运），同频顺遂，互相成就'; }
-    else if(!good1&&!good2){ dyScore=-3; dyTxt='当前大运同在低谷（'+GAN[dy1.g]+ZHI[dy1.z]+'运 / '+GAN[dy2.g]+ZHI[dy2.z]+'运），共渡时艰，相扶更贵'; }
-    else dyTxt='大运节奏一升一平，错位期需多体谅（'+GAN[dy1.g]+ZHI[dy1.z]+'运 / '+GAN[dy2.g]+ZHI[dy2.z]+'运）';
+    preferences.dayun=[transitPreference(z1,dy1.g,dy1.z),transitPreference(z2,dy2.g,dy2.z)];
+    const [p1,p2]=preferences.dayun;
+    if(p1.kind==='喜用'&&p2.kind==='喜用')dyScore=4;
+    else if(p1.kind==='忌神'&&p2.kind==='忌神')dyScore=-3;
+    dyTxt='当前大运：'+GAN[dy1.g]+ZHI[dy1.z]+'（'+strengthLabel(z1)+'·'+p1.kind+'）；'+GAN[dy2.g]+ZHI[dy2.z]+'（'+strengthLabel(z2)+'·'+p2.kind+'）。干支分别按扶抑喜向判断。';
   } else dyTxt='大运数据不全，暂不作同步评估';
-  aspects.push({icon:'🛤️',k:'大运 · 行运同步',name:dyScore===4?'同频顺遂':dyScore===-3?'共渡低谷':'节奏错位',score:dyScore,desc:dyTxt});
+  aspects.push({icon:'🛤️',k:'大运 · 行运同步',name:dyScore===4?'喜向同频':dyScore===-3?'共同承压':'分看节奏',score:dyScore,desc:dyTxt});
   // 14. 调候气候互补(出生地地气补对方调候之需)
   let thScore=0,thDesc=[];
   if(z1.tiaoHouWX>=0&&z2.placeWx===z1.tiaoHouWX){ thScore+=4; thDesc.push((n2||'乙方')+'出生地('+WUXING[z2.placeWx]+'地)正补'+(n1||'甲方')+'调候之需（'+(z1.tiaoHouWX===1?'冬寒需火暖':'夏燥需水润')+'）'); }
@@ -10631,7 +10633,7 @@ function heHunCompute(z1,z2,n1,n2,referenceYear=beijingNow().getFullYear()){
     if(he)relations.push({id:'gan-'+a+'-'+b,lane:'gan',name:he,left:{column:a,label:positions[a]+'干'+GAN[ag]},right:{column:b,label:positions[b]+'干'+GAN[bg]}});
     if(rel.k!=='none')relations.push({id:'zhi-'+a+'-'+b,lane:'zhi',name:ZHI[az]+ZHI[bz]+rel.name,left:{column:a,label:positions[a]+'支'+ZHI[az]},right:{column:b,label:positions[b]+'支'+ZHI[bz]}});
   }
-  return {rules:{version:HEHUN_RULE_VERSION},referenceYear,score,rawScore:60+aspects.reduce((sum,a)=>sum+a.score,0),ledger:{base:60,items:aspects.map(a=>({label:a.k,delta:a.score})),min:30,max:95,deepIncluded:false},relations,aspects,summary,highlights,deep};
+  return {rules:{version:HEHUN_RULE_VERSION},preferences,referenceYear,score,rawScore:60+aspects.reduce((sum,a)=>sum+a.score,0),ledger:{base:60,items:aspects.map(a=>({label:a.k,delta:a.score})),min:30,max:95,deepIncluded:false},relations,aspects,summary,highlights,deep};
 }
 
 function hhDeepText(r){
@@ -11016,6 +11018,13 @@ function calculateBirth(date,hourIdx,place='',options={}){
 
 /* Source: src/bazi/relations.js */
 /** Existing relation rules and pillar-aware presentation data; no network or DOM. */
+const BRANCH_PUNISHMENT_RULES=freezeRules({version:'1.1.0',groups:[[[2,5,8],'寅巳申三刑'],[[1,10,7],'丑戌未三刑'],[[0,3],'子卯相刑']],self:[4,6,9,11]});
+function branchPunishment(a,b){
+  if(![a,b].every(z=>Number.isInteger(z)&&z>=0&&z<12))throw new RangeError('地支参数无效');
+  if(a===b)return BRANCH_PUNISHMENT_RULES.self.includes(a)?{kind:'self',name:ZHI[a]+ZHI[a]+'自刑',group:[a],version:BRANCH_PUNISHMENT_RULES.version}:null;
+  const hit=BRANCH_PUNISHMENT_RULES.groups.find(([group])=>group.includes(a)&&group.includes(b));
+  return hit?{kind:'pair',name:hit[0].filter(z=>z===a||z===b).map(z=>ZHI[z]).join('')+'相刑',group:[...hit[0]],version:BRANCH_PUNISHMENT_RULES.version}:null;
+}
 // 干支合冲刑害图示
 function zhGanZhiMap(zh){
   const gans=[['年',zh.yearGZ[0]],['月',zh.monthGZ[0]],['日',zh.dayGZ[0]],['时',zh.hourGZ[0]]];
@@ -11055,13 +11064,13 @@ function zhGanZhiMap(zh){
     const present=set.filter(z=>zhis.some(x=>x[1]===z));
     if(present.length>=2) rels.push({t:'地支三合',name:name+(present.length===3?'（三合全）':'（半合）'),from:present.map(z=>ZHI[z]).join(''),to:'',cls:'sanhe'});
   });
-  const xings=[[[2,5,8],'寅巳申三刑'],[[1,10,7],'丑戌未三刑'],[[0,3],'子卯相刑']];
+  const xings=BRANCH_PUNISHMENT_RULES.groups;
   xings.forEach(([set,name])=>{
     const present=set.filter(z=>zhis.some(x=>x[1]===z));
-    if(present.length>=2) rels.push({t:'地支相刑',name:name,from:present.map(z=>ZHI[z]).join(''),to:'',cls:'xing'});
+    if(present.length>=2) rels.push({t:'地支相刑',name:present.length===set.length?name:present.map(z=>ZHI[z]).join('')+'相刑（两支）',from:present.map(z=>ZHI[z]).join(''),to:'',cls:'xing',complete:present.length===set.length});
   });
   // 自刑(辰辰/午午/酉酉/亥亥 需同支双见)
-  const ziXingZhi=[4,6,9,11];
+  const ziXingZhi=BRANCH_PUNISHMENT_RULES.self;
   ziXingZhi.forEach(z=>{
     const hit=zhis.filter(x=>x[1]===z);
     if(hit.length>=2) rels.push({t:'地支自刑',name:ZHI[z]+ZHI[z]+'自刑',from:hit.map(x=>x[0]+ZHI[z]).join('·'),to:'',cls:'xing'});
@@ -12033,7 +12042,7 @@ function aiDimensionIds(ids){
 function createAiSession(chart,schoolId,now=new Date().toISOString()){
   aiFacts(chart);
   if(getRuleProfile(schoolId).key!==chart.rules.profile)throw new TypeError('流派与计算规则不一致，请重新排盘');
-  return {version:AI_SESSION_VERSION,chartId:chartFactId(chart),input:JSON.parse(JSON.stringify(chart.input)),schoolId:getRuleProfile(schoolId).id,ruleVersion:chart.rules.version,accepted:{},history:[],attempt:null,updatedAt:now};
+  return {version:AI_SESSION_VERSION,chartId:chartFactId(chart),input:JSON.parse(JSON.stringify(chart.input)),schoolId:getRuleProfile(schoolId).id,ruleVersion:chart.rules.version,accepted:{},history:[],attempt:null,followup:emptyAiFollowup(),updatedAt:now};
 }
 function beginAiAttempt(session,{ids,model,base,format='json',now=new Date().toISOString()}){
   aiDimensionIds(ids);if(!['json','markdown'].includes(format))throw new TypeError('输出格式无效');
@@ -12085,7 +12094,51 @@ function restoreAiSession(raw,chart){
   const a=saved.attempt;
   if(a){aiDimensionIds(a.ids);if(!['json','markdown'].includes(a.format)||typeof a.text!=='string'||a.text.length>1000000)throw new TypeError('草稿内容无效');restored.attempt={ids:a.ids,format:a.format,text:a.text,status:a.status==='running'?'interrupted':String(a.status).slice(0,30),errors:[],meta:cleanMeta(a.meta)};}
   if(Array.isArray(saved.history))restored.history=saved.history.slice(-10).map(h=>({ids:aiDimensionIds(h.ids),status:String(h.status).slice(0,30),meta:cleanMeta(h.meta)}));
+  restored.followup=restoreAiFollowup(saved.followup);
   restored.updatedAt=String(saved.updatedAt||'').slice(0,40);return restored;
+}
+
+/* Source: src/ai/followup.js */
+/* Bounded, chart-bound dialogue state; additive to v1 interpretation drafts. */
+function emptyAiFollowup(){return {version:1,turns:[],draft:null};}
+function trimAiFollowup(turns){
+  const rows=turns.slice(-10);
+  while(rows.length&&rows.reduce((n,t)=>n+t.question.length+t.answer.length,0)>180000)rows.shift();
+  return rows;
+}
+function beginAiFollowup(session,question,now=new Date().toISOString()){
+  if(typeof question!=='string'||!question.trim()||question.length>4000)throw new RangeError('追问限1至4000字');
+  const f=session.followup||emptyAiFollowup();if(f.draft?.status==='running')throw new TypeError('请先停止当前追问');
+  const turns=f.draft?trimAiFollowup([...f.turns,f.draft]):f.turns;
+  return {...session,followup:{version:1,turns,draft:{question:question.trim(),answer:'',status:'running',createdAt:now}},updatedAt:now};
+}
+function updateAiFollowup(session,answer,status='running',now=new Date().toISOString()){
+  if(!session.followup?.draft)throw new TypeError('没有当前追问');
+  if(typeof answer!=='string'||answer.length>60000)throw new RangeError('追问回复超过6万字上限');
+  if(!['running','complete','canceled','failed'].includes(status))throw new TypeError('追问状态无效');
+  const f=session.followup,draft={...f.draft,answer,status,updatedAt:now};
+  return {...session,followup:{version:1,turns:status==='complete'?trimAiFollowup([...f.turns,draft]):f.turns,draft:status==='complete'?null:draft},updatedAt:now};
+}
+function clearAiFollowup(session){return {...session,followup:emptyAiFollowup()};}
+function aiFollowupMessages(session,report){
+  const f=session.followup;if(!f?.draft)throw new TypeError('没有当前追问');
+  const history=[];let remaining=32000;
+  for(const turn of [...f.turns].reverse()){
+    if(turn.status!=='complete')continue;
+    const q=turn.question;if(remaining<=q.length)break;
+    const a=turn.answer.slice(-(remaining-q.length));
+    history.unshift({role:'user',content:q},{role:'assistant',content:a});remaining-=q.length+a.length;
+  }
+  return [{role:'assistant',content:String(report||'').slice(-12000)},...history,{role:'user',content:f.draft.question}];
+}
+function restoreAiFollowup(value){
+  if(value===undefined)return emptyAiFollowup();
+  if(!value||value.version!==1||!Array.isArray(value.turns)||value.turns.length>10)throw new TypeError('追问草稿无效');
+  const clean=(t,isDraft)=>{
+    if(!t||typeof t.question!=='string'||!t.question.trim()||t.question.length>4000||typeof t.answer!=='string'||t.answer.length>60000||!['complete','running','canceled','failed','interrupted'].includes(t.status)||(!isDraft&&t.status==='running'))throw new TypeError('追问记录无效');
+    return {question:t.question,answer:t.answer,status:t.status==='running'?'interrupted':t.status,createdAt:String(t.createdAt||'').slice(0,40),updatedAt:String(t.updatedAt||'').slice(0,40)};
+  };
+  return {version:1,turns:trimAiFollowup(value.turns.map(t=>clean(t,false))),draft:value.draft?clean(value.draft,true):null};
 }
 
 /* Source: src/ui/calculation-controls.js */
@@ -12387,7 +12440,11 @@ function aiEvidenceSave(force=false){
   catch(e){aiDraftWarning='草稿无法写入会话存储，仅当前页面保留。';}
 }
 function aiEvidenceCancel(){
-  if(aiFollowActive){const follow=aiFollowActive;aiFollowActive=null;follow.abort();}
+  if(aiFollowActive){
+    const follow=aiFollowActive;aiFollowActive=null;
+    if(aiEvidenceSession?.chartId===follow.chartId&&aiEvidenceSession.followup?.draft){aiEvidenceSession=updateAiFollowup(aiEvidenceSession,aiEvidenceSession.followup.draft.answer,'canceled');aiEvidenceSave(true);}
+    follow.handle?.abort();if(lastZh)aiEvidencePaint();
+  }
   const run=aiEvidenceActive;if(!run)return;aiEvidenceActive=null;run.handle?.abort();
   if(aiEvidenceSession?.attempt){aiEvidenceSession=updateAiAttempt(aiEvidenceSession,aiEvidenceSession.attempt.text,'canceled');aiEvidenceSave(true);}
   if(lastZh&&chartFactId(aiEvidenceChart())===run.chartId)aiEvidencePaint();
@@ -12430,11 +12487,12 @@ function aiEvidencePaint(){
     const details=document.createElement('details'),summary=document.createElement('summary'),meta=document.createElement('p');summary.textContent='生成记录';meta.textContent=JSON.stringify(item.meta,null,2);details.append(summary,meta);target.appendChild(details);
     const badge=card.querySelector('.ai-dim-badge');if(badge){badge.style.display='inline-block';badge.textContent=item.format==='json'?'结构已校验':'Markdown';}
   }
+  aiFollowPaint();
 }
 function aiEvidenceMount(){
   const chart=aiEvidenceChart();aiEvidenceSession=createAiSession(chart,lastSchool);aiDraftWarning='';
   const host=document.getElementById('ai-workflow-controls');if(!host)return;
-  host.innerHTML='<label for="ai-output-format">输出格式</label> <select id="ai-output-format"><option value="json">JSON（兼容模式）</option><option value="schema">JSON Schema（接口需支持）</option><option value="markdown">Markdown文本</option></select> <button type="button" id="ai-cancel" class="btn btn-ghost" disabled>停止生成</button> <button type="button" id="ai-retry-missing" class="btn btn-ghost">仅重试缺失维度（调用API）</button> <button type="button" id="ai-restore-draft" class="btn btn-ghost">恢复最近草稿</button> <button type="button" id="ai-clear-draft" class="btn btn-ghost">清除AI草稿</button><p class="note">仅保留最近一盘的标签页会话草稿（含出生资料和回复，不含API设置）；浏览器恢复会话可能保留。取消或失败不会自动重发收费请求。JSON Schema不支持时请主动改选兼容格式后重试。</p><p id="ai-workflow-status" role="status" aria-live="polite"></p><ul id="ai-evidence-errors"></ul><details><summary>查看回复草稿</summary><pre id="ai-draft-text"></pre><button type="button" id="ai-validate-draft" class="btn btn-ghost">重新校验草稿（不调用API）</button></details>';
+  host.innerHTML='<label for="ai-output-format">输出格式</label> <select id="ai-output-format"><option value="json">JSON（兼容模式）</option><option value="schema">JSON Schema（接口需支持）</option><option value="markdown">Markdown文本</option></select> <button type="button" id="ai-cancel" class="btn btn-ghost" disabled>停止生成</button> <button type="button" id="ai-retry-missing" class="btn btn-ghost">仅重试缺失维度（调用API）</button> <button type="button" id="ai-restore-draft" class="btn btn-ghost">恢复最近草稿</button> <button type="button" id="ai-clear-draft" class="btn btn-ghost">清除AI草稿</button><p class="note">仅保留最近一盘的标签页会话草稿（含出生资料、回复及追问记录，不含API设置）；浏览器恢复会话可能保留。取消或失败不会自动重发收费请求。JSON Schema不支持时请主动改选兼容格式后重试。</p><p id="ai-workflow-status" role="status" aria-live="polite"></p><ul id="ai-evidence-errors"></ul><details><summary>查看回复草稿</summary><pre id="ai-draft-text"></pre><button type="button" id="ai-validate-draft" class="btn btn-ghost">重新校验草稿（不调用API）</button></details>';
   document.getElementById('ai-cancel').onclick=aiEvidenceCancel;
   document.getElementById('ai-retry-missing').onclick=()=>aiEvidenceStart(aiEvidenceMissing());
   document.getElementById('ai-restore-draft').onclick=aiEvidenceRestore;
@@ -12448,7 +12506,7 @@ function aiEvidenceMount(){
 function aiEvidenceClear(){
   if(aiEvidenceActive||aiFollowActive)return;
   try{sessionStorage.removeItem(AI_DRAFT_NS);}catch(e){aiEvidenceNotice('浏览器拒绝删除存储，请清除站点数据。');return;}
-  aiEvidenceSession=createAiSession(aiEvidenceChart(),lastSchool);lastAIReply='';document.querySelectorAll('.ai-evidence-result').forEach(el=>el.remove());document.querySelectorAll('[id^="ai-dim-"] .ai-dim-badge').forEach(el=>{el.style.display='none';});aiEvidencePaint();aiEvidenceNotice('已清除AI草稿；排盘记录和API设置各自保留。');
+  aiEvidenceSession=createAiSession(aiEvidenceChart(),lastSchool);lastAIReply='';const followInput=document.getElementById('ai-follow-input');if(followInput)followInput.value='';document.querySelectorAll('.ai-evidence-result').forEach(el=>el.remove());document.querySelectorAll('[id^="ai-dim-"] .ai-dim-badge').forEach(el=>{el.style.display='none';});aiEvidencePaint();aiEvidenceNotice('已清除AI草稿；排盘记录和API设置各自保留。');
 }
 function aiEvidenceRestore(){
   if(aiEvidenceActive||aiFollowActive)return;
@@ -12494,6 +12552,47 @@ function aiEvidenceStart(ids=AI_DIM_CONTRACTS.map(d=>d.id)){
       onError:error=>{if(!current())return;aiEvidenceSession=updateAiAttempt(aiEvidenceSession,aiEvidenceSession.attempt.text,error.code==='CANCELED'?'canceled':'failed');aiEvidenceActive=null;aiEvidenceSave(true);aiEvidencePaint();aiEvidenceNotice((error.code==='CANCELED'?'已取消':'请求失败，请检查接口/格式后手动重试')+'；已收到文本和已有维度保留。'+(aiDraftWarning?' '+aiDraftWarning:''));}
     });
   }catch(e){aiEvidenceActive=null;aiEvidenceNotice('无法生成：'+e.message);}
+}
+
+/* Source: src/ui/ai-followup.js */
+function aiFollowPaint(){
+  const box=document.getElementById('ai-follow-box'),input=document.getElementById('ai-follow-input'),button=document.getElementById('ai-follow-btn');
+  if(!box||!aiEvidenceSession)return;
+  const active=!!(aiEvidenceActive||aiFollowActive),f=aiEvidenceSession.followup||emptyAiFollowup();
+  if(input)input.disabled=active;if(button)button.disabled=active;
+  const clear=document.getElementById('ai-follow-clear');if(clear)clear.disabled=!!aiEvidenceActive;
+  box.replaceChildren();box.style.display=f.turns.length||f.draft?'block':'none';
+  const labels={complete:'已完成',running:'正在回复',canceled:'已停止',failed:'请求中断',interrupted:'上次已中断'};
+  for(const t of [...f.turns,...(f.draft?[f.draft]:[])]){
+    const article=document.createElement('article');article.className='ai-follow-turn';
+    const q=document.createElement('p'),a=document.createElement('p'),status=document.createElement('small');
+    q.className='ai-follow-question';q.textContent='问：'+t.question;a.className='ai-follow-answer';a.textContent=t.answer||(t.status==='running'?'正在生成追问回复…':'尚未收到回复，可修改问题后重新发送');status.textContent=labels[t.status]||t.status;article.append(q,a,status);box.appendChild(article);
+  }
+  if(!active&&f.draft&&input&&!input.value)input.value=f.draft.question;
+}
+function aiFollowClear(){
+  if(!aiEvidenceSession||aiEvidenceActive)return;
+  if(aiFollowActive)aiEvidenceCancel();
+  aiEvidenceSession=clearAiFollowup(aiEvidenceSession);const input=document.getElementById('ai-follow-input');if(input)input.value='';
+  aiEvidenceSave(true);aiEvidencePaint();aiEvidenceNotice('已清空追问；原始解读和排盘记录保留。');
+}
+function aiFollowUp(){
+  const c=aiGetConfig(),input=document.getElementById('ai-follow-input'),q=input?.value.trim();
+  if(!q||!lastZh||!c.key||!lastAIReply){aiEvidenceNotice('追问需要当前命盘、API设置及已接收的解读。');return;}
+  if(aiEvidenceActive||aiFollowActive)return;
+  const chart=aiEvidenceChart(),id=chartFactId(chart);
+  try{aiEvidenceSession=beginAiFollowup(aiEvidenceSession,q);}catch(e){aiEvidenceNotice(e.message);return;}
+  const run={chartId:id,handle:null};aiFollowActive=run;
+  const current=()=>aiFollowActive===run&&lastZh&&aiEvidenceSession?.chartId===id&&chartFactId(aiEvidenceChart())===id;
+  const system='你是传统文化学习助手。计算事实只读，不得改写四柱或应用评分。不得给财富金额、学历上下限、医学诊断或命运必然结论。区分传统解释与事实，说明条件和不确定性，未核验原文不得当成已核对引文。针对追问用简洁文字回答。当前计算事实：'+JSON.stringify({chartId:id,pillars:chart.pillars,facts:aiFacts(chart),rules:chart.rules});
+  const payload={model:c.model,messages:[{role:'system',content:system},...aiFollowupMessages(aiEvidenceSession,lastAIReply)],stream:true,temperature:0.4};
+  aiEvidenceSave(true);aiEvidencePaint();
+  run.handle=aiStreamChat(aiEndpoint(c),{method:'POST',headers:aiHeaders(c),body:JSON.stringify(payload)},{
+    idleMs:90000,totalMs:180000,maxCharacters:60000,
+    onDelta:(d,all)=>{if(current()){aiEvidenceSession=updateAiFollowup(aiEvidenceSession,all);aiEvidenceSave();aiFollowPaint();}},
+    onDone:full=>{if(!current())return;if(!full.trim()){aiEvidenceSession=updateAiFollowup(aiEvidenceSession,'','failed');aiFollowActive=null;aiEvidenceSave(true);aiEvidencePaint();aiEvidenceNotice('上游未返回正文，追问草稿已保留。');return;}aiEvidenceSession=updateAiFollowup(aiEvidenceSession,full,'complete');aiFollowActive=null;if(input)input.value='';aiEvidenceSave(true);aiEvidencePaint();},
+    onError:e=>{if(!current())return;aiEvidenceSession=updateAiFollowup(aiEvidenceSession,aiEvidenceSession.followup.draft.answer,e?.code==='CANCELED'?'canceled':'failed');aiFollowActive=null;aiEvidenceSave(true);aiEvidencePaint();aiEvidenceNotice(e?.message||'请求中断，追问草稿已保留。');}
+  });
 }
 
 /* Source: src/ui/records-manager.js */
@@ -14595,7 +14694,7 @@ const QX_ALL={
   '申子辰合水':'智局，主聪慧善谋，聚智成事','亥卯未合木':'仁局，主仁慈宽厚，人缘聚和','寅午戌合火':'礼局，主热情明理，事业聚气','巳酉丑合金':'义局，主刚毅果决，团体凝聚',
   '子午相冲':'水火交战，主劳心费神、情绪起伏','丑未相冲':'土冲而动，主家宅变动、工作更迭','寅申相冲':'金木交战，主奔波劳碌、驿马之动',
   '卯酉相冲':'成败交争，主成败起伏、纠葛反复','辰戌相冲':'墓库冲开，主变革之机，财库冲开聚散皆宜','巳亥相冲':'水火冲激，主远行劳心、心思多变',
-  '寅巳申三刑':'恃势之刑，主恃强凌弱，防官非是非','丑戌未三刑':'无恩之刑，主恩将仇报，防六亲刑伤','子卯相刑':'无礼之刑，主口舌是非，防失礼失德',
+  '寅巳申三刑':'无恩之刑，主恃强凌弱，防官非是非','丑戌未三刑':'恃势之刑，主恩将仇报，防六亲刑伤','子卯相刑':'无礼之刑，主口舌是非，防失礼失德',
   '辰辰自刑':'自刑，主自寻烦恼、自我折磨','午午自刑':'自刑，主心高气傲、自视过高','酉酉自刑':'自刑，主固执己见、自伤自怜','亥亥自刑':'自刑，主多思多虑、自我设限',
   '甲庚相冲':'东西对冲，主远行变动、性格刚烈、防筋骨之伤','乙辛相冲':'主心思变动、言行反复、防口舌','丙壬相冲':'南北对冲，主劳心奔波、情绪起伏','丁癸相冲':'主暗耗忧烦、心绪不宁',
   '子未相害':'势家相害，主六亲不睦、防暗损','丑午相害':'官鬼相害，主多疑善感、防小人','寅巳相害':'临官相害，主防人暗算、慎出行',
@@ -14784,8 +14883,6 @@ function zhSchoolContrast(zh){
 const LN_HE_NAME={0:'甲己合',1:'乙庚合',2:'丙辛合',3:'丁壬合',4:'戊癸合'};
 const LN_ZHE_NAME=['子丑合','寅亥合','卯戌合','辰酉合','巳申合','午未合'];
 const LN_ZCHONG_NAME=['子午冲','丑未冲','寅申冲','卯酉冲','辰戌冲','巳亥冲'];
-const LN_XING_GRP=[[2,5,8],[1,10,7],[0,3]];
-const LN_XING_NAME=['寅巳申三刑','丑戌未三刑','子卯刑'];
 const LN_HAI_GRP=[[0,7],[1,6],[2,5],[3,4],[8,11],[9,10]];
 const LN_HAI_NAME=['子未害','丑午害','寅巳害','卯辰害','申亥害','酉戌害'];
 function liuNianRel(zh,g,z){
@@ -14803,8 +14900,11 @@ function liuNianRel(zh,g,z){
     if(zh2) rels.push({type:'六合',name:LN_ZHE_NAME[zhiHe.indexOf(zh2)],pillar:pn,power:1.5});
     const zc=zhiChong.find(([x,y])=>(x===z&&y===pzz)||(x===pzz&&y===z));
     if(zc) rels.push({type:'六冲',name:LN_ZCHONG_NAME[zhiChong.indexOf(zc)],pillar:pn,power:3});
-    LN_XING_GRP.forEach((gr,i)=>{ if(gr.includes(z)&&gr.includes(pzz)) rels.push({type:'三刑',name:LN_XING_NAME[i],pillar:pn,power:2.5}); });
-    if(z===pzz&&[3,6,9,11].includes(z)) rels.push({type:'自刑',name:ZHI[z]+ZHI[z]+'自刑',pillar:pn,power:2});
+    const punishment=branchPunishment(z,pzz);
+    if(punishment){
+      const complete=punishment.group.every(member=>member===z||pillars.some(([,gz])=>gz[1]===member));
+      rels.push({type:punishment.kind==='self'?'自刑':'三刑',name:punishment.name+(punishment.group.length===3?(complete?'（三刑全）':'（两支）'):''),pillar:pn,power:punishment.kind==='self'?2:2.5,complete,ruleVersion:punishment.version});
+    }
     const lh=LN_HAI_GRP.find(([x,y])=>(x===z&&y===pzz)||(x===pzz&&y===z));
     if(lh) rels.push({type:'六害',name:LN_HAI_NAME[LN_HAI_GRP.indexOf(lh)],pillar:pn,power:2});
   });
@@ -16030,7 +16130,7 @@ function renderZongHe(zh,name){
   html+=`<div class="section-block" style="border:1px solid var(--jade)"><h3>🤖 AI 深度解读 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">（计算事实只读；解读需核对依据；当前流派：<b style="color:var(--jade)">${SCHOOLS[lastSchool]}</b>，可回排盘表单顶部下拉切换）</span></h3>`;
   html+=`<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px"><button class="btn btn-primary" id="ai-deep-btn" onclick="aiDeepAnalyze()" style="border-color:var(--jade);background:var(--jade);color:#fff">🤖 一键 AI 深化 18 维</button><button class="btn btn-ghost" onclick="aiExtractPrompt()" style="font-size:.78rem;border-color:var(--gold);color:var(--gold)">📋 提取 Prompt（无 Key 用）</button><span style="font-size:.72rem;color:var(--ink3)">方式一：配置 API Key 一键生成；方式二：提取 Prompt 复制到任意 AI 对话，回复粘回回填</span></div>`;
   html+=`<div id="ai-workflow-controls" class="ai-workflow-controls"></div><div id="ai-deep-box" style="background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;max-height:420px;overflow-y:auto;font-size:.85rem;line-height:1.9;color:var(--ink)"><span style="color:var(--ink3);font-size:.78rem">JSON回复完整结束后逐维检查四柱身份、字段与引用；错误维度保留草稿，已有结果不被无效回复覆盖。检查不证明自由文本正确或传统预测有效。</span></div>`;
-  html+=`<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)"><div style="font-size:.8rem;color:var(--gold);margin-bottom:6px;font-weight:700">💬 AI 追问 <span style="font-size:.68rem;color:var(--ink3);font-weight:400">（先生成解读，再针对任一维度或年份深挖）</span></div><div style="display:flex;gap:8px;flex-wrap:wrap"><input id="ai-follow-input" placeholder="如：第14维里2032年为什么是喜用？展开讲讲" style="flex:1;min-width:220px;background:var(--card2);border:1px solid var(--line);color:var(--ink);padding:8px 12px;border-radius:10px;font-size:.82rem;font-family:inherit" onkeydown="if(event.key==='Enter')aiFollowUp()"><button class="btn btn-primary" onclick="aiFollowUp()" id="ai-follow-btn" style="font-size:.78rem;padding:7px 16px">发送追问</button></div><div id="ai-follow-box" style="margin-top:8px;font-size:.82rem;line-height:1.8;color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;max-height:320px;overflow-y:auto;display:none"></div></div>`;
+  html+=`<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)"><div style="font-size:.8rem;color:var(--gold);margin-bottom:6px;font-weight:700">💬 AI 追问 <span style="font-size:.68rem;color:var(--ink3);font-weight:400">（先生成解读，再针对任一维度或年份深挖）</span></div><div style="display:flex;gap:8px;flex-wrap:wrap"><input id="ai-follow-input" maxlength="4000" aria-label="连续追问" placeholder="如：第14维里2032年为什么是喜用？展开讲讲" style="flex:1;min-width:220px;background:var(--card2);border:1px solid var(--line);color:var(--ink);padding:8px 12px;border-radius:10px;font-size:.82rem;font-family:inherit" onkeydown="if(event.key==='Enter')aiFollowUp()"><button class="btn btn-primary" onclick="aiFollowUp()" id="ai-follow-btn" style="font-size:.78rem;padding:7px 16px">发送追问</button><button type="button" class="btn btn-ghost" id="ai-follow-clear" onclick="aiFollowClear()">清空追问</button></div><div id="ai-follow-box" role="log" aria-label="追问记录" style="margin-top:8px;font-size:.82rem;line-height:1.8;color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;max-height:320px;overflow-y:auto;display:none"></div></div>`;
   html+=`</div>`;
   html+=`<div class="note">说明：八字以节气定月、子时换日；紫微以农历定命身宫；奇门以时辰定局；六爻以时间起卦。四术共享同一出生时刻基准，分别展示各自取法。典籍佐证与十神心法已并入 AI 深度解读的提示词（知识库参考）中。</div>`;
   html+=`</div>`;
@@ -16379,24 +16479,6 @@ function hhAiDeep(){
 }
 
 /* ======================== AI 追问（多轮对话式深挖） ======================== */
-function aiFollowUp(){
-  const c=aiGetConfig(),inp=document.getElementById('ai-follow-input'),box=document.getElementById('ai-follow-box'),btn=document.getElementById('ai-follow-btn'),q=inp?.value.trim();
-  if(!q||!lastZh||!c.key||!lastAIReply){aiEvidenceNotice('追问需要当前命盘、API设置及已接收的解读。');return;}
-  if(aiEvidenceActive||aiFollowActive)return;
-  const chart=aiEvidenceChart(),id=chartFactId(chart);
-  const current=()=>lastZh&&chartFactId(aiEvidenceChart())===id;
-  if(btn)btn.disabled=true;if(box){box.style.display='block';box.textContent='正在生成追问回复…';}
-  const system='你是传统文化学习助手。计算事实只读，不得改写四柱或应用评分。不得给财富金额、学历上下限、医学诊断或命运必然结论。区分传统解释与事实，说明条件和不确定性，未核验原文不得当成已核对引文。针对追问用简洁文字回答。当前计算事实：'+JSON.stringify({chartId:id,pillars:chart.pillars,facts:aiFacts(chart),rules:chart.rules});
-  const payload={model:c.model,messages:[{role:'system',content:system},{role:'assistant',content:lastAIReply.slice(-12000)},{role:'user',content:q}],stream:true,temperature:0.4};
-  aiFollowActive=aiStreamChat(aiEndpoint(c),{method:'POST',headers:aiHeaders(c),body:JSON.stringify(payload)},{
-    idleMs:90000,totalMs:180000,
-    onDelta:(d,all)=>{if(current()&&box)box.textContent=all;},
-    onDone:full=>{if(current()){if(box)box.textContent=full;if(inp)inp.value='';}aiFollowActive=null;if(btn)btn.disabled=false;aiEvidencePaint();},
-    onError:()=>{if(current()&&box)box.textContent+='\n请求中断；不会自动重发。';aiFollowActive=null;if(btn)btn.disabled=false;if(lastZh)aiEvidencePaint();}
-  });aiEvidencePaint();
-}
-/* ======================== 命盘导出（图片 + 记录备份） ======================== */
-// canvas 绘制命盘速览卡并下载 PNG
 function exportChartPng(options){
   const zh=options?.chart||lastZh,name=options?.name??lastName;
   if(!zh){alert(lastCandidates?'时辰未知，请先核对时分；候选模式不导出确定命盘图':'请先排盘');return;}

@@ -1,0 +1,216 @@
+{
+  "application": "5.30.0",
+  "date": "2026-10-27",
+  "rules": {
+    "calendar": "5.20.0",
+    "relations": "1.1.0",
+    "marriage": "5.30.0"
+  },
+  "verification": {
+    "node": 120,
+    "python": 5,
+    "browser": {
+      "startTime": "2026-10-27T13:49:31.812Z",
+      "duration": 249377.024,
+      "expected": 77,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "staticErrors": 0,
+    "existingWarnings": 32,
+    "newWarnings": 0,
+    "frozenCharts": "12/12 unchanged",
+    "widths": [
+      1440,
+      1024,
+      390,
+      320
+    ],
+    "dark": true,
+    "paidAiRequests": 0
+  },
+  "html": {
+    "bytes": 1809543,
+    "sha256": "4a236b93f0764a03c8ddfa156bbdd087bec6619521634d3e7a254a6b5f2ba3f2"
+  },
+  "annual": {
+    "pillars": [
+      "己卯",
+      "丁卯",
+      "癸未",
+      "戊午"
+    ],
+    "year2023": {
+      "y": 2023,
+      "g": 9,
+      "z": 3,
+      "tg": 0,
+      "tgName": "比肩",
+      "zz": 1,
+      "tz": 2,
+      "tzName": "食神",
+      "zzAll": "乙食神",
+      "rels": [
+        {
+          "type": "冲",
+          "name": "癸丁相冲",
+          "pillar": "月",
+          "power": 3
+        },
+        {
+          "type": "合",
+          "name": "戊癸合",
+          "pillar": "时",
+          "power": 1.5
+        }
+      ],
+      "strong": "强",
+      "tags": [
+        "喜忌交杂",
+        "人际/竞争",
+        "才华/子女",
+        "变动"
+      ],
+      "good": false,
+      "bad": false,
+      "kind": "喜忌交杂",
+      "tip": "流年癸丁相冲·月(父母/环境)、戊癸合·时(子女/晚运)，动荡多变，父母/环境之事被引动；地支卯本气乙为日主食神",
+      "adv": "干支作用分看：喜向提供承接，忌向加重原局所需制化"
+    }
+  },
+  "pairs": {
+    "rules": {
+      "version": "5.30.0"
+    },
+    "score": 80,
+    "rawScore": 80,
+    "ledger": {
+      "base": 60,
+      "items": [
+        {
+          "label": "年支 · 两族根基",
+          "delta": 0
+        },
+        {
+          "label": "月支 · 成长背景",
+          "delta": -3
+        },
+        {
+          "label": "日支 · 夫妻宫",
+          "delta": 12
+        },
+        {
+          "label": "时支 · 子女宫",
+          "delta": 0
+        },
+        {
+          "label": "纳音 · 年命",
+          "delta": 6
+        },
+        {
+          "label": "日主互看（合成甲 → 合成乙）",
+          "delta": -3
+        },
+        {
+          "label": "日主互看（合成乙 → 合成甲）",
+          "delta": -3
+        },
+        {
+          "label": "用神 · 扶抑互补",
+          "delta": 13
+        },
+        {
+          "label": "五行 · 补缺",
+          "delta": 0
+        },
+        {
+          "label": "调候 · 命局配合",
+          "delta": 0
+        },
+        {
+          "label": "九星 · 命卦配宫",
+          "delta": -6
+        },
+        {
+          "label": "紫微 · 命宫星曜",
+          "delta": 4
+        },
+        {
+          "label": "大运 · 行运同步",
+          "delta": 0
+        }
+      ],
+      "min": 30,
+      "max": 95,
+      "deepIncluded": false
+    },
+    "preferences": {
+      "version": "1.0.0",
+      "directions": [
+        {
+          "receiver": "合成甲",
+          "donor": "合成乙",
+          "strength": "身弱",
+          "help": [
+            {
+              "element": 3,
+              "count": 3
+            }
+          ],
+          "burden": [],
+          "score": 9
+        },
+        {
+          "receiver": "合成乙",
+          "donor": "合成甲",
+          "strength": "身弱",
+          "help": [
+            {
+              "element": 3,
+              "count": 3
+            }
+          ],
+          "burden": [
+            {
+              "element": 1,
+              "count": 3
+            }
+          ],
+          "score": 4
+        }
+      ],
+      "missing": [
+        {
+          "receiver": "合成甲",
+          "donor": "合成乙",
+          "element": 0,
+          "preference": -1,
+          "rewarded": false
+        }
+      ],
+      "climate": [
+        {
+          "receiver": "合成甲",
+          "donor": "合成乙",
+          "element": 4,
+          "preference": -1
+        }
+      ],
+      "dayun": [
+        {
+          "stem": -1,
+          "branch": 1,
+          "value": 0,
+          "kind": "喜忌交杂"
+        },
+        {
+          "stem": 1,
+          "branch": 1,
+          "value": 2,
+          "kind": "喜用"
+        }
+      ]
+    }
+  }
+}
