@@ -41,3 +41,25 @@ test('mobile/dark learning dialog fits the viewport and its tabs and focus trap 
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   await page.keyboard.press('Escape');await expect(page.locator('#study-open')).toBeFocused();
 });
+
+for(const width of [1440,390])test('solar-time reference warnings survive import and report export at '+width+'px',async({page})=>{
+  await page.setViewportSize({width,height:900});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('/');await expect(page.locator('#study-open')).toBeVisible();
+  await page.evaluate(()=>{const d=withBirthTime(parseCivilDate('2024-02-10'),0,'12:00');lastZh=zhCompute(d,hourIndexAt(d),1,'120°',{preciseTime:true,trueSolar:true,utcOffsetMinutes:480,dstMinutes:0,dayBoundary:'zi-chu'});renderZongHe(lastZh,'对照核验样本');});
+  await page.locator('#study-open').click();await page.locator('#study-tab-compare').click();
+  const baseline=await page.evaluate(()=>createStudySnapshot(serializeChart(lastZh))),before=await page.evaluate(()=>JSON.stringify({local:{...localStorage},session:{...sessionStorage}}));
+  const network=[];page.on('request',r=>network.push(r.url()));
+  const importData=async(data,name)=>{await page.locator('#study-reference-file').setInputFiles({name,mimeType:'application/json',buffer:Buffer.from(JSON.stringify(data))});};
+  baseline.chart.time.correction.longitude=121;await importData(baseline,'经度不同.json');
+  await expect(page.locator('#study-comparison-result')).toContainText('真太阳时经度不同：本盘120°、对照121°');
+  const pending=page.waitForEvent('download');await page.locator('#study-report-export').click();const report=await readDownload(await pending);
+  expect(report.verdict).toBe('aligned-with-gaps');expect(report.summary.different).toBe(0);
+  delete baseline.chart.time.correction.longitude;await importData(baseline,'经度未提供.json');
+  await expect(page.locator('#study-comparison-result')).toContainText('真太阳时经度未提供');
+  baseline.chart.time.correction.longitude=120;baseline.chart.input.calendarType='lunar';await importData(baseline,'农历日期.json');
+  await expect(page.locator('[data-study-compare-status="not-provided"]')).toContainText('出生日期');
+  baseline.chart.time.correction.longitude=181;await importData(baseline,'经度无效.json');
+  await expect(page.locator('#study-compare-status')).toContainText('经度无效');await expect(page.locator('#study-report-export')).toBeDisabled();
+  expect(network).toEqual([]);expect(await page.evaluate(()=>JSON.stringify({local:{...localStorage},session:{...sessionStorage}}))).toBe(before);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);expect(errors).toEqual([]);
+});

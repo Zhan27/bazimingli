@@ -1,10 +1,25 @@
 /** Offline adapters written for documented JSON shapes. No service URLs, credentials or remote requests. */
+function referenceTimeConventions(options){
+  if(options===undefined||options===null)return {};
+  if(typeof options!=='object'||Array.isArray(options))throw new TypeError('对照时区与时间选项须为对象');
+  const result={};
+  for(const key of ['utcOffsetMinutes','dstMinutes'])if(options[key]!==undefined){
+    const value=options[key];
+    if(!['number','string'].includes(typeof value)||(typeof value==='string'&&!value.trim()))throw new TypeError(key==='utcOffsetMinutes'?'对照时区偏移无效':'对照夏令时修正无效');
+    const number=Number(value);
+    if(!Number.isInteger(number)||(key==='utcOffsetMinutes'?(number < -720||number>840):![0,60].includes(number)))throw new RangeError(key==='utcOffsetMinutes'?'对照时区偏移无效':'对照夏令时修正无效');
+    result[key]=number;
+  }
+  if(options.dayBoundary!==undefined){if(!['zi-chu','zi-zheng'].includes(options.dayBoundary))throw new TypeError('对照换日规则无效');result.dayBoundary=options.dayBoundary;}
+  if(options.trueSolar!==undefined){if(typeof options.trueSolar!=='boolean')throw new TypeError('对照真太阳时选项须为布尔值');result.trueSolar=options.trueSolar;}
+  return result;
+}
 function normalizeReferenceChart(value){
   if(!value||typeof value!=='object'||Array.isArray(value))throw new TypeError('对照文件须为JSON对象');
-  let data=value,input;
+  let data=value,input,clockData;
   if(value.format==='bazimingli-study'){
     if(value.formatVersion!==1)throw new TypeError('不支持此学习快照版本');
-    assertStudyChart(value.chart);input={...value.chart.input,options:chartStudyFacts(value.chart).timeOptions};data=value.facts;
+    assertStudyChart(value.chart);input={...value.chart.input,options:chartStudyFacts(value.chart).timeOptions};clockData=value.chart.time;data=value.facts;
     if(!data||JSON.stringify(data.pillars?.map(p=>p.text))!==JSON.stringify(value.chart.pillars.map(p=>p.text)))throw new TypeError('快照盘面与四柱不一致');
   }else if(value.action==='chart'&&value.data&&typeof value.data==='object')data=value.data;
   input=input||data.input||{};
@@ -21,14 +36,23 @@ function normalizeReferenceChart(value){
   const periodSource=data.dayun?.periods??data.dayun?.dyList??data.dayun?.list;
   if(periodSource!==undefined&&(!Array.isArray(periodSource)||periodSource.length>20))throw new TypeError('大运列表无效');
   const dayun=periodSource?.map(p=>{
+    if(!p||typeof p!=='object'||Array.isArray(p))throw new TypeError('大运条目无效');
     const text=small(p.text??p.ganZhi)??(Number.isInteger(p.g)&&Number.isInteger(p.z)?GAN[p.g]+ZHI[p.z]:undefined);
     if(!text||text.length!==2||!GAN.includes(text[0])||!ZHI.includes(text[1])||GAN.indexOf(text[0])%2!==ZHI.indexOf(text[1])%2)throw new TypeError('大运干支无效');return text;
   });
-  const date=small(input.date)??((!input.calendarType||input.calendarType==='solar')&&[input.birthYear,input.birthMonth,input.birthDay].every(Number.isInteger)?String(input.birthYear)+'-'+String(input.birthMonth).padStart(2,'0')+'-'+String(input.birthDay).padStart(2,'0'):undefined);
+  const date=!input.calendarType||input.calendarType==='solar'?small(input.date)??([input.birthYear,input.birthMonth,input.birthDay].every(Number.isInteger)?String(input.birthYear)+'-'+String(input.birthMonth).padStart(2,'0')+'-'+String(input.birthDay).padStart(2,'0'):undefined):undefined;
   const time=small(input.time)??([input.birthHour,input.birthMinute].every(Number.isInteger)?String(input.birthHour).padStart(2,'0')+':'+String(input.birthMinute).padStart(2,'0'):undefined);
   const periodStartYears=periodSource?.map(p=>Number.isInteger(p.startYear)?p.startYear:Number.isInteger(p.years?.[0]?.year)?p.years[0].year:undefined);
+  const conventions=referenceTimeConventions(input.options),correction=(clockData||data.time)?.correction;
+  if(correction!==undefined&&correction!==null){
+    if(typeof correction!=='object'||Array.isArray(correction))throw new TypeError('对照太阳时修正字段无效');
+    if(correction.longitude!==undefined){
+      if(!Number.isFinite(correction.longitude)||Math.abs(correction.longitude)>180)throw new RangeError('对照太阳时经度无效');
+      conventions.longitude=correction.longitude;
+    }
+  }
   return {pillars,dayun,periodStartYears,startAge:Number.isFinite(data.dayun?.startAge)?data.dayun.startAge:undefined,input:{date,time,gender:input.gender==='male'?1:input.gender==='female'?0:[0,1].includes(input.gender)?input.gender:undefined},
-    conventions:Object.fromEntries(['utcOffsetMinutes','dstMinutes','dayBoundary','trueSolar'].map(k=>[k,input.options?.[k]]))};
+    conventions};
 }
 function compareReferenceChart(chart,reference){
   const local=normalizeReferenceChart(createStudySnapshot(chart)),other=normalizeReferenceChart(reference),fields=[],warnings=[];
@@ -41,6 +65,11 @@ function compareReferenceChart(chart,reference){
   for(const key of ['utcOffsetMinutes','dstMinutes','dayBoundary','trueSolar']){
     const a=local.conventions[key],b=other.conventions[key];
     if(a===undefined||b===undefined)warnings.push('口径尚未同时提供：'+key);else if(a!==b)warnings.push('口径不同：'+key);
+  }
+  if(local.conventions.trueSolar||other.conventions.trueSolar){
+    const a=local.conventions.longitude,b=other.conventions.longitude;
+    if(a===undefined||b===undefined)warnings.push('真太阳时经度未提供：请核对双方实际使用的经度');
+    else if(a!==b)warnings.push('真太阳时经度不同：本盘'+a+'°、对照'+b+'°；请核对地点与太阳时口径');
   }
   for(let i=0;i<4;i++)for(const key of ['text','hidden','tenGod','branchTenGod','nayin','diShi','isKong']){
     add('pillars.'+local.pillars[i].id+'.'+key,['年','月','日','时'][i]+'柱 · '+({text:'干支',hidden:'藏干集合',tenGod:'干十神',branchTenGod:'支本气十神',nayin:'纳音',diShi:'十二长生',isKong:'日旬空亡'}[key]),local.pillars[i][key],other.pillars[i][key],key==='nayin'?x=>aliases[x]||x:x=>x);

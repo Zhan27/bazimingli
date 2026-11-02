@@ -55,8 +55,13 @@ function calculateChart(input,{rulePack}={}){
 function unknownClock(ms){const d=civilFromMillis(ms);return fmtLocalDate(d)+'T'+[d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':')+(d.getMilliseconds()?'.'+String(d.getMilliseconds()).padStart(3,'0'):'');}
 function compareChartFacts(a,b){
   const differences=[];
-  const visit=(x,y,path)=>{
-    if(x&&y&&typeof x==='object'&&typeof y==='object'){for(const k of new Set([...Object.keys(x),...Object.keys(y)]))visit(x[k],y[k],path?path+'.'+k:k);}
+  const visit=(x,y,path,beforePresent=true,afterPresent=true)=>{
+    if(!beforePresent||!afterPresent){differences.push({path,before:x??null,after:y??null,beforePresent,afterPresent});return;}
+    if(Array.isArray(x)!==Array.isArray(y)){differences.push({path,before:x,after:y});return;}
+    if(x&&y&&typeof x==='object'&&typeof y==='object'){
+      if(Array.isArray(x)&&x.length!==y.length)differences.push({path:path?path+'.length':'length',before:x.length,after:y.length});
+      for(const k of new Set([...Object.keys(x),...Object.keys(y)]))visit(x[k],y[k],path?path+'.'+k:k,Object.hasOwn(x,k),Object.hasOwn(y,k));
+    }
     else if(x!==y)differences.push({path,before:x??null,after:y??null});
   };visit(a,b,'');return {schemaVersion:CHART_SCHEMA_VERSION,differences,count:differences.length};
 }

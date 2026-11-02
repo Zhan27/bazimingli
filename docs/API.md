@@ -14,6 +14,8 @@ const qm = engine.calculateModule('qimen',input);
 const ly = engine.calculateModule('liuyao',{...input,mode:1,numStr:'1 2 3'});
 ```
 
+`compareChartFacts` compares JSON container types as well as values. Array/object mismatches are recorded at the container path; different array lengths have a `.length` entry. Added/deleted fields include `beforePresent` and `afterPresent`, so an absent field is distinguishable from an explicit `null`. This is a structural JSON diff, not a normalization of different calendar conventions.
+
 Input `date` is a Gregorian wall-clock date; use explicit UTC standard offset and optional manual DST. `gender` is 0/1 for legacy directional rules. Defaults are UTC+8, no DST, school0, 23:00 boundary and 12:00 **only for developer convenience**; supply `unknownTime:true` for a real unknown birth time, which returns candidate intervals rather than a definite chart. `hourIdx` without `time` requests the documented hour midpoint. Do not silently use defaults for incomplete personal records.
 
 Explicit `unknownTime:true` is accepted by `calculateChart`, `compareSchools` and `batchCalculate`. `calendarDebug`, `calculateModule` and either side of `comparePair` reject it with a `TypeError`, even if `time` is also supplied. Verify a specific time and clear the unknown flag before requesting a definite result.

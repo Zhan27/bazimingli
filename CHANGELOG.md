@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.33.0 — 2026-11-02
+- Corrected JSON fact comparison to distinguish arrays from objects, disclose array-length changes and retain explicit presence flags when a field is absent. Null values no longer make an added/deleted field look like two identical values.
+- Offline reference reports now disclose missing or different true-solar longitude. Explicit lunar dates are not treated as Gregorian dates. Valid numeric-string UTC/DST conventions are normalized; malformed time conventions, solar longitudes and period objects produce actionable errors.
+- Added six failing-before-fix Node regressions and desktop/mobile import/export tests. Calculation rules, single-HTML delivery, AI contracts, record and provider formats remain unchanged; comparison metadata only affects verification.
+
 ## 5.32.0 — 2026-11-02
 - Reject explicit unknown-time inputs in definite-only module, marriage and calendar-debug APIs instead of silently using noon, including when a stale clock value accompanies the unknown flag. Candidate calculation and five-school comparisons remain available.
 - Fixed candidate coverage at calendar-range edges: validate UTC/DST settings independently of a noon sample, retain every valid interval, and report invalid day-boundary settings accurately. Candidate rules1.1.0 are separately versioned; definite-chart rules5.31.0 remain unchanged.
