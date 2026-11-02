@@ -1,0 +1,9 @@
+{
+  "baseline": "c252a3446b250f574d4d42edb3ab302985d93dc5",
+  "scope": "Synthetic full-JSON pre/post software regression for definite inputs; not independent calendrical or predictive validation.",
+  "charts": 480,
+  "modules": 120,
+  "pairs": 8,
+  "debug": 40,
+  "differences": 0
+}

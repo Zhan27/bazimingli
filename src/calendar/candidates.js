@@ -1,14 +1,16 @@
 /* Partition an unknown birth day at every actual calculation boundary, rather
  * than pretending a single default hour is known. Intervals are [from,to).
  * Includes early/late Zi, exact solar terms and solar-time hour/day crossings. */
+const CANDIDATE_RULE_VERSION='1.1.0';
 function unknownBirthCandidates(date,place='',options={}){
   assertSolarDate(date);
   const profile=getRuleProfile(options.schoolId===undefined?0:options.schoolId);
   const opts={...options,preciseTime:true,dayBoundary:options.dayBoundary||profile.dayBoundary};
   const start=civilDay(date),end=start+86400000;
-  const offset=opts.utcOffsetMinutes===undefined?480:Number(opts.utcOffsetMinutes),dst=Number(opts.dstMinutes||0);
-  // Validate the offset even if the first/last effective dates fall out of range.
-  normalizeBirthTime(civilFromMillis(start+12*3600000),opts);
+  const {utcOffsetMinutes:offset,dstMinutes:dst}=birthTimeOffsets(opts);
+  if(!['zi-chu','zi-zheng'].includes(opts.dayBoundary))throw new RangeError('未知换日规则');
+  // Validate settings without requiring an arbitrary noon sample to be in range.
+  // Individual intervals may still be valid when part of the day is unsupported.
   const shift=(480-offset-dst)*60000,longitude=opts.trueSolar?resolveLongitude(place):null;
   const corrected=t=>{
     const civil=civilFromMillis(t+shift);
@@ -43,6 +45,6 @@ function unknownBirthCandidates(date,place='',options={}){
   }
   if(!candidates.length)throw new RangeError('候选时段均超出历法支持范围');
   const stablePillars=[0,1,2,3].map(i=>{const values=[...new Set(candidates.map(c=>GAN[c.pillars[i][0]]+ZHI[c.pillars[i][1]]))];return {pillar:['年','月','日','时'][i],stable:values.length===1,values};});
-  return {kind:'unknown-time',inputDate:civilFromMillis(start),profile,options:opts,place,candidates,excluded,stablePillars,
-    precision:'时辰未知：列出全天候选区间，不生成默认确定命盘；区间中点仅供内部求值，临界分秒受近似太阳时和坐标精度影响'};
+  return {kind:'unknown-time',ruleVersion:CANDIDATE_RULE_VERSION,inputDate:civilFromMillis(start),profile,options:opts,place,candidates,excluded,stablePillars,
+    precision:'时辰未知：按全天边界分段，稳定四柱仅指有效候选时段；区间中点仅供内部求值，临界分秒受近似太阳时和坐标精度影响'};
 }

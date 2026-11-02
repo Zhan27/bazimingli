@@ -17,6 +17,11 @@ function chartInputFromCalculation(z){
   const d=z.inputDate||z.temporal.inputDate;
   return {date:fmtLocalDate(d),time:String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'),gender:z.gender,place:z.place||'',options:{schoolId:z.profile.id,dayBoundary:z.temporal.dayBoundary,trueSolar:!!z.temporal.correction,utcOffsetMinutes:z.temporal.utcOffsetMinutes,dstMinutes:z.temporal.dstMinutes,wxMode:z.wxStatistics.mode}};
 }
+function requireKnownBirthTime(input){
+  const normalized=validateChartInput(input);
+  if(normalized.unknownTime)throw new TypeError('时辰未知，请先用calculateChart查看候选区间，核对具体时分后再计算');
+  return normalized;
+}
 function serializeChart(z,input){
   const t=z.temporal;
   return {schemaVersion:CHART_SCHEMA_VERSION,kind:'chart',input:input||chartInputFromCalculation(z),rules:{version:RULE_VERSION,profile:z.profile.key,strength:z.strength.rule,dayBoundary:t.dayBoundary},
@@ -43,11 +48,11 @@ function validateRulePack(pack){
 /** Calculate without DOM, storage, network, or modifying the caller's input. */
 function calculateChart(input,{rulePack}={}){
   const i=validateChartInput(input),d=withBirthTime(parseCivilDate(i.date),i.hourIdx,i.time);
-  if(i.unknownTime){const r=unknownBirthCandidates(d,i.place,i.options);return {schemaVersion:CHART_SCHEMA_VERSION,kind:r.kind,input:i,rules:{version:RULE_VERSION,profile:r.profile.key},stablePillars:r.stablePillars,candidates:r.candidates.map(c=>({fromClock:unknownClock(c.from),toClock:unknownClock(c.to),pillars:c.pillars.map(([g,z])=>GAN[g]+ZHI[z])})),excluded:r.excluded};}
+  if(i.unknownTime){const r=unknownBirthCandidates(d,i.place,i.options);return {schemaVersion:CHART_SCHEMA_VERSION,kind:r.kind,input:i,rules:{version:RULE_VERSION,profile:r.profile.key,candidates:r.ruleVersion},precision:r.precision,stablePillars:r.stablePillars,candidates:r.candidates.map(c=>({fromClock:unknownClock(c.from),toClock:unknownClock(c.to),pillars:c.pillars.map(([g,z])=>GAN[g]+ZHI[z])})),excluded:r.excluded.map(c=>({...c,fromClock:unknownClock(c.from),toClock:unknownClock(c.to)}))};}
   const pack=rulePack?validateRulePack(rulePack):null;
   return serializeChart(zhCompute(d,hourIndexAt(d),i.gender,i.place,{...i.options,strengthRules:pack?.strength}),i);
 }
-function unknownClock(ms){const d=civilFromMillis(ms);return fmtLocalDate(d)+'T'+[d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');}
+function unknownClock(ms){const d=civilFromMillis(ms);return fmtLocalDate(d)+'T'+[d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':')+(d.getMilliseconds()?'.'+String(d.getMilliseconds()).padStart(3,'0'):'');}
 function compareChartFacts(a,b){
   const differences=[];
   const visit=(x,y,path)=>{
@@ -61,7 +66,7 @@ function batchCalculate(inputs,options={}){
   return inputs.map((input,index)=>{try{return {index,status:'pass',result:calculateChart(input,options)};}catch(e){return {index,status:'fail',error:{code:'INVALID_INPUT',message:e.message}};}});
 }
 function calendarDebug(input){
-  const i=validateChartInput(input),d=withBirthTime(parseCivilDate(i.date),i.hourIdx,i.time),t=calculateBirth(d,hourIndexAt(d),i.place,i.options),ms=civilMillis(t.civilDate),year=t.civilDate.getFullYear();
+  const i=requireKnownBirthTime(input),d=withBirthTime(parseCivilDate(i.date),i.hourIdx,i.time),t=calculateBirth(d,hourIndexAt(d),i.place,i.options),ms=civilMillis(t.civilDate),year=t.civilDate.getFullYear();
   const terms=[year-1,year,year+1].flatMap(y=>solarTerms(y).map((v,n)=>({name:TERM_NAMES[n],clock:unknownClock(v),ms:v,boundary:n%2===0?'jie':'qi'})));
   return {input:i,time:serializeChart(zhCompute(d,hourIndexAt(d),i.gender,i.place,i.options),i).time,previousTerm:terms.filter(x=>x.ms<=ms).at(-1),nextTerm:terms.find(x=>x.ms>ms),dayBoundary:dayBoundaryLabel(t.dayBoundary),calendarRange:[CALENDAR_MIN,CALENDAR_MAX]};
 }
@@ -78,7 +83,7 @@ function chartEvidenceGraph(chart){
   return {nodes,edges,meaning:'Traditional rule relationships; no predictive validity claim'};
 }
 function calculateModule(module,input){
-  const i=validateChartInput(input),date=withBirthTime(parseCivilDate(i.date),i.hourIdx,i.time);
+  const i=requireKnownBirthTime(input),date=withBirthTime(parseCivilDate(i.date),i.hourIdx,i.time);
   const args={date,hourIdx:hourIndexAt(date),gender:i.gender,referenceYear:input.referenceYear??date.getFullYear()};
   let result;
   if(module==='ziwei')result=calculateZiwei({...args,referenceDate:input.referenceDate});
@@ -88,6 +93,7 @@ function calculateModule(module,input){
   return JSON.parse(JSON.stringify({schemaVersion:CHART_SCHEMA_VERSION,module,input,result}));
 }
 function comparePair(a,b,referenceYear){
-  const raw=i=>{const x=validateChartInput(i),d=withBirthTime(parseCivilDate(x.date),x.hourIdx,x.time);return zhCompute(d,hourIndexAt(d),x.gender,x.place,x.options);};
+  a=requireKnownBirthTime(a);b=requireKnownBirthTime(b);
+  const raw=x=>{const d=withBirthTime(parseCivilDate(x.date),x.hourIdx,x.time);return zhCompute(d,hourIndexAt(d),x.gender,x.place,x.options);};
   return {left:calculateChart(a),right:calculateChart(b),comparison:heHunCompute(raw(a),raw(b),'甲方','乙方',referenceYear),scoreMeaning:'传统规则的主观分档，未经现实关系预测校准'};
 }

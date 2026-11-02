@@ -122,11 +122,15 @@ function withBirthTime(date,hourIdx,timeText,minute=0){
   if(!Number.isInteger(m)||m<0||m>59) throw new RangeError('分钟须为0至59');
   return civilFromMillis(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate(),h,m));
 }
-function normalizeBirthTime(inputDate,options={}){
+function birthTimeOffsets(options={}){
   const utcOffsetMinutes=options.utcOffsetMinutes===undefined?480:Number(options.utcOffsetMinutes);
   const dstMinutes=options.dstMinutes===undefined?0:Number(options.dstMinutes);
   if(!Number.isInteger(utcOffsetMinutes)||utcOffsetMinutes < -720||utcOffsetMinutes>840)throw new RangeError('UTC标准时偏移须在-12:00至+14:00之间');
   if(![0,60].includes(dstMinutes))throw new RangeError('夏令时修正须为0或60分钟');
+  return {utcOffsetMinutes,dstMinutes};
+}
+function normalizeBirthTime(inputDate,options={}){
+  const {utcOffsetMinutes,dstMinutes}=birthTimeOffsets(options);
   const instantMs=civilMillis(inputDate)-(utcOffsetMinutes+dstMinutes)*60000;
   const civilDate=civilFromMillis(instantMs+480*60000);
   assertSolarDate(civilDate);

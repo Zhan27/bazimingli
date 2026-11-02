@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="application-version" content="5.31.0">
+<meta name="application-version" content="5.32.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="description" content="玄机命理排盘：八字四柱、紫微斗数、奇门遁甲、六爻卜筮在线排盘工具，支持 AI 深度解读与多流派分析。">
 <meta name="keywords" content="八字排盘,紫微斗数,奇门遁甲,六爻,合婚,真太阳时,命理排盘,AI命理解读">
@@ -429,6 +429,15 @@ body[data-theme=xuanmo] .gz-explorer{--gz-he:#d8b276;--gz-chong:#e0a99b;--gz-san
 .structure-score-heading>div:first-child{white-space:nowrap;flex:0 0 auto}
 
 #ai-follow-input{min-width:0!important;flex:1 1 200px!important}#ai-follow-box{overflow-wrap:anywhere;white-space:pre-wrap}.ai-follow-turn{padding:8px 0;border-bottom:1px solid var(--line)}.ai-follow-turn:last-child{border-bottom:0}.ai-follow-turn p{margin:4px 0;text-align:start}.ai-follow-question{color:var(--jade);font-weight:600}.ai-follow-turn small{color:var(--ink3);font-size:.7rem}
+
+#unknown-candidates{font-size:.82rem;line-height:1.8;overflow-wrap:anywhere}
+#unknown-candidates h2{font-size:1.15rem;margin:0 0 10px}
+#unknown-candidates p{margin:8px 0}
+#unknown-candidates ul{padding-left:1.4em;margin:8px 0}
+#unknown-candidates table{border-collapse:collapse;width:100%;min-width:560px;margin:10px 0;font-variant-numeric:tabular-nums}
+#unknown-candidates th,#unknown-candidates td{text-align:start;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+#unknown-candidates th{color:var(--ink3);font-weight:500;background:var(--card2)}
+#unknown-candidates details{margin:12px 0}#unknown-candidates summary{color:var(--jade);cursor:pointer}
 
 </style>
 </head>
@@ -9511,11 +9520,15 @@ function withBirthTime(date,hourIdx,timeText,minute=0){
   if(!Number.isInteger(m)||m<0||m>59) throw new RangeError('分钟须为0至59');
   return civilFromMillis(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate(),h,m));
 }
-function normalizeBirthTime(inputDate,options={}){
+function birthTimeOffsets(options={}){
   const utcOffsetMinutes=options.utcOffsetMinutes===undefined?480:Number(options.utcOffsetMinutes);
   const dstMinutes=options.dstMinutes===undefined?0:Number(options.dstMinutes);
   if(!Number.isInteger(utcOffsetMinutes)||utcOffsetMinutes < -720||utcOffsetMinutes>840)throw new RangeError('UTC标准时偏移须在-12:00至+14:00之间');
   if(![0,60].includes(dstMinutes))throw new RangeError('夏令时修正须为0或60分钟');
+  return {utcOffsetMinutes,dstMinutes};
+}
+function normalizeBirthTime(inputDate,options={}){
+  const {utcOffsetMinutes,dstMinutes}=birthTimeOffsets(options);
   const instantMs=civilMillis(inputDate)-(utcOffsetMinutes+dstMinutes)*60000;
   const civilDate=civilFromMillis(instantMs+480*60000);
   assertSolarDate(civilDate);
@@ -11163,14 +11176,16 @@ function gzRelationModel(zh,relations=zhGanZhiMap(zh)){
 /* Partition an unknown birth day at every actual calculation boundary, rather
  * than pretending a single default hour is known. Intervals are [from,to).
  * Includes early/late Zi, exact solar terms and solar-time hour/day crossings. */
+const CANDIDATE_RULE_VERSION='1.1.0';
 function unknownBirthCandidates(date,place='',options={}){
   assertSolarDate(date);
   const profile=getRuleProfile(options.schoolId===undefined?0:options.schoolId);
   const opts={...options,preciseTime:true,dayBoundary:options.dayBoundary||profile.dayBoundary};
   const start=civilDay(date),end=start+86400000;
-  const offset=opts.utcOffsetMinutes===undefined?480:Number(opts.utcOffsetMinutes),dst=Number(opts.dstMinutes||0);
-  // Validate the offset even if the first/last effective dates fall out of range.
-  normalizeBirthTime(civilFromMillis(start+12*3600000),opts);
+  const {utcOffsetMinutes:offset,dstMinutes:dst}=birthTimeOffsets(opts);
+  if(!['zi-chu','zi-zheng'].includes(opts.dayBoundary))throw new RangeError('未知换日规则');
+  // Validate settings without requiring an arbitrary noon sample to be in range.
+  // Individual intervals may still be valid when part of the day is unsupported.
   const shift=(480-offset-dst)*60000,longitude=opts.trueSolar?resolveLongitude(place):null;
   const corrected=t=>{
     const civil=civilFromMillis(t+shift);
@@ -11205,8 +11220,8 @@ function unknownBirthCandidates(date,place='',options={}){
   }
   if(!candidates.length)throw new RangeError('候选时段均超出历法支持范围');
   const stablePillars=[0,1,2,3].map(i=>{const values=[...new Set(candidates.map(c=>GAN[c.pillars[i][0]]+ZHI[c.pillars[i][1]]))];return {pillar:['年','月','日','时'][i],stable:values.length===1,values};});
-  return {kind:'unknown-time',inputDate:civilFromMillis(start),profile,options:opts,place,candidates,excluded,stablePillars,
-    precision:'时辰未知：列出全天候选区间，不生成默认确定命盘；区间中点仅供内部求值，临界分秒受近似太阳时和坐标精度影响'};
+  return {kind:'unknown-time',ruleVersion:CANDIDATE_RULE_VERSION,inputDate:civilFromMillis(start),profile,options:opts,place,candidates,excluded,stablePillars,
+    precision:'时辰未知：按全天边界分段，稳定四柱仅指有效候选时段；区间中点仅供内部求值，临界分秒受近似太阳时和坐标精度影响'};
 }
 
 /* Source: src/api/chart.js */
@@ -11228,6 +11243,11 @@ function validateChartInput(input){
 function chartInputFromCalculation(z){
   const d=z.inputDate||z.temporal.inputDate;
   return {date:fmtLocalDate(d),time:String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'),gender:z.gender,place:z.place||'',options:{schoolId:z.profile.id,dayBoundary:z.temporal.dayBoundary,trueSolar:!!z.temporal.correction,utcOffsetMinutes:z.temporal.utcOffsetMinutes,dstMinutes:z.temporal.dstMinutes,wxMode:z.wxStatistics.mode}};
+}
+function requireKnownBirthTime(input){
+  const normalized=validateChartInput(input);
+  if(normalized.unknownTime)throw new TypeError('时辰未知，请先用calculateChart查看候选区间，核对具体时分后再计算');
+  return normalized;
 }
 function serializeChart(z,input){
   const t=z.temporal;
@@ -11255,11 +11275,11 @@ function validateRulePack(pack){
 /** Calculate without DOM, storage, network, or modifying the caller's input. */
 function calculateChart(input,{rulePack}={}){
   const i=validateChartInput(input),d=withBirthTime(parseCivilDate(i.date),i.hourIdx,i.time);
-  if(i.unknownTime){const r=unknownBirthCandidates(d,i.place,i.options);return {schemaVersion:CHART_SCHEMA_VERSION,kind:r.kind,input:i,rules:{version:RULE_VERSION,profile:r.profile.key},stablePillars:r.stablePillars,candidates:r.candidates.map(c=>({fromClock:unknownClock(c.from),toClock:unknownClock(c.to),pillars:c.pillars.map(([g,z])=>GAN[g]+ZHI[z])})),excluded:r.excluded};}
+  if(i.unknownTime){const r=unknownBirthCandidates(d,i.place,i.options);return {schemaVersion:CHART_SCHEMA_VERSION,kind:r.kind,input:i,rules:{version:RULE_VERSION,profile:r.profile.key,candidates:r.ruleVersion},precision:r.precision,stablePillars:r.stablePillars,candidates:r.candidates.map(c=>({fromClock:unknownClock(c.from),toClock:unknownClock(c.to),pillars:c.pillars.map(([g,z])=>GAN[g]+ZHI[z])})),excluded:r.excluded.map(c=>({...c,fromClock:unknownClock(c.from),toClock:unknownClock(c.to)}))};}
   const pack=rulePack?validateRulePack(rulePack):null;
   return serializeChart(zhCompute(d,hourIndexAt(d),i.gender,i.place,{...i.options,strengthRules:pack?.strength}),i);
 }
-function unknownClock(ms){const d=civilFromMillis(ms);return fmtLocalDate(d)+'T'+[d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');}
+function unknownClock(ms){const d=civilFromMillis(ms);return fmtLocalDate(d)+'T'+[d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':')+(d.getMilliseconds()?'.'+String(d.getMilliseconds()).padStart(3,'0'):'');}
 function compareChartFacts(a,b){
   const differences=[];
   const visit=(x,y,path)=>{
@@ -11273,7 +11293,7 @@ function batchCalculate(inputs,options={}){
   return inputs.map((input,index)=>{try{return {index,status:'pass',result:calculateChart(input,options)};}catch(e){return {index,status:'fail',error:{code:'INVALID_INPUT',message:e.message}};}});
 }
 function calendarDebug(input){
-  const i=validateChartInput(input),d=withBirthTime(parseCivilDate(i.date),i.hourIdx,i.time),t=calculateBirth(d,hourIndexAt(d),i.place,i.options),ms=civilMillis(t.civilDate),year=t.civilDate.getFullYear();
+  const i=requireKnownBirthTime(input),d=withBirthTime(parseCivilDate(i.date),i.hourIdx,i.time),t=calculateBirth(d,hourIndexAt(d),i.place,i.options),ms=civilMillis(t.civilDate),year=t.civilDate.getFullYear();
   const terms=[year-1,year,year+1].flatMap(y=>solarTerms(y).map((v,n)=>({name:TERM_NAMES[n],clock:unknownClock(v),ms:v,boundary:n%2===0?'jie':'qi'})));
   return {input:i,time:serializeChart(zhCompute(d,hourIndexAt(d),i.gender,i.place,i.options),i).time,previousTerm:terms.filter(x=>x.ms<=ms).at(-1),nextTerm:terms.find(x=>x.ms>ms),dayBoundary:dayBoundaryLabel(t.dayBoundary),calendarRange:[CALENDAR_MIN,CALENDAR_MAX]};
 }
@@ -11290,7 +11310,7 @@ function chartEvidenceGraph(chart){
   return {nodes,edges,meaning:'Traditional rule relationships; no predictive validity claim'};
 }
 function calculateModule(module,input){
-  const i=validateChartInput(input),date=withBirthTime(parseCivilDate(i.date),i.hourIdx,i.time);
+  const i=requireKnownBirthTime(input),date=withBirthTime(parseCivilDate(i.date),i.hourIdx,i.time);
   const args={date,hourIdx:hourIndexAt(date),gender:i.gender,referenceYear:input.referenceYear??date.getFullYear()};
   let result;
   if(module==='ziwei')result=calculateZiwei({...args,referenceDate:input.referenceDate});
@@ -11300,7 +11320,8 @@ function calculateModule(module,input){
   return JSON.parse(JSON.stringify({schemaVersion:CHART_SCHEMA_VERSION,module,input,result}));
 }
 function comparePair(a,b,referenceYear){
-  const raw=i=>{const x=validateChartInput(i),d=withBirthTime(parseCivilDate(x.date),x.hourIdx,x.time);return zhCompute(d,hourIndexAt(d),x.gender,x.place,x.options);};
+  a=requireKnownBirthTime(a);b=requireKnownBirthTime(b);
+  const raw=x=>{const d=withBirthTime(parseCivilDate(x.date),x.hourIdx,x.time);return zhCompute(d,hourIndexAt(d),x.gender,x.place,x.options);};
   return {left:calculateChart(a),right:calculateChart(b),comparison:heHunCompute(raw(a),raw(b),'甲方','乙方',referenceYear),scoreMeaning:'传统规则的主观分档，未经现实关系预测校准'};
 }
 
@@ -12263,18 +12284,21 @@ function renderRuleFacts(zh){
     (zh.useGod?.conflict?'<p>规则分歧：当前取'+WUXING[zh.yongShen]+'；另一取用路径为'+zh.useGod.alternatives.map(w=>WUXING[w]).join('、')+'。'+esc0(zh.useGod.reason)+'</p>':'')+'</div>';
 }
 function unknownRangeText(ms){
-  const d=civilFromMillis(ms);return fmtLocalDate(d)+' '+[d.getHours(),d.getMinutes(),d.getSeconds()].map(x=>String(x).padStart(2,'0')).join(':');
+  return unknownClock(ms).replace('T',' ');
 }
 function unknownSummary(result,name=''){
   return '姓名：'+(name||'未命名')+'\n'+result.precision+'\n规则：'+result.profile.name+' '+result.profile.version+'；'+dayBoundaryLabel(result.options.dayBoundary)+'\n'+
     result.stablePillars.map(p=>p.pillar+'柱'+(p.stable?'稳定：':'存在候选：')+p.values.join(' / ')).join('\n')+'\n'+
-    result.candidates.map(c=>unknownRangeText(c.from)+' 至 '+unknownRangeText(c.to)+'（不含右端）：'+c.pillars.map(p=>GAN[p[0]]+ZHI[p[1]]).join(' ')).join('\n');
+    result.candidates.map(c=>unknownRangeText(c.from)+' 至 '+unknownRangeText(c.to)+'（不含右端）：'+c.pillars.map(p=>GAN[p[0]]+ZHI[p[1]]).join(' ')).join('\n')+
+    (result.excluded.length?'\n排除时段（不含右端）：\n'+result.excluded.map(c=>unknownRangeText(c.from)+' 至 '+unknownRangeText(c.to)+'：'+c.reason).join('\n'):'');
 }
 function renderUnknownCandidates(result,name){
+  const summary=document.getElementById('compact-input-summary');
+  if(summary)summary.textContent=fmtLocalDate(result.inputDate)+' · 时辰未知'+(result.place?' · '+result.place:'');
   const stable=result.stablePillars.map(p=>'<li>'+p.pillar+'柱'+(p.stable?'稳定：':'随时段变化：')+p.values.join(' / ')+'</li>').join('');
   const rows=result.candidates.map((c,i)=>'<tr><td>'+(i+1)+'</td><td>'+unknownRangeText(c.from)+'<br>至 '+unknownRangeText(c.to)+'（不含右端）</td><td>'+c.pillars.map(p=>GAN[p[0]]+ZHI[p[1]]).join(' ')+'</td><td>'+c.lunar.year+'年'+lunarMonthName(c.lunar.month,c.lunar.isLeap)+lunarDayName(c.lunar.day)+'</td></tr>').join('');
   document.getElementById('zh-result').innerHTML='<div class="result" id="unknown-candidates"><h2>时辰未知 · 候选命盘</h2><p>'+esc0(name||'未命名')+'：'+esc0(result.precision)+'</p><p>性别未提供时，候选四柱不依赖性别；大运与其他性别相关推演暂不生成。</p><p>当前规则：'+esc0(result.profile.name)+' · '+esc0(dayBoundaryLabel(result.options.dayBoundary))+'</p><ul>'+stable+'</ul><p>以下按全部边界分段（含早/晚子时、交节与太阳时跨日），共 '+result.candidates.length+' 个候选区间。起运时分及依赖时柱的解读待核对。</p><div style="overflow-x:auto"><table><thead><tr><th>序号</th><th>原输入时区内的可能时间</th><th>年 月 日 时</th><th>对应农历</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
-    (result.excluded.length?'<p>有 '+result.excluded.length+' 段校正后超出历法范围，已明确排除。</p>':'')+
+    (result.excluded.length?'<details data-unknown-excluded><summary>有 '+result.excluded.length+' 段校正后超出历法范围，查看排除时段</summary><ul>'+result.excluded.map(c=>'<li>'+unknownRangeText(c.from)+' 至 '+unknownRangeText(c.to)+'（不含右端）：'+esc0(c.reason)+'</li>').join('')+'</ul></details>':'')+
     '<button class="btn btn-ghost" onclick="copyUnknownSummary()">复制候选对比</button><p>如已知具体时分，请将“时辰准确性”改为“确定”后重新排盘。此模式不生成确定的AI解读、命局定档或PNG命盘图。</p></div>';
 }
 function copyUnknownSummary(){if(lastCandidates)copyText(unknownSummary(lastCandidates,lastName),'候选对比已复制');}

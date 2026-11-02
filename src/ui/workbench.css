@@ -146,3 +146,12 @@ body[data-theme=xuanmo] .gz-explorer{--gz-he:#d8b276;--gz-chong:#e0a99b;--gz-san
 .structure-score-heading>div:first-child{white-space:nowrap;flex:0 0 auto}
 
 #ai-follow-input{min-width:0!important;flex:1 1 200px!important}#ai-follow-box{overflow-wrap:anywhere;white-space:pre-wrap}.ai-follow-turn{padding:8px 0;border-bottom:1px solid var(--line)}.ai-follow-turn:last-child{border-bottom:0}.ai-follow-turn p{margin:4px 0;text-align:start}.ai-follow-question{color:var(--jade);font-weight:600}.ai-follow-turn small{color:var(--ink3);font-size:.7rem}
+
+#unknown-candidates{font-size:.82rem;line-height:1.8;overflow-wrap:anywhere}
+#unknown-candidates h2{font-size:1.15rem;margin:0 0 10px}
+#unknown-candidates p{margin:8px 0}
+#unknown-candidates ul{padding-left:1.4em;margin:8px 0}
+#unknown-candidates table{border-collapse:collapse;width:100%;min-width:560px;margin:10px 0;font-variant-numeric:tabular-nums}
+#unknown-candidates th,#unknown-candidates td{text-align:start;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+#unknown-candidates th{color:var(--ink3);font-weight:500;background:var(--card2)}
+#unknown-candidates details{margin:12px 0}#unknown-candidates summary{color:var(--jade);cursor:pointer}

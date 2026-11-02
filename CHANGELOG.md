@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.32.0 — 2026-11-02
+- Reject explicit unknown-time inputs in definite-only module, marriage and calendar-debug APIs instead of silently using noon, including when a stale clock value accompanies the unknown flag. Candidate calculation and five-school comparisons remain available.
+- Fixed candidate coverage at calendar-range edges: validate UTC/DST settings independently of a noon sample, retain every valid interval, and report invalid day-boundary settings accurately. Candidate rules1.1.0 are separately versioned; definite-chart rules5.31.0 remain unchanged.
+- Preserve fractional seconds in candidate boundary strings. Excluded intervals include named clock fields in JSON and expandable clock/reason details in the page and copied summary. Stable pillars refer explicitly to valid candidate intervals.
+- Refresh the compact input summary when entering unknown-time mode, so the previous chart's date/time is not retained; improve candidate-table spacing and mobile scrolling.
+- Added API regressions, a200-case range-edge matrix checking interval endpoints and complete coverage, and four-width browser coverage for copying, history replay and mobile/dark rendering. No new dependencies or paid model calls.
+
 ## 5.31.0 — 2026-10-27
 - Replaced the neutral-strength resource fallback with explicit month-command and exposed-obstacle routes, ranked by separate positional stem/root evidence. Existing calendar, strength thresholds, non-neutral use-god paths and school climate strategies remain unchanged. Annual prose and local decade replies use the shared stem/branch preferences so neutral charts are not relabelled as weak. Bazi and marriage rules are versioned5.31.0; three reviewed neutral use-god amendments retain their original fixture alongside the new expectations.
 - Structure score2.0.0 weights stem position, month main qi and root depth; excludes day-stem self credit, removes three-occurrence saturation and single-root full credit, and provides clickable positional evidence in the existing compact score breakdown.

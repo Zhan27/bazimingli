@@ -39,18 +39,21 @@ function renderRuleFacts(zh){
     (zh.useGod?.conflict?'<p>规则分歧：当前取'+WUXING[zh.yongShen]+'；另一取用路径为'+zh.useGod.alternatives.map(w=>WUXING[w]).join('、')+'。'+esc0(zh.useGod.reason)+'</p>':'')+'</div>';
 }
 function unknownRangeText(ms){
-  const d=civilFromMillis(ms);return fmtLocalDate(d)+' '+[d.getHours(),d.getMinutes(),d.getSeconds()].map(x=>String(x).padStart(2,'0')).join(':');
+  return unknownClock(ms).replace('T',' ');
 }
 function unknownSummary(result,name=''){
   return '姓名：'+(name||'未命名')+'\n'+result.precision+'\n规则：'+result.profile.name+' '+result.profile.version+'；'+dayBoundaryLabel(result.options.dayBoundary)+'\n'+
     result.stablePillars.map(p=>p.pillar+'柱'+(p.stable?'稳定：':'存在候选：')+p.values.join(' / ')).join('\n')+'\n'+
-    result.candidates.map(c=>unknownRangeText(c.from)+' 至 '+unknownRangeText(c.to)+'（不含右端）：'+c.pillars.map(p=>GAN[p[0]]+ZHI[p[1]]).join(' ')).join('\n');
+    result.candidates.map(c=>unknownRangeText(c.from)+' 至 '+unknownRangeText(c.to)+'（不含右端）：'+c.pillars.map(p=>GAN[p[0]]+ZHI[p[1]]).join(' ')).join('\n')+
+    (result.excluded.length?'\n排除时段（不含右端）：\n'+result.excluded.map(c=>unknownRangeText(c.from)+' 至 '+unknownRangeText(c.to)+'：'+c.reason).join('\n'):'');
 }
 function renderUnknownCandidates(result,name){
+  const summary=document.getElementById('compact-input-summary');
+  if(summary)summary.textContent=fmtLocalDate(result.inputDate)+' · 时辰未知'+(result.place?' · '+result.place:'');
   const stable=result.stablePillars.map(p=>'<li>'+p.pillar+'柱'+(p.stable?'稳定：':'随时段变化：')+p.values.join(' / ')+'</li>').join('');
   const rows=result.candidates.map((c,i)=>'<tr><td>'+(i+1)+'</td><td>'+unknownRangeText(c.from)+'<br>至 '+unknownRangeText(c.to)+'（不含右端）</td><td>'+c.pillars.map(p=>GAN[p[0]]+ZHI[p[1]]).join(' ')+'</td><td>'+c.lunar.year+'年'+lunarMonthName(c.lunar.month,c.lunar.isLeap)+lunarDayName(c.lunar.day)+'</td></tr>').join('');
   document.getElementById('zh-result').innerHTML='<div class="result" id="unknown-candidates"><h2>时辰未知 · 候选命盘</h2><p>'+esc0(name||'未命名')+'：'+esc0(result.precision)+'</p><p>性别未提供时，候选四柱不依赖性别；大运与其他性别相关推演暂不生成。</p><p>当前规则：'+esc0(result.profile.name)+' · '+esc0(dayBoundaryLabel(result.options.dayBoundary))+'</p><ul>'+stable+'</ul><p>以下按全部边界分段（含早/晚子时、交节与太阳时跨日），共 '+result.candidates.length+' 个候选区间。起运时分及依赖时柱的解读待核对。</p><div style="overflow-x:auto"><table><thead><tr><th>序号</th><th>原输入时区内的可能时间</th><th>年 月 日 时</th><th>对应农历</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
-    (result.excluded.length?'<p>有 '+result.excluded.length+' 段校正后超出历法范围，已明确排除。</p>':'')+
+    (result.excluded.length?'<details data-unknown-excluded><summary>有 '+result.excluded.length+' 段校正后超出历法范围，查看排除时段</summary><ul>'+result.excluded.map(c=>'<li>'+unknownRangeText(c.from)+' 至 '+unknownRangeText(c.to)+'（不含右端）：'+esc0(c.reason)+'</li>').join('')+'</ul></details>':'')+
     '<button class="btn btn-ghost" onclick="copyUnknownSummary()">复制候选对比</button><p>如已知具体时分，请将“时辰准确性”改为“确定”后重新排盘。此模式不生成确定的AI解读、命局定档或PNG命盘图。</p></div>';
 }
 function copyUnknownSummary(){if(lastCandidates)copyText(unknownSummary(lastCandidates,lastName),'候选对比已复制');}
