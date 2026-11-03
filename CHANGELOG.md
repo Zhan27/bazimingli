@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.35.0 — 2026-11-03
+- Keep separate birth-chart history entries when saved inputs differ, including UTC offsets, exact minutes and gender. Replaying an identical candidate chart preserves its record ID and note.
+- Show the saved clock, UTC offset and day rollover convention in the comprehensive and Bazi history views so users can select the intended record.
+- If backup import fails, roll back only the categories already written and keep restoring other categories if a rollback attempt fails.
+
 ## 5.34.0 — 2026-11-03
 - Keep the workbench usable when browser storage access is denied at startup.
 - Render new charts when local history cannot be saved, and show a separate save failure message. This covers definite and candidate charts and the standalone chart modules.

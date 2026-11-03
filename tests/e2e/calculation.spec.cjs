@@ -58,6 +58,11 @@ test('unknown-time history reloads as candidates, and both Zi conventions change
   await page.locator('#zh-name').fill('未知时辰验收');await page.locator('#zh-solar').fill('2024-02-10');await page.locator('#zh-unknow-hour').selectOption('1');await page.evaluate(()=>zhCast());
   await expect(page.locator('#unknown-candidates')).toContainText('日柱随时段变化');expect(await page.evaluate(()=>lastZh)).toBeNull();
   await page.locator('#zh-day-boundary').selectOption('zi-zheng');await page.evaluate(()=>zhCast());await expect(page.locator('#unknown-candidates')).toContainText('日柱稳定');
-  await page.reload();await expect(page.locator('#zh-records')).toContainText('未知时辰验收');await page.locator('#zh-records .rec-item').filter({hasText:'未知时辰验收'}).click();
+  await page.reload();
+  const candidates=page.locator('#zh-records .rec-item').filter({hasText:'未知时辰验收'});
+  await expect(candidates).toHaveCount(2);
+  await candidates.filter({hasText:'子正换日'}).click();
   await expect(page.locator('#unknown-candidates')).toContainText('日柱稳定');expect(await page.evaluate(()=>lastZh)).toBeNull();await expect(page.locator('#zh-time')).toBeDisabled();
+  await candidates.filter({hasText:'子初换日'}).click();
+  await expect(page.locator('#unknown-candidates')).toContainText('日柱随时段变化');
 });

@@ -1113,7 +1113,7 @@ function renderRecords(){
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   recs.forEach(r=>{
     const rid=esc(r.id), rname=esc(r.name), rds=esc(r.dateStr), rlt=esc(r.lunarText), rbazi=esc(r.bazi||r.pillars||'');
-    html+=`<div class="rec-item" onclick="recordReload('${rid}')"><div class="rec-main"><div class="rec-name">${rname||'未命名'} ${r.gender===1?'♂':'♀'}</div><div class="rec-meta">${rds} · ${r.unknowHour?'时辰未知':HOUR_NAMES[r.hourIdx]||''} · ${rlt}</div><div class="rec-bazi">${rbazi.split(' ').map(g=>'<b>'+g+'</b>').join(' ')}</div></div><button class="rec-del" onclick="event.stopPropagation();recordDelete('${rid}')">删除</button></div>`;
+    html+=`<div class="rec-item" onclick="recordReload('${rid}')"><div class="rec-main"><div class="rec-name">${rname||'未命名'} ${r.gender===1?'♂':'♀'}</div><div class="rec-meta">${rds} · ${esc(birthRecordClockLabel(r))} · ${rlt}</div><div class="rec-bazi">${rbazi.split(' ').map(g=>'<b>'+g+'</b>').join(' ')}</div></div><button class="rec-del" onclick="event.stopPropagation();recordDelete('${rid}')">删除</button></div>`;
   });
   html+='</div>';
   html+=`<div class="rec-tools"><button class="rec-clear" onclick="clearRecords()"> 清空全部记录</button></div>`;
@@ -1198,7 +1198,8 @@ function renderModRecords(mod){
     const m=modRecMeta(mod,r);
     const rid=esc(r.id),rds=esc(r.dateStr),rlt=esc(r.lunarText||''),rsub=esc(r.bazi||r.title||'');
     const mextra=esc(m.extra);
-    html+=`<div class="rec-item" onclick="modRecordReload('${mod}','${rid}')"><div class="rec-main"><div class="rec-name">${rds} ${m.gender}${mextra}</div><div class="rec-meta">${r.unknowHour?'时辰未知':HOUR_NAMES[r.hourIdx]||''} · ${rlt}</div>${rsub?`<div class="rec-bazi">${rsub.split(' ').map(g=>'<b>'+g+'</b>').join(' ')}</div>`:''}</div><button class="rec-del" onclick="event.stopPropagation();modRecordDelete('${mod}','${rid}')">删除</button></div>`;
+    const clock=mod==='bz'?birthRecordClockLabel(r):r.unknowHour?'时辰未知':HOUR_NAMES[r.hourIdx]||'';
+    html+=`<div class="rec-item" onclick="modRecordReload('${mod}','${rid}')"><div class="rec-main"><div class="rec-name">${rds} ${m.gender}${mextra}</div><div class="rec-meta">${esc(clock)} · ${rlt}</div>${rsub?`<div class="rec-bazi">${rsub.split(' ').map(g=>'<b>'+g+'</b>').join(' ')}</div>`:''}</div><button class="rec-del" onclick="event.stopPropagation();modRecordDelete('${mod}','${rid}')">删除</button></div>`;
   });
   html+='</div>';
   html+=`<div class="rec-tools"><button class="rec-clear" onclick="clearModRecords('${mod}')">清空全部记录</button></div>`;

@@ -57,6 +57,14 @@ function renderUnknownCandidates(result,name){
     '<button class="btn btn-ghost" onclick="copyUnknownSummary()">复制候选对比</button><p>如已知具体时分，请将“时辰准确性”改为“确定”后重新排盘。此模式不生成确定的AI解读、命局定档或PNG命盘图。</p></div>';
 }
 function copyUnknownSummary(){if(lastCandidates)copyText(unknownSummary(lastCandidates,lastName),'候选对比已复制');}
+
+function birthRecordClockLabel(record){
+  const clock=record.unknowHour?'时辰未知':record.time||HOUR_NAMES[record.hourIdx];
+  const offset=utcOffsetLabel(record.utcOffsetMinutes??480);
+  const boundary=record.dayBoundary??(record.school===1?'zi-zheng':'zi-chu');
+  return [clock,offset,record.dstMinutes?'夏令时':'',boundary==='zi-zheng'?'子正换日':'子初换日',record.trueSun?'真太阳时':''].filter(Boolean).join(' · ');
+}
+
 function saveUnknownRecord(result,name,gender,schoolId,genderUnspecified=false){
   migrateLegacyRecords();const recs=readStoredRecords(REC_KEY),dateStr=fmtLocalDate(result.inputDate);
   const rec={name,gender,dateStr,hourIdx:0,time:'',unknowHour:true,genderUnspecified,bazi:'时辰未知·'+result.candidates.length+'个候选区间',lunarText:'见候选对比',ts:Date.now(),place:result.place,

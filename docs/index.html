@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="application-version" content="5.34.0">
+<meta name="application-version" content="5.35.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="description" content="玄机命理排盘：八字四柱、紫微斗数、奇门遁甲、六爻卜筮在线排盘工具，支持 AI 深度解读与多流派分析。">
 <meta name="keywords" content="八字排盘,紫微斗数,奇门遁甲,六爻,合婚,真太阳时,命理排盘,AI命理解读">
@@ -11855,6 +11855,18 @@ const MOD_REC_KEYS={zw:'zw_records',bz:'bz_records',qm:'qm_records',ly:'ly_recor
 const PAIR_REC_KEY='hh_records';
 const RECORD_KEYS=[REC_KEY,...Object.values(MOD_REC_KEYS),PAIR_REC_KEY];
 const BACKUP_MAX_BYTES=2*1024*1024;
+
+function birthRecordIdentity(record){
+  const unknown=!!record.unknowHour;
+  const clock=unknown?null:record.time||[record.hourIdx,record.minute??0];
+  const boundary=record.dayBoundary??(record.school===1?'zi-zheng':'zi-chu');
+  return JSON.stringify([
+    record.name||'',record.dateStr,clock,record.gender,!!record.genderUnspecified,
+    record.place||'',!!record.trueSun,record.utcOffsetMinutes??480,record.dstMinutes??0,
+    boundary,record.school2??0,record.wxMode||'stems-main-qi',record.style??0
+  ]);
+}
+
 function cleanRecord(record){
   if(!record||typeof record!=='object'||Array.isArray(record)) throw new Error('记录必须是对象');
   const r={};
@@ -11949,21 +11961,28 @@ function parseRecordBackup(data){
   return result;
 }
 function restoreRecordBackup(data,storage=localStorage){
-  const records=parseRecordBackup(data), before={};
+  const records=parseRecordBackup(data),before={},written=[];
   if(data.version.endsWith('-selection'))for(const key of Object.keys(records)){
     const existing=key===REC_KEY?mergeLegacyRecords(readStoredRecords(key,storage),readStoredRecords('mingli_records',storage)):readStoredRecords(key,storage);
     const ids=new Set(records[key].map(r=>r.id));records[key]=cleanStoreList(key,[...records[key],...existing.filter(r=>!ids.has(r.id))]);
   }
   Object.keys(records).forEach(k=>{before[k]=storage.getItem(k);});
-  // Remove the migrated legacy key so clear/reload cannot resurrect old records.
-  before.mingli_records=storage.getItem('mingli_records');
   try{
-    Object.entries(records).forEach(([k,v])=>storage.setItem(k,JSON.stringify(v)));
+    for(const [key,rows] of Object.entries(records)){
+      storage.setItem(key,JSON.stringify(rows));
+      written.push(key);
+    }
+    // Remove the migrated legacy key last so clear/reload cannot resurrect old records.
     if(Object.hasOwn(records,REC_KEY)) storage.removeItem('mingli_records');
   }catch(e){
-    for(const [k,v] of Object.entries(before)){
-      try{if(v===null) storage.removeItem(k);else storage.setItem(k,v);}catch(rollbackError){throw new Error('存储失败且回滚失败，请保留原备份文件');}
+    let rollbackFailed=false;
+    for(const key of written.reverse()){
+      try{
+        if(before[key]===null)storage.removeItem(key);
+        else storage.setItem(key,before[key]);
+      }catch(error){rollbackFailed=true;}
     }
+    if(rollbackFailed)throw new Error('存储失败且回滚失败，请保留原备份文件');
     throw new Error('存储空间不足或不可用，导入未完成，已还原原记录');
   }
   return Object.keys(records).length;
@@ -12336,11 +12355,22 @@ function renderUnknownCandidates(result,name){
     '<button class="btn btn-ghost" onclick="copyUnknownSummary()">复制候选对比</button><p>如已知具体时分，请将“时辰准确性”改为“确定”后重新排盘。此模式不生成确定的AI解读、命局定档或PNG命盘图。</p></div>';
 }
 function copyUnknownSummary(){if(lastCandidates)copyText(unknownSummary(lastCandidates,lastName),'候选对比已复制');}
+
+function birthRecordClockLabel(record){
+  const clock=record.unknowHour?'时辰未知':record.time||HOUR_NAMES[record.hourIdx];
+  const offset=utcOffsetLabel(record.utcOffsetMinutes??480);
+  const boundary=record.dayBoundary??(record.school===1?'zi-zheng':'zi-chu');
+  return [clock,offset,record.dstMinutes?'夏令时':'',boundary==='zi-zheng'?'子正换日':'子初换日',record.trueSun?'真太阳时':''].filter(Boolean).join(' · ');
+}
+
 function saveUnknownRecord(result,name,gender,schoolId,genderUnspecified=false){
   migrateLegacyRecords();const recs=readStoredRecords(REC_KEY),dateStr=fmtLocalDate(result.inputDate);
-  const old=recs.find(r=>r.unknowHour&&r.name===name&&r.dateStr===dateStr);
-  const rec={id:old?old.id:Date.now()+''+Math.floor(Math.random()*1000),name,gender,dateStr,hourIdx:0,time:'',unknowHour:true,genderUnspecified,bazi:'时辰未知·'+result.candidates.length+'个候选区间',lunarText:'见候选对比',ts:Date.now(),place:result.place,
+  const rec={name,gender,dateStr,hourIdx:0,time:'',unknowHour:true,genderUnspecified,bazi:'时辰未知·'+result.candidates.length+'个候选区间',lunarText:'见候选对比',ts:Date.now(),place:result.place,
     trueSun:!!result.options.trueSolar,dayBoundary:result.options.dayBoundary,utcOffsetMinutes:result.options.utcOffsetMinutes??480,dstMinutes:result.options.dstMinutes||0,school2:schoolId,wxMode:result.options.wxMode||'stems-main-qi'};
+  const identity=birthRecordIdentity(rec);
+  const old=recs.find(r=>birthRecordIdentity(r)===identity);
+  rec.id=old?.id??Date.now()+''+Math.floor(Math.random()*1000);
+  if(old?.note!==undefined)rec.note=old.note;
   const all=[rec,...recs.filter(r=>r.id!==rec.id)].slice(0,50);localStorage.setItem(REC_KEY,JSON.stringify(all));renderRecords();
 }
 
@@ -12769,7 +12799,8 @@ function showRecordManager(category='all'){
         const row=document.createElement('article');row.className='record-manager-row';row.dataset.recordKey=key;row.dataset.recordId=r.id;
         const top=document.createElement('div'),label=document.createElement('label'),check=document.createElement('input');top.className='record-manager-row-heading';check.type='checkbox';check.checked=selected.has(key+'/'+r.id);check.setAttribute('aria-label','选择'+RECORD_LABELS[key]+'记录'+(r.name||r.dateStr));label.append(check,document.createTextNode(RECORD_LABELS[key]+' · '+(r.name||'未命名')+' · '+r.dateStr));check.onchange=()=>{if(check.checked)selected.set(key+'/'+r.id,{key,id:r.id});else selected.delete(key+'/'+r.id);updateSelection();};top.appendChild(label);
         const load=document.createElement('button');load.type='button';load.className='btn btn-ghost';load.textContent='重新排盘';load.onclick=()=>{const tab={ml_records:'zonghe',bz_records:'bazi',zw_records:'ziwei',qm_records:'qimen',ly_records:'liuyao',hh_records:'hehun'}[key];document.querySelector('.tab[data-tab="'+tab+'"]').click();close();if(key===PAIR_REC_KEY)hhRecordReload(r.id);else if(key===REC_KEY)recordReload(r.id);else modRecordReload(Object.keys(MOD_REC_KEYS).find(k=>MOD_REC_KEYS[k]===key),r.id);};top.appendChild(load);
-        const detail=document.createElement('p');detail.textContent=[r.time||HOUR_NAMES[r.hourIdx],r.place,r.bazi||r.title||r.pillars].filter(Boolean).join(' · ');
+        const clock=key===REC_KEY||key===MOD_REC_KEYS.bz?birthRecordClockLabel(r):r.time||HOUR_NAMES[r.hourIdx];
+        const detail=document.createElement('p');detail.textContent=[clock,r.place,r.bazi||r.title||r.pillars].filter(Boolean).join(' · ');
         const note=document.createElement('textarea');note.maxLength=1000;note.rows=2;note.value=r.note||'';note.setAttribute('aria-label','备注 '+RECORD_LABELS[key]+' '+(r.name||r.dateStr));note.placeholder='备注（最多1000字，可能包含个人信息）';
         const save=document.createElement('button');save.type='button';save.className='btn btn-ghost';save.textContent='保存备注';save.onclick=()=>{try{updateRecordNote(key,r.id,note.value);refreshRecordViews();render();status('备注已保存。');}catch(e){status(e.message);}};
         row.append(top,detail,note,save);list.appendChild(row);
@@ -14105,9 +14136,10 @@ function saveRecord(zh,name){
   const bazi=zh.pillars.map(g=>GAN[g[0]]+ZHI[g[1]]).join(' ');
   const lunarText=zh.lunar.year+'年'+(zh.lunar.isLeap?'闰':'')+lunarMonthName(zh.lunar.month,zh.lunar.isLeap)+lunarDayName(zh.lunar.day);
   const dateStr=fmtLocalDate(zh.inputDate||zh.date);
-  // 相同姓名+日期+时辰则更新
-  const idx=recs.findIndex(r=>r.name===name&&r.dateStr===dateStr&&r.hourIdx===hourIndexAt(zh.inputDate||zh.date)&&(r.time||'')===(zh.time||'')&&(r.dayBoundary||'zi-chu')===(zh.temporal?.dayBoundary||'zi-chu'));
-  const rec={id:idx>=0?recs[idx].id:(Date.now()+''+Math.floor(Math.random()*1000)),name,gender:zh.gender,dateStr,hourIdx:hourIndexAt(zh.inputDate||zh.date),bazi,lunarText,ts:Date.now(),time:zh.time||'',minute:zh.minute||0,place:zh.place||'',trueSun:!!zh.trueSun,unknowHour:!!zh.unknowHour,genderUnspecified:!!zh.genderUnspecified,dayBoundary:zh.temporal?.dayBoundary||'zi-chu',school2:lastSchool,utcOffsetMinutes:zh.temporal.utcOffsetMinutes,dstMinutes:zh.temporal.dstMinutes,wxMode:zh.wxStatistics.mode};
+  const rec={name,gender:zh.gender,dateStr,hourIdx:hourIndexAt(zh.inputDate||zh.date),bazi,lunarText,ts:Date.now(),time:zh.time||'',minute:zh.minute||0,place:zh.place||'',trueSun:!!zh.trueSun,unknowHour:!!zh.unknowHour,genderUnspecified:!!zh.genderUnspecified,dayBoundary:zh.temporal?.dayBoundary||'zi-chu',school2:lastSchool,utcOffsetMinutes:zh.temporal.utcOffsetMinutes,dstMinutes:zh.temporal.dstMinutes,wxMode:zh.wxStatistics.mode};
+  const identity=birthRecordIdentity(rec);
+  const idx=recs.findIndex(r=>birthRecordIdentity(r)===identity);
+  rec.id=idx>=0?recs[idx].id:Date.now()+''+Math.floor(Math.random()*1000);
   if(idx>=0){if(recs[idx].note!==undefined)rec.note=recs[idx].note;recs[idx]=rec;}else recs.unshift(rec);
   if(recs.length>50) recs=recs.slice(0,50);
   localStorage.setItem(REC_KEY,JSON.stringify(recs));
@@ -14123,7 +14155,7 @@ function renderRecords(){
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   recs.forEach(r=>{
     const rid=esc(r.id), rname=esc(r.name), rds=esc(r.dateStr), rlt=esc(r.lunarText), rbazi=esc(r.bazi||r.pillars||'');
-    html+=`<div class="rec-item" onclick="recordReload('${rid}')"><div class="rec-main"><div class="rec-name">${rname||'未命名'} ${r.gender===1?'♂':'♀'}</div><div class="rec-meta">${rds} · ${r.unknowHour?'时辰未知':HOUR_NAMES[r.hourIdx]||''} · ${rlt}</div><div class="rec-bazi">${rbazi.split(' ').map(g=>'<b>'+g+'</b>').join(' ')}</div></div><button class="rec-del" onclick="event.stopPropagation();recordDelete('${rid}')">删除</button></div>`;
+    html+=`<div class="rec-item" onclick="recordReload('${rid}')"><div class="rec-main"><div class="rec-name">${rname||'未命名'} ${r.gender===1?'♂':'♀'}</div><div class="rec-meta">${rds} · ${esc(birthRecordClockLabel(r))} · ${rlt}</div><div class="rec-bazi">${rbazi.split(' ').map(g=>'<b>'+g+'</b>').join(' ')}</div></div><button class="rec-del" onclick="event.stopPropagation();recordDelete('${rid}')">删除</button></div>`;
   });
   html+='</div>';
   html+=`<div class="rec-tools"><button class="rec-clear" onclick="clearRecords()"> 清空全部记录</button></div>`;
@@ -14177,7 +14209,8 @@ function saveModRecord(mod,rec){
   let recs=readStoredRecords(MOD_REC_KEYS[mod]);
   const detail=mod==='ly'?[rec.time||'',rec.mode,rec.nums||'',rec.ruleMode||'legacy',rec.dayBoundary||'zi-chu']:mod==='qm'?[rec.hourHH,rec.minute,rec.school,QIMEN_RULE_VERSION]:[];
   const key=mod+'|'+rec.dateStr+'|'+rec.hourIdx+(detail.length?'|'+JSON.stringify(detail):'');
-  const idx=recs.findIndex(r=>r.key===key);
+  const identity=mod==='bz'||mod==='zw'?birthRecordIdentity(rec):null;
+  const idx=recs.findIndex(r=>identity===null?r.key===key:birthRecordIdentity(r)===identity);
   const id=idx>=0?recs[idx].id:(Date.now()+''+Math.floor(Math.random()*1000));
   rec=Object.assign({},idx>=0?recs[idx]:{},rec,{id,key,ts:Date.now()});
   if(idx>=0) recs[idx]=rec; else recs.unshift(rec);
@@ -14207,7 +14240,8 @@ function renderModRecords(mod){
     const m=modRecMeta(mod,r);
     const rid=esc(r.id),rds=esc(r.dateStr),rlt=esc(r.lunarText||''),rsub=esc(r.bazi||r.title||'');
     const mextra=esc(m.extra);
-    html+=`<div class="rec-item" onclick="modRecordReload('${mod}','${rid}')"><div class="rec-main"><div class="rec-name">${rds} ${m.gender}${mextra}</div><div class="rec-meta">${r.unknowHour?'时辰未知':HOUR_NAMES[r.hourIdx]||''} · ${rlt}</div>${rsub?`<div class="rec-bazi">${rsub.split(' ').map(g=>'<b>'+g+'</b>').join(' ')}</div>`:''}</div><button class="rec-del" onclick="event.stopPropagation();modRecordDelete('${mod}','${rid}')">删除</button></div>`;
+    const clock=mod==='bz'?birthRecordClockLabel(r):r.unknowHour?'时辰未知':HOUR_NAMES[r.hourIdx]||'';
+    html+=`<div class="rec-item" onclick="modRecordReload('${mod}','${rid}')"><div class="rec-main"><div class="rec-name">${rds} ${m.gender}${mextra}</div><div class="rec-meta">${esc(clock)} · ${rlt}</div>${rsub?`<div class="rec-bazi">${rsub.split(' ').map(g=>'<b>'+g+'</b>').join(' ')}</div>`:''}</div><button class="rec-del" onclick="event.stopPropagation();modRecordDelete('${mod}','${rid}')">删除</button></div>`;
   });
   html+='</div>';
   html+=`<div class="rec-tools"><button class="rec-clear" onclick="clearModRecords('${mod}')">清空全部记录</button></div>`;
