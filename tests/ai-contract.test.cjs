@@ -49,3 +49,25 @@ test('SSE completion releases a provider connection that stays open after DONE',
   assert.equal(canceled,1);
   assert.equal(vm.runInContext('AI_REQUESTS.size',context),0);
 });
+
+test('JSON responses recognize case-insensitive media types and report invalid payloads',async()=>{
+  const context=vm.createContext({AbortController,TextDecoder,setTimeout,clearTimeout});
+  vm.runInContext(fs.readFileSync(path.join(root,'src/ai/request.js'),'utf8'),context);
+  const request=body=>new Promise((resolve,reject)=>{
+    context.fetch=async()=>new Response(body,{headers:{'content-type':'Application/JSON; charset=utf-8'}});
+    context.finish=resolve;
+    context.fail=reject;
+    vm.runInContext("aiStreamChat('https://mock.invalid',{}, {onDone:finish,onError:fail})",context);
+  });
+  assert.equal(await request('{"choices":[{"message":{"content":"完成"}}]}'),'完成');
+  for(const body of ['null','{broken','[]']){
+    await assert.rejects(request(body),{code:'INVALID_RESPONSE'});
+  }
+});
+
+test('SSE frames with non-object JSON return a stream format error',()=>{
+  for(const frame of ['data: null','data: []','data: 1']){
+    e.context.frame=frame;
+    assert.throws(()=>e.run('createAiSseParser(()=>{}).feed(frame+"\\n")'),{code:'INVALID_STREAM'});
+  }
+});

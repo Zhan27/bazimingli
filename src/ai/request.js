@@ -17,6 +17,7 @@ function createAiSseParser(onText,{maxCharacters=1000000}={}){
     if(!raw||raw.startsWith(':')||!raw.startsWith('data:'))return;
     const data=raw.slice(5).trim();if(data==='[DONE]'){ended=true;return;}if(ended||!data)return;
     let value;try{value=JSON.parse(data);}catch(e){throw aiTransportError('INVALID_STREAM','流式响应含无效JSON帧，已保留草稿');}
+    if(!value||typeof value!=='object'||Array.isArray(value))throw aiTransportError('INVALID_STREAM','流式响应帧须为JSON对象');
     if(value.error)throw aiTransportError('UPSTREAM_ERROR','上游返回流式错误，已保留草稿');
     const text=value.choices?.[0]?.delta?.content??value.choices?.[0]?.message?.content??'';
     if(typeof text!=='string')throw aiTransportError('INVALID_STREAM','流式内容类型不兼容');
@@ -36,7 +37,9 @@ function aiStreamChat(url,opts,handlers={}){
       arm();const r=await fetch(url,{...opts,signal:ctrl.signal});if(!r.ok)throw aiTransportError('HTTP_'+r.status,await aiErrMsg(r));
       if(!r.body)throw aiTransportError('NO_STREAM','浏览器不支持响应流');reader=r.body.getReader();
       const decoder=new TextDecoder(),parser=createAiSseParser((d,all)=>{if(!done)handlers.onDelta?.(d,all);},{maxCharacters:handlers.maxCharacters});
-      const isJson=(r.headers.get('content-type')||'').includes('application/json');let jsonText='';
+      const mediaType=(r.headers.get('content-type')||'').split(';',1)[0].trim().toLowerCase();
+      const isJson=mediaType==='application/json';
+      let jsonText='';
       while(!done){
         const {done:finished,value}=await reader.read();
         if(finished||done)break;
@@ -54,7 +57,15 @@ function aiStreamChat(url,opts,handlers={}){
         }
       }
       if(done)return;let all;
-      if(isJson){jsonText+=decoder.decode();const j=JSON.parse(jsonText);if(j.error)throw aiTransportError('UPSTREAM_ERROR','上游返回错误');all=j.choices?.[0]?.message?.content;if(typeof all!=='string')throw aiTransportError('INVALID_RESPONSE','响应缺少文本');handlers.onDelta?.(all,all);}
+      if(isJson){
+        jsonText+=decoder.decode();
+        let response;
+        try{response=JSON.parse(jsonText);}catch(e){throw aiTransportError('INVALID_RESPONSE','响应不是有效的JSON');}
+        if(response?.error)throw aiTransportError('UPSTREAM_ERROR','上游返回错误');
+        all=response?.choices?.[0]?.message?.content;
+        if(typeof all!=='string')throw aiTransportError('INVALID_RESPONSE','响应缺少文本');
+        handlers.onDelta?.(all,all);
+      }
       else {parser.feed(decoder.decode());all=parser.finish();}
       done=true;clear();handlers.onDone?.(all);
     }catch(e){fail(e.name==='AbortError'?aiTransportError('CANCELED','连接已中断；草稿已保留'):e);}
