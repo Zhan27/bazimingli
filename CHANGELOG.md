@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.38.0 — 2026-11-03
+- Finish AI streams when the provider sends the SSE terminal event and release the response reader promptly.
+- Recognize JSON media types regardless of capitalization and report invalid JSON replies or stream frames with clear format errors.
+
 ## 5.37.0 — 2026-11-03
 - Accept 1900 as a Ziwei annual reference year, including when the API defaults to the birth year at the calendar's earliest supported date.
 - Honor an explicit Ziwei reference date before validating the effective lunar year.
