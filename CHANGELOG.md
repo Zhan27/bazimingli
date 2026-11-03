@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.34.0 — 2026-11-03
+- Keep the workbench usable when browser storage access is denied at startup.
+- Render new charts when local history cannot be saved, and show a separate save failure message. This covers definite and candidate charts and the standalone chart modules.
+
 ## 5.33.0 — 2026-11-02
 - Corrected JSON fact comparison to distinguish arrays from objects, disclose array-length changes and retain explicit presence flags when a field is absent. Null values no longer make an added/deleted field look like two identical values.
 - Offline reference reports now disclose missing or different true-solar longitude. Explicit lunar dates are not treated as Gregorian dates. Valid numeric-string UTC/DST conventions are normalized; malformed time conventions, solar longitudes and period objects produce actionable errors.

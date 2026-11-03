@@ -138,7 +138,7 @@ function bzCast(){
   const zhFull=zhCompute(date,hourIdx,gender,'',options);
   zhFull.time=time;zhFull.precisionNote=time?'时分已填写（分钟精度）':'仅知时辰：按时辰中点估算，交节与换日结果待核对';zhFull.solarNote=temporalDescription(zhFull);
   lastCandidates=null;lastZh=zhFull; lastName=name; lastSchool=school2;
-  localStorage.setItem('mingli_school',school2);
+  rememberChartSchool(school2);
   zhFull.dg=dayGan; // 兼容 renderBazi 内 zhiHiddenTs 等
   renderBazi({name,gender,date:actualDate,origDate:date,hourIdx:temporal.hourIdx,lunar,yearGZ,monthGZ,dayGZ,hourGZ,
     yearHidden,monthHidden,dayHidden,hourHidden,dayGan,tianyiZhi,wenchangZhi,taoHua,yiMa,huaGai,jiangXing,kong,dy,liuNian,taiYuan,mingGongZhi,shenGongZhi,wxCount,
@@ -148,7 +148,7 @@ function bzCast(){
     saveModRecord('bz',{name,gender,dateStr,hourIdx:hourIndexAt(date),school,school2,time,utcOffsetMinutes:options.utcOffsetMinutes,dstMinutes:options.dstMinutes,wxMode:options.wxMode,
       bazi:[yearGZ,monthGZ,dayGZ,hourGZ].map(g=>GAN[g[0]]+ZHI[g[1]]).join(' '),
       lunarText:lunar.year+'年'+(lunar.isLeap?'闰':'')+lunarMonthName(lunar.month,lunar.isLeap)+lunarDayName(lunar.day)});
-  }catch(e){}
+  }catch(e){showChartRecordFailure();}
   }catch(e){alert(e.message||String(e));}
 }
 function wxTag(wx){ return `<span class="wu-xing tag ${WUXING_CLS[WUXING[wx]]}" style="background:rgba(255,255,255,.04)">${WUXING[wx]}</span>`; }
@@ -345,7 +345,7 @@ function zwCast(){
     saveModRecord('zw',{gender,dateStr,hourIdx,style:(zwStyle>=0&&zwStyle<=1)?zwStyle:0,
       title:'命宫'+GAN[mgGan]+ZHI[mingGong]+'·'+['水二','木三','金四','土五','火六'][ju-2]+'局',
       lunarText:lunar.year+'年'+(lunar.isLeap?'闰':'')+lunarMonthName(lunar.month,lunar.isLeap)+lunarDayName(lunar.day)});
-  }catch(e){}
+  }catch(e){showChartRecordFailure();}
   }catch(e){alert(e.message||String(e));}
 }
 
@@ -674,7 +674,7 @@ function qmCast(){
     saveModRecord('qm',{mode,dateStr,hourIdx,minute,hourHH:date.getHours(),school,
       title:(juInfo.yang?'阳':'阴')+'遁'+juInfo.ju+'局·'+TERM_NAMES[juInfo.termIdx],
       lunarText:lunarQ.year+'年'+(lunarQ.isLeap?'闰':'')+lunarMonthName(lunarQ.month,lunarQ.isLeap)+lunarDayName(lunarQ.day)});
-  }catch(e){}
+  }catch(e){showChartRecordFailure();}
   }catch(e){alert(e.message||String(e));}
 }
 // 时支→九宫(丑寅艮8 辰巳巽4 未申坤2 戌亥乾6)
@@ -801,7 +801,7 @@ function lyCast(){
   try{
     saveModRecord('ly',{mode,dateStr,hourIdx:result.hourIdx,time,ruleMode,dayBoundary,moduleVersion:LIUYAO_RULE_VERSION,nums:mode===1?numStr:(mode===2?(lyYaoSeq||[]).join(''):''),
       title:GUA_NAMES[upGua*8+downGua]||(BAGUA[upGua]+BAGUA[downGua])+(dongYao?'·动'+dongYao+'爻':'·静卦')});
-  }catch(e){}
+  }catch(e){showChartRecordFailure();}
   }catch(e){alert(e.message||String(e));}
 }
 function renderLY(d){
@@ -941,8 +941,10 @@ function zhCast(){
       aiEvidenceLeave();
       const result=unknownBirthCandidates(date,place,options);
       lastZh=null;lastCandidates=result;lastName=name;lastSchool=school2;
-      localStorage.setItem('mingli_school',school2);
-      renderUnknownCandidates(result,name);saveUnknownRecord(result,name,gender,school2,genderRaw===2);return;
+      rememberChartSchool(school2);
+      renderUnknownCandidates(result,name);
+      try{saveUnknownRecord(result,name,gender,school2,genderRaw===2);}catch(e){showChartRecordFailure();}
+      return;
     }
     date=withBirthTime(date,hourIdx,time,minute);
     const zh=zhCompute(date,hourIdx,gender,place,options);
@@ -955,9 +957,9 @@ function zhCast(){
     zh.minute=minute;
     zh.place=place;
     lastZh=zh; lastName=name; lastSchool=school2;
-    localStorage.setItem('mingli_school',school2);
+    rememberChartSchool(school2);
     renderZongHe(zh,name);
-    saveRecord(zh,name);
+    try{saveRecord(zh,name);}catch(e){showChartRecordFailure();}
     hideCastLoading();
     animateResult();
     }catch(e){alert(e.message||String(e));}finally{hideCastLoading();}
@@ -1022,7 +1024,19 @@ function markRollNumbers(){
 window.addEventListener('load',initInteractionFX);
 window.addEventListener('load',markRollNumbers);
 // 分享: 生成命盘摘要文本
-let lastZh=null,lastName='',lastSchool=(()=>{const v=parseInt(localStorage.getItem('mingli_school')||'0');return (v>=0&&v<=4)?v:0;})();
+let lastZh=null,lastName='',lastSchool=0;
+try{
+  const savedSchool=parseInt(localStorage.getItem('mingli_school')||'0');
+  if(savedSchool>=0&&savedSchool<=4)lastSchool=savedSchool;
+}catch(e){/* Storage access is optional. */}
+
+function rememberChartSchool(school){
+  try{localStorage.setItem('mingli_school',school);}catch(e){/* Keep the in-page selection. */}
+}
+
+function showChartRecordFailure(){
+  workbenchToast('排盘已完成，本次记录未保存。');
+}
 let lastAIReply=''; // AI 上次解读全文(供追问/导出使用)
 // 真太阳时校正(经度差+均时差近似): 返回{offsetMin,trueTime,note}
 function zhTrueSolarTime(date,hourIdx,minute,place){
@@ -1085,7 +1099,7 @@ function saveRecord(zh,name){
   const rec={id:idx>=0?recs[idx].id:(Date.now()+''+Math.floor(Math.random()*1000)),name,gender:zh.gender,dateStr,hourIdx:hourIndexAt(zh.inputDate||zh.date),bazi,lunarText,ts:Date.now(),time:zh.time||'',minute:zh.minute||0,place:zh.place||'',trueSun:!!zh.trueSun,unknowHour:!!zh.unknowHour,genderUnspecified:!!zh.genderUnspecified,dayBoundary:zh.temporal?.dayBoundary||'zi-chu',school2:lastSchool,utcOffsetMinutes:zh.temporal.utcOffsetMinutes,dstMinutes:zh.temporal.dstMinutes,wxMode:zh.wxStatistics.mode};
   if(idx>=0){if(recs[idx].note!==undefined)rec.note=recs[idx].note;recs[idx]=rec;}else recs.unshift(rec);
   if(recs.length>50) recs=recs.slice(0,50);
-  try{ localStorage.setItem(REC_KEY,JSON.stringify(recs)); }catch(e){}
+  localStorage.setItem(REC_KEY,JSON.stringify(recs));
   renderRecords();
 }
 function renderRecords(){
@@ -1157,7 +1171,7 @@ function saveModRecord(mod,rec){
   rec=Object.assign({},idx>=0?recs[idx]:{},rec,{id,key,ts:Date.now()});
   if(idx>=0) recs[idx]=rec; else recs.unshift(rec);
   if(recs.length>50) recs=recs.slice(0,50);
-  try{ localStorage.setItem(MOD_REC_KEYS[mod],JSON.stringify(recs)); }catch(e){}
+  localStorage.setItem(MOD_REC_KEYS[mod],JSON.stringify(recs));
   renderModRecords(mod);
 }
 function modRecMeta(mod,r){
