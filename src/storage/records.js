@@ -39,7 +39,7 @@ function cleanRecord(record){
     if(record[field]!==undefined){ if(typeof record[field]!=='boolean') throw new Error('记录字段无效：'+field); r[field]=record[field]; }
   }
   if(r.dstMinutes!==undefined&&![0,60].includes(r.dstMinutes))throw new Error('夏令时参数无效');
-  if(r.wxMode&&!WX_MODES[r.wxMode])throw new Error('五行统计口径无效');
+  if(r.wxMode&&!Object.hasOwn(WX_MODES,r.wxMode))throw new Error('五行统计口径无效');
   if(r.time&&!/^([01]\d|2[0-3]):[0-5]\d$/.test(r.time)) throw new Error('记录时间无效');
   if(r.dayBoundary&&!['zi-chu','zi-zheng'].includes(r.dayBoundary)) throw new Error('记录换日规则无效');
   if(r.ruleMode&&!['standard','legacy'].includes(r.ruleMode))throw new Error('记录取数规则无效');
@@ -51,7 +51,7 @@ function cleanPairSide(side){
   if(typeof side.name!=='string'||side.name.length>100)throw new Error('合婚姓名无效');
   const schoolId=o.schoolId??0,dayBoundary=o.dayBoundary??'zi-chu',wxMode=o.wxMode??'stems-main-qi',trueSolar=o.trueSolar??false;
   getRuleProfile(schoolId);normalizeBirthTime(date,o);
-  if(!['zi-chu','zi-zheng'].includes(dayBoundary)||!WX_MODES[wxMode]||typeof trueSolar!=='boolean')throw new Error('合婚计算选项无效');
+  if(!['zi-chu','zi-zheng'].includes(dayBoundary)||typeof wxMode!=='string'||!Object.hasOwn(WX_MODES,wxMode)||typeof trueSolar!=='boolean')throw new Error('合婚计算选项无效');
   return {name:side.name,date:i.date,time:i.time,hourIdx:hourIndexAt(date),gender:i.gender,place:i.place,options:{schoolId,dayBoundary,wxMode,trueSolar,utcOffsetMinutes:o.utcOffsetMinutes??480,dstMinutes:o.dstMinutes??0}};
 }
 function cleanPairRecord(record){

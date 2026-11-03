@@ -8,7 +8,8 @@ function assertPillars(pillars){
   if(!Array.isArray(pillars)||pillars.length!==4||pillars.some(p=>!Array.isArray(p)||p.length!==2||!Number.isInteger(p[0])||!Number.isInteger(p[1])||p[0]<0||p[0]>9||p[1]<0||p[1]>11||p[0]%2!==p[1]%2))throw new RangeError('四柱干支参数无效');
 }
 function countWuXing(pillars,mode='stems-main-qi'){
-  assertPillars(pillars);if(!WX_MODES[mode])throw new RangeError('未知五行统计口径');
+  assertPillars(pillars);
+  if(typeof mode!=='string'||!Object.hasOwn(WX_MODES,mode))throw new RangeError('未知五行统计口径');
   const counts=[0,0,0,0,0];
   pillars.forEach(([g,z])=>{
     counts[GAN_WX[g]]++;

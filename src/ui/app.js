@@ -3613,20 +3613,24 @@ function exportRecords(){
   }catch(e){alert('备份导出失败：'+e.message);}
 }
 // 导入备份
+let recordImportSequence=0;
 function importRecords(input){
-  const f=input.files&&input.files[0];if(!f)return;
-  if(f.size>BACKUP_MAX_BYTES){alert('备份文件超过2MB，请检查文件');input.value='';return;}
+  const sequence=++recordImportSequence;
+  const file=input.files?.[0];
+  if(!file)return;
+  input.value='';
+  if(file.size>BACKUP_MAX_BYTES){alert('备份文件超过2MB，请检查文件');return;}
   const rd=new FileReader();
   rd.onload=()=>{
+    if(sequence!==recordImportSequence)return;
     try{
       const data=JSON.parse(rd.result),n=restoreRecordBackup(data);
       renderRecords();['zw','bz','qm','ly'].forEach(renderModRecords);
       alert('✅ 备份导入成功（'+n+'类记录），已恢复到当前版本');
     }catch(e){alert('导入失败：'+e.message);}
-    input.value='';
   };
-  rd.onerror=()=>{alert('备份文件读取失败，请重试');input.value='';};
-  rd.readAsText(f);
+  rd.onerror=()=>{if(sequence===recordImportSequence)alert('备份文件读取失败，请重试');};
+  rd.readAsText(file);
 }
 
 /* ======================== 合婚 Prompt 提取 / 回填（无 Key 双通道） ======================== */

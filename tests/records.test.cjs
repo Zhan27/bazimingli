@@ -54,6 +54,14 @@ test('a permanently rejected category is left alone during rollback',()=>{
   assert.equal(store.getItem('bz_records'),'[]');
 });
 
+test('backup validation rejects inherited names as element count modes',()=>{
+  const store=memoryStorage({ml_records:'[]'});
+  for(const wxMode of ['constructor','__proto__','toString']){
+    assert.throws(()=>restore({version:'v5',ml_records:[{...rec,wxMode}]},store),/五行统计口径无效/);
+  }
+  assert.equal(store.getItem('ml_records'),'[]');
+});
+
 test('a rollback failure does not prevent restoring other written categories',()=>{
   const store=memoryStorage({ml_records:'[]',bz_records:'[]',zw_records:'[]'}),set=store.setItem;
   store.setItem=(key,value)=>{
