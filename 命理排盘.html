@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="application-version" content="5.36.0">
+<meta name="application-version" content="5.37.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="description" content="玄机命理排盘：八字四柱、紫微斗数、奇门遁甲、六爻卜筮在线排盘工具，支持 AI 深度解读与多流派分析。">
 <meta name="keywords" content="八字排盘,紫微斗数,奇门遁甲,六爻,合婚,真太阳时,命理排盘,AI命理解读">
@@ -10100,15 +10100,14 @@ const ZW_BRIGHT={
 function calculateZiwei({date,hourIdx,gender,referenceYear=beijingNow().getFullYear(),referenceDate}){
   assertSolarDate(date);
   if(!Number.isInteger(hourIdx)||hourIdx<0||hourIdx>11||![0,1].includes(gender))throw new RangeError('紫微时辰或性别参数无效');
-  if(!Number.isInteger(referenceYear)||referenceYear<1901||referenceYear>2099)throw new RangeError('紫微流年参考年份须为1901至2099');
   // A year label means that lunar year's Tai Sui, while a date observes lunar New Year.
   let annualYear=referenceYear;
   if(referenceDate!==undefined){
     if(typeof referenceDate!=='string')throw new TypeError('紫微参考日期须为YYYY-MM-DD');
-    const target=parseCivilDate(referenceDate);assertSolarDate(target);
-    annualYear=solar2lunar(target).year;
+    annualYear=solar2lunar(parseCivilDate(referenceDate)).year;
   }
-const lunar=solar2lunar(date);
+  if(!Number.isInteger(annualYear)||annualYear<1900||annualYear>2099)throw new RangeError('紫微流年参考年份须为1900至2099');
+  const lunar=solar2lunar(date);
   // 紫微斗数以农历排盘(年柱按农历正月初一,非八字立春)
   const lunarGZ=indexToGZ(((lunar.year-4)%60+60)%60);
   // 命宫: 从寅起正月顺数生月,逆数生时

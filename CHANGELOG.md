@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.37.0 — 2026-11-03
+- Accept 1900 as a Ziwei annual reference year, including when the API defaults to the birth year at the calendar's earliest supported date.
+- Honor an explicit Ziwei reference date before validating the effective lunar year.
+
 ## 5.36.0 — 2026-11-03
 - Apply only the latest backup selection if overlapping file reads finish out of order.
 - Preserve unreadable history on deletion and roll back failed clears of comprehensive history. Report write failures in the history UI.
