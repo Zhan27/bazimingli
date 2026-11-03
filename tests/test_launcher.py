@@ -58,6 +58,14 @@ class LauncherTests(unittest.TestCase):
                     server.shutdown()
                     server.server_close()
 
+    def test_fallback_port_is_reported_to_the_workbench(self):
+        fake = types.SimpleNamespace(settings={}, create_window=Mock(), start=Mock())
+        server = Mock(server_port=app.PREFERRED_PORTS[0]+1)
+        with patch.object(app, 'serve_preferred', return_value=server), patch.object(sys, 'argv', ['launcher.py', '--private']), patch.dict(sys.modules, {'webview': fake}):
+            self.assertEqual(app.main(), 0)
+        url = fake.create_window.call_args.args[1]
+        self.assertTrue(url.endswith('?desktop_port_fallback=1'), url)
+
     def test_occupied_preferred_port_falls_back_without_probe_race(self):
         with socket.socket() as occupied:
             occupied.bind(('127.0.0.1', 0))

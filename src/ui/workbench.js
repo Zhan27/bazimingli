@@ -73,6 +73,15 @@ function enhanceWorkbenchChart(){
 }
 function initializeWorkbench(){
   const wrap=document.querySelector('.wrap'),header=wrap.querySelector('header'),tabs=document.querySelector('.tabs');
+  const desktopFallback=location.hostname==='127.0.0.1'&&new URLSearchParams(location.search).get('desktop_port_fallback')==='1';
+  if(desktopFallback){
+    const notice=document.createElement('p');
+    notice.id='desktop-port-notice';
+    notice.className='note';
+    notice.setAttribute('role','status');
+    notice.textContent='首选端口不可用，本次使用独立的记录空间。恢复原端口后可看到原来的记录。';
+    header.before(notice);
+  }
   const sidebar=document.createElement('aside');sidebar.className='workbench-sidebar';sidebar.setAttribute('aria-label','功能导航');sidebar.innerHTML='<div class="brand-lockup"><span class="brand-seal" aria-hidden="true">玄</span><div><div class="brand-name">玄机命理</div><div class="brand-sub">CHINESE CULTURE / STUDY</div></div></div><p class="nav-caption">排 盘 工 作 台</p>';
   wrap.before(sidebar);sidebar.appendChild(tabs);tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','排盘模块');
   const labels={zonghe:'综合排盘',bazi:'八字排盘',ziwei:'紫微斗数',qimen:'奇门遁甲',liuyao:'六爻卜筮',hehun:'合婚配对'};

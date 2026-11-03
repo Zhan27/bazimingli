@@ -1,4 +1,12 @@
 const {test,expect}=require('@playwright/test');
+
+test('desktop fallback explains the separate record space in the window',async({page})=>{
+  await page.goto('/?desktop_port_fallback=1');
+  await expect(page.locator('#desktop-port-notice')).toContainText('本次使用独立的记录空间');
+  await expect(page.locator('#zh-result')).toContainText('命格总断');
+  await page.goto('/');
+  await expect(page.locator('#desktop-port-notice')).toHaveCount(0);
+});
 const fs=require('node:fs'),path=require('node:path');
 const screenshots=path.resolve('verification/screenshots');
 test('privacy disclosure is available offline and key persistence is opt-in',async({page})=>{

@@ -134,6 +134,8 @@ def main() -> int:
         return 3
     port = httpd.server_port
     url = f"http://127.0.0.1:{port}/{APP_FILE}"
+    if port != PREFERRED_PORTS[0]:
+        url += '?desktop_port_fallback=1'
 
     try:
         print(f"[·] 本地服务: http://127.0.0.1:{port}/")
