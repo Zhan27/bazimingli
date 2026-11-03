@@ -45,3 +45,22 @@ test('storage quota failure rolls back preceding category writes',()=>{
   assert.throws(()=>restore({version:'v5',ml_records:[rec],bz_records:[rec]},store),/已还原/);
   assert.equal(store.getItem('ml_records'),'[]');assert.equal(store.getItem('bz_records'),'[]');
 });
+
+test('a permanently rejected category is left alone during rollback',()=>{
+  const store=memoryStorage({ml_records:'[]',bz_records:'[]'}),set=store.setItem;
+  store.setItem=(key,value)=>{if(key==='bz_records')throw new Error('quota');set(key,value);};
+  assert.throws(()=>restore({version:'v5',ml_records:[rec],bz_records:[rec]},store),/已还原/);
+  assert.equal(store.getItem('ml_records'),'[]');
+  assert.equal(store.getItem('bz_records'),'[]');
+});
+
+test('a rollback failure does not prevent restoring other written categories',()=>{
+  const store=memoryStorage({ml_records:'[]',bz_records:'[]',zw_records:'[]'}),set=store.setItem;
+  store.setItem=(key,value)=>{
+    if(key==='bz_records'||(key==='ml_records'&&value==='[]'))throw new Error('quota');
+    set(key,value);
+  };
+  assert.throws(()=>restore({version:'v5',ml_records:[rec],bz_records:[rec],zw_records:[rec]},store),/回滚失败/);
+  assert.equal(store.getItem('bz_records'),'[]');
+  assert.equal(store.getItem('zw_records'),'[]');
+});

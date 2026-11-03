@@ -110,21 +110,28 @@ function parseRecordBackup(data){
   return result;
 }
 function restoreRecordBackup(data,storage=localStorage){
-  const records=parseRecordBackup(data), before={};
+  const records=parseRecordBackup(data),before={},written=[];
   if(data.version.endsWith('-selection'))for(const key of Object.keys(records)){
     const existing=key===REC_KEY?mergeLegacyRecords(readStoredRecords(key,storage),readStoredRecords('mingli_records',storage)):readStoredRecords(key,storage);
     const ids=new Set(records[key].map(r=>r.id));records[key]=cleanStoreList(key,[...records[key],...existing.filter(r=>!ids.has(r.id))]);
   }
   Object.keys(records).forEach(k=>{before[k]=storage.getItem(k);});
-  // Remove the migrated legacy key so clear/reload cannot resurrect old records.
-  before.mingli_records=storage.getItem('mingli_records');
   try{
-    Object.entries(records).forEach(([k,v])=>storage.setItem(k,JSON.stringify(v)));
+    for(const [key,rows] of Object.entries(records)){
+      storage.setItem(key,JSON.stringify(rows));
+      written.push(key);
+    }
+    // Remove the migrated legacy key last so clear/reload cannot resurrect old records.
     if(Object.hasOwn(records,REC_KEY)) storage.removeItem('mingli_records');
   }catch(e){
-    for(const [k,v] of Object.entries(before)){
-      try{if(v===null) storage.removeItem(k);else storage.setItem(k,v);}catch(rollbackError){throw new Error('存储失败且回滚失败，请保留原备份文件');}
+    let rollbackFailed=false;
+    for(const key of written.reverse()){
+      try{
+        if(before[key]===null)storage.removeItem(key);
+        else storage.setItem(key,before[key]);
+      }catch(error){rollbackFailed=true;}
     }
+    if(rollbackFailed)throw new Error('存储失败且回滚失败，请保留原备份文件');
     throw new Error('存储空间不足或不可用，导入未完成，已还原原记录');
   }
   return Object.keys(records).length;
