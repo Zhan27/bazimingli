@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.36.0 — 2026-11-03
+- Apply only the latest backup selection if overlapping file reads finish out of order.
+- Preserve unreadable history on deletion and roll back failed clears of comprehensive history. Report write failures in the history UI.
+- Reject inherited property names and unsupported values as five-element count modes in backup validation and chart calculation.
+
 ## 5.35.0 — 2026-11-03
 - Keep separate birth-chart history entries when saved inputs differ, including UTC offsets, exact minutes and gender. Replaying an identical candidate chart preserves its record ID and note.
 - Show the saved clock, UTC offset and day rollover convention in the comprehensive and Bazi history views so users can select the intended record.

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="application-version" content="5.35.0">
+<meta name="application-version" content="5.36.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="description" content="玄机命理排盘：八字四柱、紫微斗数、奇门遁甲、六爻卜筮在线排盘工具，支持 AI 深度解读与多流派分析。">
 <meta name="keywords" content="八字排盘,紫微斗数,奇门遁甲,六爻,合婚,真太阳时,命理排盘,AI命理解读">
@@ -9578,7 +9578,8 @@ function assertPillars(pillars){
   if(!Array.isArray(pillars)||pillars.length!==4||pillars.some(p=>!Array.isArray(p)||p.length!==2||!Number.isInteger(p[0])||!Number.isInteger(p[1])||p[0]<0||p[0]>9||p[1]<0||p[1]>11||p[0]%2!==p[1]%2))throw new RangeError('四柱干支参数无效');
 }
 function countWuXing(pillars,mode='stems-main-qi'){
-  assertPillars(pillars);if(!WX_MODES[mode])throw new RangeError('未知五行统计口径');
+  assertPillars(pillars);
+  if(typeof mode!=='string'||!Object.hasOwn(WX_MODES,mode))throw new RangeError('未知五行统计口径');
   const counts=[0,0,0,0,0];
   pillars.forEach(([g,z])=>{
     counts[GAN_WX[g]]++;
@@ -11890,7 +11891,7 @@ function cleanRecord(record){
     if(record[field]!==undefined){ if(typeof record[field]!=='boolean') throw new Error('记录字段无效：'+field); r[field]=record[field]; }
   }
   if(r.dstMinutes!==undefined&&![0,60].includes(r.dstMinutes))throw new Error('夏令时参数无效');
-  if(r.wxMode&&!WX_MODES[r.wxMode])throw new Error('五行统计口径无效');
+  if(r.wxMode&&!Object.hasOwn(WX_MODES,r.wxMode))throw new Error('五行统计口径无效');
   if(r.time&&!/^([01]\d|2[0-3]):[0-5]\d$/.test(r.time)) throw new Error('记录时间无效');
   if(r.dayBoundary&&!['zi-chu','zi-zheng'].includes(r.dayBoundary)) throw new Error('记录换日规则无效');
   if(r.ruleMode&&!['standard','legacy'].includes(r.ruleMode))throw new Error('记录取数规则无效');
@@ -11902,7 +11903,7 @@ function cleanPairSide(side){
   if(typeof side.name!=='string'||side.name.length>100)throw new Error('合婚姓名无效');
   const schoolId=o.schoolId??0,dayBoundary=o.dayBoundary??'zi-chu',wxMode=o.wxMode??'stems-main-qi',trueSolar=o.trueSolar??false;
   getRuleProfile(schoolId);normalizeBirthTime(date,o);
-  if(!['zi-chu','zi-zheng'].includes(dayBoundary)||!WX_MODES[wxMode]||typeof trueSolar!=='boolean')throw new Error('合婚计算选项无效');
+  if(!['zi-chu','zi-zheng'].includes(dayBoundary)||typeof wxMode!=='string'||!Object.hasOwn(WX_MODES,wxMode)||typeof trueSolar!=='boolean')throw new Error('合婚计算选项无效');
   return {name:side.name,date:i.date,time:i.time,hourIdx:hourIndexAt(date),gender:i.gender,place:i.place,options:{schoolId,dayBoundary,wxMode,trueSolar,utcOffsetMinutes:o.utcOffsetMinutes??480,dstMinutes:o.dstMinutes??0}};
 }
 function cleanPairRecord(record){
@@ -12007,7 +12008,7 @@ function selectedRecordEntries(selection,storage){
     if(!item||!RECORD_KEYS.includes(item.key)||typeof item.id!=='string'||!/^[-\w]{1,80}$/.test(item.id))throw new TypeError('记录选择无效');
     const token=item.key+'/'+item.id;if(seen.has(token))throw new TypeError('存在重复选择');seen.add(token);
   }
-  migrateLegacyRecords(storage);
+  if(selection.some(item=>item.key===REC_KEY))migrateLegacyRecords(storage);
   for(const item of selection){if(!groups[item.key])groups[item.key]=readStoredRecords(item.key,storage);if(!groups[item.key].some(r=>r.id===item.id))throw new RangeError('记录已变化，请刷新后重试');}
   return {groups,seen};
 }
@@ -14191,15 +14192,17 @@ function recordReload(id){
   if(el) el.scrollIntoView({behavior:'smooth'});
 }
 function recordDelete(id){
-  let recs=getRecords();
-  recs=recs.filter(r=>r.id!==id);
-  try{ localStorage.setItem(REC_KEY,JSON.stringify(recs)); }catch(e){}
-  renderRecords();
+  try{
+    deleteRecordEntries([{key:REC_KEY,id:String(id)}]);
+    renderRecords();
+  }catch(error){workbenchToast('删除失败：'+error.message);}
 }
 function clearRecords(){
-  if(!confirm('确定清空全部排盘记录？此操作不可恢复。')) return;
-  try{ localStorage.removeItem(REC_KEY); localStorage.removeItem('mingli_records'); }catch(e){}
-  renderRecords();
+  if(!confirm('确定清空综合排盘记录？此操作不可恢复。'))return;
+  try{
+    restoreRecordBackup({version:'v5',[REC_KEY]:[]});
+    renderRecords();
+  }catch(error){workbenchToast('清空失败：'+error.message);}
 }
 /* ======================== 各子功能排盘历史 ======================== */
 function getModRecords(mod){
@@ -14306,15 +14309,17 @@ function modRecordReload(mod,id){
   if(el) el.scrollIntoView({behavior:'smooth'});
 }
 function modRecordDelete(mod,id){
-  let recs=getModRecords(mod);
-  recs=recs.filter(r=>String(r.id)!==String(id));
-  try{ localStorage.setItem(MOD_REC_KEYS[mod],JSON.stringify(recs)); }catch(e){}
-  renderModRecords(mod);
+  try{
+    deleteRecordEntries([{key:MOD_REC_KEYS[mod],id:String(id)}]);
+    renderModRecords(mod);
+  }catch(error){workbenchToast('删除失败：'+error.message);}
 }
 function clearModRecords(mod){
-  if(!confirm('确定清空该模块全部排盘记录？此操作不可恢复。')) return;
-  try{ localStorage.removeItem(MOD_REC_KEYS[mod]); }catch(e){}
-  renderModRecords(mod);
+  if(!confirm('确定清空该模块全部排盘记录？此操作不可恢复。'))return;
+  try{
+    restoreRecordBackup({version:'v5',[MOD_REC_KEYS[mod]]:[]});
+    renderModRecords(mod);
+  }catch(error){workbenchToast('清空失败：'+error.message);}
 }
 /* ======================== 进阶命理要素(对标主流App) ======================== */
 // 十二长生
@@ -16655,20 +16660,24 @@ function exportRecords(){
   }catch(e){alert('备份导出失败：'+e.message);}
 }
 // 导入备份
+let recordImportSequence=0;
 function importRecords(input){
-  const f=input.files&&input.files[0];if(!f)return;
-  if(f.size>BACKUP_MAX_BYTES){alert('备份文件超过2MB，请检查文件');input.value='';return;}
+  const sequence=++recordImportSequence;
+  const file=input.files?.[0];
+  if(!file)return;
+  input.value='';
+  if(file.size>BACKUP_MAX_BYTES){alert('备份文件超过2MB，请检查文件');return;}
   const rd=new FileReader();
   rd.onload=()=>{
+    if(sequence!==recordImportSequence)return;
     try{
       const data=JSON.parse(rd.result),n=restoreRecordBackup(data);
       renderRecords();['zw','bz','qm','ly'].forEach(renderModRecords);
       alert('✅ 备份导入成功（'+n+'类记录），已恢复到当前版本');
     }catch(e){alert('导入失败：'+e.message);}
-    input.value='';
   };
-  rd.onerror=()=>{alert('备份文件读取失败，请重试');input.value='';};
-  rd.readAsText(f);
+  rd.onerror=()=>{if(sequence===recordImportSequence)alert('备份文件读取失败，请重试');};
+  rd.readAsText(file);
 }
 
 /* ======================== 合婚 Prompt 提取 / 回填（无 Key 双通道） ======================== */
