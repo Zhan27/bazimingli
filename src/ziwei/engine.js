@@ -285,15 +285,14 @@ const ZW_BRIGHT={
 function calculateZiwei({date,hourIdx,gender,referenceYear=beijingNow().getFullYear(),referenceDate}){
   assertSolarDate(date);
   if(!Number.isInteger(hourIdx)||hourIdx<0||hourIdx>11||![0,1].includes(gender))throw new RangeError('紫微时辰或性别参数无效');
-  if(!Number.isInteger(referenceYear)||referenceYear<1901||referenceYear>2099)throw new RangeError('紫微流年参考年份须为1901至2099');
   // A year label means that lunar year's Tai Sui, while a date observes lunar New Year.
   let annualYear=referenceYear;
   if(referenceDate!==undefined){
     if(typeof referenceDate!=='string')throw new TypeError('紫微参考日期须为YYYY-MM-DD');
-    const target=parseCivilDate(referenceDate);assertSolarDate(target);
-    annualYear=solar2lunar(target).year;
+    annualYear=solar2lunar(parseCivilDate(referenceDate)).year;
   }
-const lunar=solar2lunar(date);
+  if(!Number.isInteger(annualYear)||annualYear<1900||annualYear>2099)throw new RangeError('紫微流年参考年份须为1900至2099');
+  const lunar=solar2lunar(date);
   // 紫微斗数以农历排盘(年柱按农历正月初一,非八字立春)
   const lunarGZ=indexToGZ(((lunar.year-4)%60+60)%60);
   // 命宫: 从寅起正月顺数生月,逆数生时

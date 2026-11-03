@@ -28,6 +28,8 @@ Output includes `schemaVersion`, untouched input facts, versioned rules, actual 
 
 `batchCalculate(inputs)` is bounded to1000 rows, returns per-row success/error without stopping the rest. CLI: `node scripts/batch.cjs authorized-input.json output.json`; output must not already exist. It performs no network calls and leaves inputs in place. Use synthetic or explicitly authorized local data.
 
+Ziwei accepts an annual year from 1900 through 2099. When a reference date is supplied, the engine derives the lunar year from that date and uses it in place of the annual year argument.
+
 ## Declarative scoring packs
 
 `validateRulePack({id:'custom-example',version:'1',strength:{...}})` accepts only finite bounded month/root/momentum weights and strictly increasing thresholds with the documented `STRENGTH_RULES` shape. Pass as `calculateChart(input,{rulePack})`. The pack is copied and frozen, does not execute code, does not change shared defaults, and the result records the pack's id/version. These are custom **scoring** packages; arbitrary astronomy or executable plugins are not supported.

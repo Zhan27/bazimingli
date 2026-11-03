@@ -40,6 +40,19 @@ test('annual labels use their own TaiSui while dated observations follow lunar N
   }
   for(const referenceDate of ['2024-02-30','bad',4])assert.throws(()=>api.calculateModule('ziwei',{...input,referenceDate}));
 });
+test('Ziwei annual input covers the calendar endpoints and honors the date override',()=>{
+  for(const [date,year,gan,zhi] of [['1900-01-31',1900,6,0],['2099-12-31',2099,5,7]]){
+    const z=api.calculateModule('ziwei',{date}).result;
+    assert.equal(z.referenceYear,year);
+    assert.deepEqual(Array.from(z.annualYearGZ),[gan,zhi]);
+    const override=api.calculateModule('ziwei',{date,referenceYear:2100,referenceDate:date}).result;
+    assert.equal(override.referenceYear,year);
+    assert.deepEqual(override.liuNianSiHua,z.liuNianSiHua);
+  }
+  for(const referenceYear of [1899,2100,2024.5]){
+    assert.throws(()=>api.calculateModule('ziwei',{date:'2024-02-10',referenceYear}),/参考年份/);
+  }
+});
 test('both Ziwei entry points share versioned rules and explicit annual labels with independently versioned Bazi identities',()=>{
   const z=api.calculateModule('ziwei',{date:'2024-02-10',time:'00:00',referenceYear:2026}).result;
   e.context.zwFixture=z;
