@@ -137,7 +137,6 @@ function bzCast(){
   // 渲染
   const zhFull=zhCompute(date,hourIdx,gender,'',options);
   zhFull.time=time;zhFull.precisionNote=time?'时分已填写（分钟精度）':'仅知时辰：按时辰中点估算，交节与换日结果待核对';zhFull.solarNote=temporalDescription(zhFull);
-  lastCandidates=null;lastZh=zhFull; lastName=name; lastSchool=school2;
   rememberChartSchool(school2);
   zhFull.dg=dayGan; // 兼容 renderBazi 内 zhiHiddenTs 等
   renderBazi({name,gender,date:actualDate,origDate:date,hourIdx:temporal.hourIdx,lunar,yearGZ,monthGZ,dayGZ,hourGZ,

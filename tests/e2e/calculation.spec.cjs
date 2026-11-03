@@ -25,11 +25,12 @@ test('Bazi hour-only history retains the original clock hour after timezone conv
   await page.locator('.tab[data-tab="bazi"]').click();
   await page.locator('#bz-name').fill('八字原时辰');await page.locator('#bz-date').fill('2024-02-10');await page.locator('#bz-hour').selectOption('6');await page.locator('#bz-time').fill('');
   await page.locator('#bz-utc-offset').selectOption('120');await page.evaluate(()=>bzCast());
-  const before=await page.evaluate(()=>({pillars:lastZh.pillars,instant:lastZh.temporal.instantUtc}));
-  expect(before.instant).toBe('2024-02-10T10:00:00.000Z');
+  await expect(page.locator('#bz-result .info-bar')).toContainText('统一东八区 2024-02-10 18:00');
+  const before=await page.locator('#bz-result .p-gz').allTextContents();
   await page.reload();await expect(page.locator('#zh-result')).toContainText('命格总断');await page.locator('.tab[data-tab="bazi"]').click();await page.locator('#bz-records .rec-item').filter({hasText:'2024-02-10'}).click();
   await expect(page.locator('#bz-hour')).toHaveValue('6');await expect(page.locator('#bz-time')).toHaveValue('');await expect(page.locator('#bz-utc-offset')).toHaveValue('120');
-  expect(await page.evaluate(()=>({pillars:lastZh.pillars,instant:lastZh.temporal.instantUtc}))).toEqual(before);
+  await expect(page.locator('#bz-result .info-bar')).toContainText('统一东八区 2024-02-10 18:00');
+  expect(await page.locator('#bz-result .p-gz').allTextContents()).toEqual(before);
   // A valid imported historical minute offset must survive a select restoration.
   expect(await page.evaluate(()=>{restoreUtcOffset('bz-utc-offset',483);return document.getElementById('bz-utc-offset').value;})).toBe('483');
   expect(errors).toEqual([]);
@@ -44,6 +45,27 @@ test('all five school selections drive the displayed rule, calculation and seria
     if(!common)common=data.pillars;expect(data.pillars).toEqual(common);expect(data.chart.rules.profile).toBe(data.profile.key);expect(data.prompt).toContain(data.profile.useStrategy);
     await expect(page.locator('#zh-result [data-calculation-basis]')).toContainText(data.profile.name);
   }
+});
+
+test('a standalone Bazi cast leaves the comprehensive study export attached to its displayed chart',async({page})=>{
+  await page.locator('#zh-name').fill('综合原盘');
+  await page.locator('#zh-solar').fill('2024-02-10');
+  await page.locator('#zh-time').fill('12:00');
+  await page.evaluate(()=>zhCast());
+  await expect(page.locator('#zh-result')).toContainText('综合原盘');
+  await page.locator('.tab[data-tab="bazi"]').click();
+  await page.locator('#bz-date').fill('2025-04-18');
+  await page.locator('#bz-time').fill('09:30');
+  await page.evaluate(()=>bzCast());
+  await expect(page.locator('#bz-result .info-bar')).toContainText('2025年4月18日');
+  await page.locator('.tab[data-tab="zonghe"]').click();
+  await page.locator('#study-open').click();
+  const pending=page.waitForEvent('download');
+  await page.locator('#study-export').click();
+  const file=await pending;
+  const report=JSON.parse(require('node:fs').readFileSync(await file.path(),'utf8'));
+  expect(report.chart.input.date).toBe('2024-02-10');
+  expect(report.chart.input.time).toBe('12:00');
 });
 test('wuxing display changes convention without changing pillars or the scoring model',async({page})=>{
   await page.locator('#zh-solar').fill('2024-02-10');await page.locator('#zh-time').fill('12:00');await page.evaluate(()=>zhCast());
