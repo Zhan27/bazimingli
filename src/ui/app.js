@@ -1059,29 +1059,34 @@ function buildShareText(zh,name){
 }
 function shareCopy(){
   if(!lastZh){alert('请先排盘');return;}
-  const txt=buildShareText(lastZh,lastName);
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(txt).then(()=>{alert('✅ 命盘摘要已复制，可直接粘贴到微信/QQ分享给朋友！');}).catch(()=>{shareFallback(txt);});
-  }else{ shareFallback(txt); }
+  return copyText(buildShareText(lastZh,lastName),'✅ 命盘摘要已复制，可直接粘贴分享！');
 }
-function shareFallback(txt){
-  const ta=document.createElement('textarea');
-  ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
-  document.body.appendChild(ta); ta.select();
-  try{ document.execCommand('copy'); alert('✅ 命盘摘要已复制，可直接粘贴分享！'); }catch(e){ alert('复制失败，请手动选择复制：\n\n'+txt); }
-  document.body.removeChild(ta);
+async function writeChartClipboard(text,field){
+  try{
+    if(navigator.clipboard?.writeText){
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  }catch(error){/* Try copying from a selected field. */}
+  const target=field||document.createElement('textarea');
+  if(!field){
+    target.value=text;
+    target.style.position='fixed';
+    target.style.opacity='0';
+    document.body.appendChild(target);
+  }
+  try{
+    target.select();
+    return document.execCommand('copy')===true;
+  }catch(error){
+    return false;
+  }finally{
+    if(!field)target.remove();
+  }
 }
-function copyText(txt,msg){
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(txt).then(()=>{ alert(msg); }).catch(()=>{ shareFallback2(txt,msg); });
-  }else{ shareFallback2(txt,msg); }
-}
-function shareFallback2(txt,msg){
-  const ta=document.createElement('textarea');
-  ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
-  document.body.appendChild(ta); ta.select();
-  try{ document.execCommand('copy'); alert(msg); }catch(e){ alert('复制失败，请手动复制：\n\n'+txt); }
-  document.body.removeChild(ta);
+async function copyText(txt,msg){
+  const copied=await writeChartClipboard(txt);
+  alert(copied?msg:'复制失败，请手动复制：\n\n'+txt);
 }
 /* ======================== 排盘记录 ======================== */
 function getRecords(){
@@ -2446,15 +2451,11 @@ function aiExtractPrompt(){
   document.getElementById('ai-prompt-modal').style.display='flex';
 }
 /* 复制 Prompt */
-function aiCopyPrompt(){
+async function aiCopyPrompt(){
   const ta=document.getElementById('ai-prompt-text');
-  ta.select();ta.setSelectionRange(0,99999);
-  const done=()=>{document.getElementById('ai-prompt-msg').textContent='✅ 已复制，粘贴到任意 AI 对话（如 WorkBuddy / DeepSeek / ChatGPT）中发送';};
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(ta.value).then(done).catch(()=>{try{document.execCommand('copy');done();}catch(e){document.getElementById('ai-prompt-msg').textContent='❌ 复制失败，请手动全选复制';}});
-  }else{
-    try{document.execCommand('copy');done();}catch(e){document.getElementById('ai-prompt-msg').textContent='❌ 复制失败，请手动全选复制';}
-  }
+  const status=document.getElementById('ai-prompt-msg');
+  const copied=await writeChartClipboard(ta.value,ta);
+  status.textContent=copied?'✅ 已复制，可粘贴到 AI 对话中发送':'❌ 复制失败，请手动复制提示词';
 }
 /* 粘贴 AI 回复回填 18 维卡片 */
 /* 【18】风险提示缺失时本地引擎兜底(流式/粘贴共用) */
@@ -3704,15 +3705,12 @@ function hhExtractPrompt(){
   if(msg) msg.textContent='✅ 已生成，请复制或全选拷贝';
   try{document.getElementById('hh-prompt-box').scrollIntoView({behavior:'smooth',block:'nearest'});}catch(e){}
 }
-function hhCopyPrompt(){
+async function hhCopyPrompt(){
   const ta=document.getElementById('hh-prompt-text');
   if(!ta||!ta.value){alert('请先点击「📋 提取 Prompt」生成内容');return;}
-  ta.select();
-  try{
-    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(ta.value).then(()=>{const m=document.getElementById('hh-prompt-msg');if(m)m.textContent='✅ 已复制到剪贴板';}); }
-    else if(document.execCommand('copy')){const m=document.getElementById('hh-prompt-msg');if(m)m.textContent='✅ 已复制';}
-    else{alert('复制失败，请手动 Ctrl+C');}
-  }catch(e){ alert('复制失败，请手动全选复制'); }
+  const status=document.getElementById('hh-prompt-msg');
+  const copied=await writeChartClipboard(ta.value,ta);
+  if(status)status.textContent=copied?'✅ 已复制到剪贴板':'❌ 复制失败，请手动复制提示词';
 }
 // v5.11/v5.13 AI合婚解读五段解析: 兼容【相处模式】/ **相处模式** / ### 相处模式 / 一、相处模式 / 1. 相处模式 / 相处模式： 等格式
 function hhParseDims(text){

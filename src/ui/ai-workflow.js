@@ -28,7 +28,11 @@ function aiEvidenceCardData(id){
   const facts=aiFacts(aiEvidenceChart());return {schemaVersion:1,kind:'ai-dimension',chartId:aiEvidenceSession.chartId,dimensionId:id,validation:item.format==='json'?'structure-and-reference-only':'unverified-markdown',referencedFacts:item.format==='json'?Object.fromEntries(item.dimension.facts.map(f=>[f,facts[f]])):{},sources:item.format==='json'?item.dimension.rules.map(knowledgeCitation):[],...JSON.parse(JSON.stringify(item))};
 }
 async function aiEvidenceCopyCard(id){
-  try{const text=JSON.stringify(aiEvidenceCardData(id),null,2);if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(text);else{shareFallback2(text,'单卡内容已复制（含校验状态与依据）');return;}workbenchToast('单卡内容已复制（含校验状态与依据）');}catch(e){workbenchToast('复制失败：'+e.message);}
+  try{
+    const text=JSON.stringify(aiEvidenceCardData(id),null,2);
+    const copied=await writeChartClipboard(text);
+    workbenchToast(copied?'单卡内容已复制（含校验状态与依据）':'复制失败，可下载单卡 JSON。');
+  }catch(e){workbenchToast('复制失败：'+e.message);}
 }
 function aiEvidenceExportCard(id){
   try{const data=aiEvidenceCardData(id),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='AI维度_'+id+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){workbenchToast(e.message);}
