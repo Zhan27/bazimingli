@@ -1094,9 +1094,10 @@ function saveRecord(zh,name){
   const bazi=zh.pillars.map(g=>GAN[g[0]]+ZHI[g[1]]).join(' ');
   const lunarText=zh.lunar.year+'年'+(zh.lunar.isLeap?'闰':'')+lunarMonthName(zh.lunar.month,zh.lunar.isLeap)+lunarDayName(zh.lunar.day);
   const dateStr=fmtLocalDate(zh.inputDate||zh.date);
-  // 相同姓名+日期+时辰则更新
-  const idx=recs.findIndex(r=>r.name===name&&r.dateStr===dateStr&&r.hourIdx===hourIndexAt(zh.inputDate||zh.date)&&(r.time||'')===(zh.time||'')&&(r.dayBoundary||'zi-chu')===(zh.temporal?.dayBoundary||'zi-chu'));
-  const rec={id:idx>=0?recs[idx].id:(Date.now()+''+Math.floor(Math.random()*1000)),name,gender:zh.gender,dateStr,hourIdx:hourIndexAt(zh.inputDate||zh.date),bazi,lunarText,ts:Date.now(),time:zh.time||'',minute:zh.minute||0,place:zh.place||'',trueSun:!!zh.trueSun,unknowHour:!!zh.unknowHour,genderUnspecified:!!zh.genderUnspecified,dayBoundary:zh.temporal?.dayBoundary||'zi-chu',school2:lastSchool,utcOffsetMinutes:zh.temporal.utcOffsetMinutes,dstMinutes:zh.temporal.dstMinutes,wxMode:zh.wxStatistics.mode};
+  const rec={name,gender:zh.gender,dateStr,hourIdx:hourIndexAt(zh.inputDate||zh.date),bazi,lunarText,ts:Date.now(),time:zh.time||'',minute:zh.minute||0,place:zh.place||'',trueSun:!!zh.trueSun,unknowHour:!!zh.unknowHour,genderUnspecified:!!zh.genderUnspecified,dayBoundary:zh.temporal?.dayBoundary||'zi-chu',school2:lastSchool,utcOffsetMinutes:zh.temporal.utcOffsetMinutes,dstMinutes:zh.temporal.dstMinutes,wxMode:zh.wxStatistics.mode};
+  const identity=birthRecordIdentity(rec);
+  const idx=recs.findIndex(r=>birthRecordIdentity(r)===identity);
+  rec.id=idx>=0?recs[idx].id:Date.now()+''+Math.floor(Math.random()*1000);
   if(idx>=0){if(recs[idx].note!==undefined)rec.note=recs[idx].note;recs[idx]=rec;}else recs.unshift(rec);
   if(recs.length>50) recs=recs.slice(0,50);
   localStorage.setItem(REC_KEY,JSON.stringify(recs));
@@ -1166,7 +1167,8 @@ function saveModRecord(mod,rec){
   let recs=readStoredRecords(MOD_REC_KEYS[mod]);
   const detail=mod==='ly'?[rec.time||'',rec.mode,rec.nums||'',rec.ruleMode||'legacy',rec.dayBoundary||'zi-chu']:mod==='qm'?[rec.hourHH,rec.minute,rec.school,QIMEN_RULE_VERSION]:[];
   const key=mod+'|'+rec.dateStr+'|'+rec.hourIdx+(detail.length?'|'+JSON.stringify(detail):'');
-  const idx=recs.findIndex(r=>r.key===key);
+  const identity=mod==='bz'||mod==='zw'?birthRecordIdentity(rec):null;
+  const idx=recs.findIndex(r=>identity===null?r.key===key:birthRecordIdentity(r)===identity);
   const id=idx>=0?recs[idx].id:(Date.now()+''+Math.floor(Math.random()*1000));
   rec=Object.assign({},idx>=0?recs[idx]:{},rec,{id,key,ts:Date.now()});
   if(idx>=0) recs[idx]=rec; else recs.unshift(rec);

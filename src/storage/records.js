@@ -4,6 +4,18 @@ const MOD_REC_KEYS={zw:'zw_records',bz:'bz_records',qm:'qm_records',ly:'ly_recor
 const PAIR_REC_KEY='hh_records';
 const RECORD_KEYS=[REC_KEY,...Object.values(MOD_REC_KEYS),PAIR_REC_KEY];
 const BACKUP_MAX_BYTES=2*1024*1024;
+
+function birthRecordIdentity(record){
+  const unknown=!!record.unknowHour;
+  const clock=unknown?null:record.time||[record.hourIdx,record.minute??0];
+  const boundary=record.dayBoundary??(record.school===1?'zi-zheng':'zi-chu');
+  return JSON.stringify([
+    record.name||'',record.dateStr,clock,record.gender,!!record.genderUnspecified,
+    record.place||'',!!record.trueSun,record.utcOffsetMinutes??480,record.dstMinutes??0,
+    boundary,record.school2??0,record.wxMode||'stems-main-qi',record.style??0
+  ]);
+}
+
 function cleanRecord(record){
   if(!record||typeof record!=='object'||Array.isArray(record)) throw new Error('记录必须是对象');
   const r={};

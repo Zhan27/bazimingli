@@ -59,8 +59,11 @@ function renderUnknownCandidates(result,name){
 function copyUnknownSummary(){if(lastCandidates)copyText(unknownSummary(lastCandidates,lastName),'候选对比已复制');}
 function saveUnknownRecord(result,name,gender,schoolId,genderUnspecified=false){
   migrateLegacyRecords();const recs=readStoredRecords(REC_KEY),dateStr=fmtLocalDate(result.inputDate);
-  const old=recs.find(r=>r.unknowHour&&r.name===name&&r.dateStr===dateStr);
-  const rec={id:old?old.id:Date.now()+''+Math.floor(Math.random()*1000),name,gender,dateStr,hourIdx:0,time:'',unknowHour:true,genderUnspecified,bazi:'时辰未知·'+result.candidates.length+'个候选区间',lunarText:'见候选对比',ts:Date.now(),place:result.place,
+  const rec={name,gender,dateStr,hourIdx:0,time:'',unknowHour:true,genderUnspecified,bazi:'时辰未知·'+result.candidates.length+'个候选区间',lunarText:'见候选对比',ts:Date.now(),place:result.place,
     trueSun:!!result.options.trueSolar,dayBoundary:result.options.dayBoundary,utcOffsetMinutes:result.options.utcOffsetMinutes??480,dstMinutes:result.options.dstMinutes||0,school2:schoolId,wxMode:result.options.wxMode||'stems-main-qi'};
+  const identity=birthRecordIdentity(rec);
+  const old=recs.find(r=>birthRecordIdentity(r)===identity);
+  rec.id=old?.id??Date.now()+''+Math.floor(Math.random()*1000);
+  if(old?.note!==undefined)rec.note=old.note;
   const all=[rec,...recs.filter(r=>r.id!==rec.id)].slice(0,50);localStorage.setItem(REC_KEY,JSON.stringify(all));renderRecords();
 }
