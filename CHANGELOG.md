@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.40.0 — 2026-11-03
+- Report the real result of clipboard writes for chart summaries, prompt text and AI cards, including browser permission denial and unsuccessful fallback copies.
+- Keep prompt text available for manual copying when the browser blocks clipboard access.
+
 ## 5.39.0 — 2026-11-03
 - Keep standalone Bazi casts separate from the comprehensive chart so its study view, exports and candidate summary remain attached to the displayed inputs.
 

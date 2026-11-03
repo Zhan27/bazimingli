@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="application-version" content="5.39.0">
+<meta name="application-version" content="5.40.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="description" content="玄机命理排盘：八字四柱、紫微斗数、奇门遁甲、六爻卜筮在线排盘工具，支持 AI 深度解读与多流派分析。">
 <meta name="keywords" content="八字排盘,紫微斗数,奇门遁甲,六爻,合婚,真太阳时,命理排盘,AI命理解读">
@@ -12663,7 +12663,11 @@ function aiEvidenceCardData(id){
   const facts=aiFacts(aiEvidenceChart());return {schemaVersion:1,kind:'ai-dimension',chartId:aiEvidenceSession.chartId,dimensionId:id,validation:item.format==='json'?'structure-and-reference-only':'unverified-markdown',referencedFacts:item.format==='json'?Object.fromEntries(item.dimension.facts.map(f=>[f,facts[f]])):{},sources:item.format==='json'?item.dimension.rules.map(knowledgeCitation):[],...JSON.parse(JSON.stringify(item))};
 }
 async function aiEvidenceCopyCard(id){
-  try{const text=JSON.stringify(aiEvidenceCardData(id),null,2);if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(text);else{shareFallback2(text,'单卡内容已复制（含校验状态与依据）');return;}workbenchToast('单卡内容已复制（含校验状态与依据）');}catch(e){workbenchToast('复制失败：'+e.message);}
+  try{
+    const text=JSON.stringify(aiEvidenceCardData(id),null,2);
+    const copied=await writeChartClipboard(text);
+    workbenchToast(copied?'单卡内容已复制（含校验状态与依据）':'复制失败，可下载单卡 JSON。');
+  }catch(e){workbenchToast('复制失败：'+e.message);}
 }
 function aiEvidenceExportCard(id){
   try{const data=aiEvidenceCardData(id),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='AI维度_'+id+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){workbenchToast(e.message);}
@@ -14127,29 +14131,34 @@ function buildShareText(zh,name){
 }
 function shareCopy(){
   if(!lastZh){alert('请先排盘');return;}
-  const txt=buildShareText(lastZh,lastName);
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(txt).then(()=>{alert('✅ 命盘摘要已复制，可直接粘贴到微信/QQ分享给朋友！');}).catch(()=>{shareFallback(txt);});
-  }else{ shareFallback(txt); }
+  return copyText(buildShareText(lastZh,lastName),'✅ 命盘摘要已复制，可直接粘贴分享！');
 }
-function shareFallback(txt){
-  const ta=document.createElement('textarea');
-  ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
-  document.body.appendChild(ta); ta.select();
-  try{ document.execCommand('copy'); alert('✅ 命盘摘要已复制，可直接粘贴分享！'); }catch(e){ alert('复制失败，请手动选择复制：\n\n'+txt); }
-  document.body.removeChild(ta);
+async function writeChartClipboard(text,field){
+  try{
+    if(navigator.clipboard?.writeText){
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  }catch(error){/* Try copying from a selected field. */}
+  const target=field||document.createElement('textarea');
+  if(!field){
+    target.value=text;
+    target.style.position='fixed';
+    target.style.opacity='0';
+    document.body.appendChild(target);
+  }
+  try{
+    target.select();
+    return document.execCommand('copy')===true;
+  }catch(error){
+    return false;
+  }finally{
+    if(!field)target.remove();
+  }
 }
-function copyText(txt,msg){
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(txt).then(()=>{ alert(msg); }).catch(()=>{ shareFallback2(txt,msg); });
-  }else{ shareFallback2(txt,msg); }
-}
-function shareFallback2(txt,msg){
-  const ta=document.createElement('textarea');
-  ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
-  document.body.appendChild(ta); ta.select();
-  try{ document.execCommand('copy'); alert(msg); }catch(e){ alert('复制失败，请手动复制：\n\n'+txt); }
-  document.body.removeChild(ta);
+async function copyText(txt,msg){
+  const copied=await writeChartClipboard(txt);
+  alert(copied?msg:'复制失败，请手动复制：\n\n'+txt);
 }
 /* ======================== 排盘记录 ======================== */
 function getRecords(){
@@ -15514,15 +15523,11 @@ function aiExtractPrompt(){
   document.getElementById('ai-prompt-modal').style.display='flex';
 }
 /* 复制 Prompt */
-function aiCopyPrompt(){
+async function aiCopyPrompt(){
   const ta=document.getElementById('ai-prompt-text');
-  ta.select();ta.setSelectionRange(0,99999);
-  const done=()=>{document.getElementById('ai-prompt-msg').textContent='✅ 已复制，粘贴到任意 AI 对话（如 WorkBuddy / DeepSeek / ChatGPT）中发送';};
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(ta.value).then(done).catch(()=>{try{document.execCommand('copy');done();}catch(e){document.getElementById('ai-prompt-msg').textContent='❌ 复制失败，请手动全选复制';}});
-  }else{
-    try{document.execCommand('copy');done();}catch(e){document.getElementById('ai-prompt-msg').textContent='❌ 复制失败，请手动全选复制';}
-  }
+  const status=document.getElementById('ai-prompt-msg');
+  const copied=await writeChartClipboard(ta.value,ta);
+  status.textContent=copied?'✅ 已复制，可粘贴到 AI 对话中发送':'❌ 复制失败，请手动复制提示词';
 }
 /* 粘贴 AI 回复回填 18 维卡片 */
 /* 【18】风险提示缺失时本地引擎兜底(流式/粘贴共用) */
@@ -16772,15 +16777,12 @@ function hhExtractPrompt(){
   if(msg) msg.textContent='✅ 已生成，请复制或全选拷贝';
   try{document.getElementById('hh-prompt-box').scrollIntoView({behavior:'smooth',block:'nearest'});}catch(e){}
 }
-function hhCopyPrompt(){
+async function hhCopyPrompt(){
   const ta=document.getElementById('hh-prompt-text');
   if(!ta||!ta.value){alert('请先点击「📋 提取 Prompt」生成内容');return;}
-  ta.select();
-  try{
-    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(ta.value).then(()=>{const m=document.getElementById('hh-prompt-msg');if(m)m.textContent='✅ 已复制到剪贴板';}); }
-    else if(document.execCommand('copy')){const m=document.getElementById('hh-prompt-msg');if(m)m.textContent='✅ 已复制';}
-    else{alert('复制失败，请手动 Ctrl+C');}
-  }catch(e){ alert('复制失败，请手动全选复制'); }
+  const status=document.getElementById('hh-prompt-msg');
+  const copied=await writeChartClipboard(ta.value,ta);
+  if(status)status.textContent=copied?'✅ 已复制到剪贴板':'❌ 复制失败，请手动复制提示词';
 }
 // v5.11/v5.13 AI合婚解读五段解析: 兼容【相处模式】/ **相处模式** / ### 相处模式 / 一、相处模式 / 1. 相处模式 / 相处模式： 等格式
 function hhParseDims(text){
