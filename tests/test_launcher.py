@@ -8,7 +8,7 @@ import sys
 import tempfile
 import types
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -19,6 +19,21 @@ SPEC.loader.exec_module(app)
 
 
 class LauncherTests(unittest.TestCase):
+    def test_native_window_uses_isolated_storage_and_explicit_private_mode(self):
+        with tempfile.TemporaryDirectory(prefix='mingli-profile-') as folder:
+            for private in (False, True):
+                with self.subTest(private=private):
+                    fake = types.SimpleNamespace(settings={}, create_window=Mock(), start=Mock())
+                    server = Mock(server_port=app.PREFERRED_PORTS[0])
+                    argv = ['launcher.py'] + (['--private'] if private else [])
+                    with patch.object(app, 'serve_preferred', return_value=server), patch.object(sys, 'argv', argv), patch.dict(sys.modules, {'webview': fake}), patch.dict(app.os.environ, {'LOCALAPPDATA': folder}):
+                        self.assertEqual(app.main(), 0)
+                    path = None if private else str(Path(folder) / 'MingliPaipan' / 'WebView')
+                    fake.start.assert_called_once_with(private_mode=private, storage_path=path)
+                    self.assertIs(fake.settings['ALLOW_DOWNLOADS'], True)
+                    server.shutdown.assert_called_once()
+                    server.server_close.assert_called_once()
+
     def test_unicode_path_get_head_and_denied_paths(self):
         with tempfile.TemporaryDirectory(prefix='mingli-') as tmp:
             folder = Path(tmp) / '八字 资料'

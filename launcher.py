@@ -148,7 +148,13 @@ def main() -> int:
             else:
                 webview.create_window(APP_TITLE, url, width=1180, height=880,
                                       min_size=(900, 640), text_select=True)
-                webview.start()
+                private = '--private' in sys.argv
+                storage_path = None
+                if not private:
+                    storage_root = os.environ.get('LOCALAPPDATA') or os.path.expanduser('~/.local/share')
+                    storage_path = os.path.join(storage_root, 'MingliPaipan', 'WebView')
+                webview.settings['ALLOW_DOWNLOADS'] = True
+                webview.start(private_mode=private, storage_path=storage_path)
                 return 0
         if not webbrowser.open(url):
             print("[×] 无法打开系统浏览器。", file=sys.stderr)
