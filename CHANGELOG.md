@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.41.0 — 2026-11-03
+- Give the native desktop window its own persistent WebView profile so records and preferences survive restarts on the same local port.
+- Enable native save dialogs for exports. Use `--private` when you want a temporary native session.
+
 ## 5.40.0 — 2026-11-03
 - Report the real result of clipboard writes for chart summaries, prompt text and AI cards, including browser permission denial and unsuccessful fallback copies.
 - Keep prompt text available for manual copying when the browser blocks clipboard access.
