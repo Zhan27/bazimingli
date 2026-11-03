@@ -156,7 +156,7 @@ function selectedRecordEntries(selection,storage){
     if(!item||!RECORD_KEYS.includes(item.key)||typeof item.id!=='string'||!/^[-\w]{1,80}$/.test(item.id))throw new TypeError('记录选择无效');
     const token=item.key+'/'+item.id;if(seen.has(token))throw new TypeError('存在重复选择');seen.add(token);
   }
-  migrateLegacyRecords(storage);
+  if(selection.some(item=>item.key===REC_KEY))migrateLegacyRecords(storage);
   for(const item of selection){if(!groups[item.key])groups[item.key]=readStoredRecords(item.key,storage);if(!groups[item.key].some(r=>r.id===item.id))throw new RangeError('记录已变化，请刷新后重试');}
   return {groups,seen};
 }

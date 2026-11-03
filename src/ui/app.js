@@ -1149,15 +1149,17 @@ function recordReload(id){
   if(el) el.scrollIntoView({behavior:'smooth'});
 }
 function recordDelete(id){
-  let recs=getRecords();
-  recs=recs.filter(r=>r.id!==id);
-  try{ localStorage.setItem(REC_KEY,JSON.stringify(recs)); }catch(e){}
-  renderRecords();
+  try{
+    deleteRecordEntries([{key:REC_KEY,id:String(id)}]);
+    renderRecords();
+  }catch(error){workbenchToast('删除失败：'+error.message);}
 }
 function clearRecords(){
-  if(!confirm('确定清空全部排盘记录？此操作不可恢复。')) return;
-  try{ localStorage.removeItem(REC_KEY); localStorage.removeItem('mingli_records'); }catch(e){}
-  renderRecords();
+  if(!confirm('确定清空综合排盘记录？此操作不可恢复。'))return;
+  try{
+    restoreRecordBackup({version:'v5',[REC_KEY]:[]});
+    renderRecords();
+  }catch(error){workbenchToast('清空失败：'+error.message);}
 }
 /* ======================== 各子功能排盘历史 ======================== */
 function getModRecords(mod){
@@ -1264,15 +1266,17 @@ function modRecordReload(mod,id){
   if(el) el.scrollIntoView({behavior:'smooth'});
 }
 function modRecordDelete(mod,id){
-  let recs=getModRecords(mod);
-  recs=recs.filter(r=>String(r.id)!==String(id));
-  try{ localStorage.setItem(MOD_REC_KEYS[mod],JSON.stringify(recs)); }catch(e){}
-  renderModRecords(mod);
+  try{
+    deleteRecordEntries([{key:MOD_REC_KEYS[mod],id:String(id)}]);
+    renderModRecords(mod);
+  }catch(error){workbenchToast('删除失败：'+error.message);}
 }
 function clearModRecords(mod){
-  if(!confirm('确定清空该模块全部排盘记录？此操作不可恢复。')) return;
-  try{ localStorage.removeItem(MOD_REC_KEYS[mod]); }catch(e){}
-  renderModRecords(mod);
+  if(!confirm('确定清空该模块全部排盘记录？此操作不可恢复。'))return;
+  try{
+    restoreRecordBackup({version:'v5',[MOD_REC_KEYS[mod]]:[]});
+    renderModRecords(mod);
+  }catch(error){workbenchToast('清空失败：'+error.message);}
 }
 /* ======================== 进阶命理要素(对标主流App) ======================== */
 // 十二长生
