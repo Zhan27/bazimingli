@@ -27,3 +27,25 @@ test('shared request layer streams a mocked provider and supports explicit cance
   const text=await new Promise((resolve,reject)=>{context.finish=resolve;context.fail=reject;vm.runInContext(`aiStreamChat('https://mock.invalid',{}, {onDone:finish,onError:fail})`,context);});assert.equal(text,'完成');assert.equal(calls,1);
   context.fetch=()=>new Promise(()=>{});const error=await new Promise(resolve=>{context.fail=resolve;vm.runInContext(`aiStreamChat('https://mock.invalid',{}, {onError:fail}).abort()`,context);});assert.equal(error.code,'CANCELED');
 });
+
+test('SSE completion releases a provider connection that stays open after DONE',async()=>{
+  let canceled=0;
+  const payload='data: {"choices":[{"delta":{"content":"已完成"}}]}\n\ndata: [DONE]\n\n';
+  const body=new ReadableStream({
+    start(controller){controller.enqueue(new TextEncoder().encode(payload));},
+    cancel(){canceled++;}
+  });
+  const context=vm.createContext({
+    AbortController,TextDecoder,setTimeout,clearTimeout,
+    fetch:async()=>new Response(body,{headers:{'content-type':'text/event-stream'}})
+  });
+  vm.runInContext(fs.readFileSync(path.join(root,'src/ai/request.js'),'utf8'),context);
+  const text=await new Promise((resolve,reject)=>{
+    context.finish=resolve;
+    context.fail=reject;
+    vm.runInContext("aiStreamChat('https://mock.invalid',{}, {onDone:finish,onError:fail,idleMs:500})",context);
+  });
+  assert.equal(text,'已完成');
+  assert.equal(canceled,1);
+  assert.equal(vm.runInContext('AI_REQUESTS.size',context),0);
+});

@@ -37,7 +37,22 @@ function aiStreamChat(url,opts,handlers={}){
       if(!r.body)throw aiTransportError('NO_STREAM','浏览器不支持响应流');reader=r.body.getReader();
       const decoder=new TextDecoder(),parser=createAiSseParser((d,all)=>{if(!done)handlers.onDelta?.(d,all);},{maxCharacters:handlers.maxCharacters});
       const isJson=(r.headers.get('content-type')||'').includes('application/json');let jsonText='';
-      while(!done){const {done:finished,value}=await reader.read();if(finished)break;arm();const chunk=decoder.decode(value,{stream:true});if(isJson){jsonText+=chunk;if(jsonText.length>1000000)throw aiTransportError('RESPONSE_TOO_LARGE','回复超过长度上限');}else parser.feed(chunk);}
+      while(!done){
+        const {done:finished,value}=await reader.read();
+        if(finished||done)break;
+        arm();
+        const chunk=decoder.decode(value,{stream:true});
+        if(isJson){
+          jsonText+=chunk;
+          if(jsonText.length>1000000)throw aiTransportError('RESPONSE_TOO_LARGE','回复超过长度上限');
+        }else{
+          parser.feed(chunk);
+          if(parser.ended&&!done){
+            reader.cancel().catch(()=>{});
+            break;
+          }
+        }
+      }
       if(done)return;let all;
       if(isJson){jsonText+=decoder.decode();const j=JSON.parse(jsonText);if(j.error)throw aiTransportError('UPSTREAM_ERROR','上游返回错误');all=j.choices?.[0]?.message?.content;if(typeof all!=='string')throw aiTransportError('INVALID_RESPONSE','响应缺少文本');handlers.onDelta?.(all,all);}
       else {parser.feed(decoder.decode());all=parser.finish();}
