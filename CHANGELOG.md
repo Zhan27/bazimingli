@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.47.0 — 2026-11-07
+- Preserve the selected birthday, including a leap lunar month, when switching from Gregorian to lunar input.
+- Keep the existing reverse synchronization from edited lunar fields back to Gregorian input.
+
 ## 5.46.0 — 2026-11-07
 - Fill comprehensive and standalone Bazi “now” inputs in the selected fixed offset and manual DST, aligning calculation to the current real minute, including date rollovers.
 - Treat the comprehensive “now” action as a known time and synchronize its minute and calendar fields.
