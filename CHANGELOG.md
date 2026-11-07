@@ -1,5 +1,8 @@
 # Changelog
 
+## 5.42.0 — 2026-11-07
+- Show a record-space notice in the desktop window when the launcher has to use a different port.
+
 ## 5.41.0 — 2026-11-03
 - Give the native desktop window its own persistent WebView profile so records and preferences survive restarts on the same local port.
 - Enable native save dialogs for exports. Use `--private` when you want a temporary native session.

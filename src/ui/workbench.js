@@ -73,7 +73,7 @@ function enhanceWorkbenchChart(){
 }
 function initializeWorkbench(){
   const wrap=document.querySelector('.wrap'),header=wrap.querySelector('header'),tabs=document.querySelector('.tabs');
-  const desktopFallback=location.hostname==='127.0.0.1'&&new URLSearchParams(location.search).get('desktop_port_fallback')==='1';
+  const desktopFallback=window.location.hostname==='127.0.0.1'&&new URL(window.location.href).searchParams.get('desktop_port_fallback')==='1';
   if(desktopFallback){
     const notice=document.createElement('p');
     notice.id='desktop-port-notice';
