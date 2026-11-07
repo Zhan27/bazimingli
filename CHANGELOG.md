@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.49.0 — 2026-11-07
+- Keep the selected lunar month and valid day when editing the year instead of silently resetting to the first month.
+- Preserve a leap-month choice only when the new year has that same leap month; otherwise retain the regular month and clear the leap flag.
+
 ## 5.48.0 — 2026-11-07
 - Check new record IDs against existing records so repeated clock/random values cannot create duplicate IDs or overwrite distinct charts.
 - Apply the allocator to comprehensive, unknown-time, standalone module and paired records while reusing IDs and notes on matching-input replay.

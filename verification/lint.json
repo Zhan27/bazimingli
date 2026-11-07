@@ -160,63 +160,11 @@
     {
       "ruleId": "no-unused-vars",
       "severity": 1,
-      "message": "'dSel' is assigned a value but never used.",
-      "line": 3773,
-      "column": 9,
-      "messageId": "unusedVar",
-      "endLine": 3773,
-      "endColumn": 13,
-      "suggestions": [
-        {
-          "messageId": "removeVar",
-          "data": {
-            "varName": "dSel"
-          },
-          "fix": {
-            "range": [
-              297040,
-              297084
-            ],
-            "text": ""
-          },
-          "desc": "Remove unused variable 'dSel'."
-        }
-      ]
-    },
-    {
-      "ruleId": "no-unused-vars",
-      "severity": 1,
-      "message": "'maxM' is assigned a value but never used.",
-      "line": 3778,
-      "column": 9,
-      "messageId": "unusedVar",
-      "endLine": 3778,
-      "endColumn": 13,
-      "suggestions": [
-        {
-          "messageId": "removeVar",
-          "data": {
-            "varName": "maxM"
-          },
-          "fix": {
-            "range": [
-              297189,
-              297213
-            ],
-            "text": ""
-          },
-          "desc": "Remove unused variable 'maxM'."
-        }
-      ]
-    },
-    {
-      "ruleId": "no-unused-vars",
-      "severity": 1,
       "message": "'leap' is assigned a value but never used.",
-      "line": 3793,
+      "line": 3794,
       "column": 9,
       "messageId": "unusedVar",
-      "endLine": 3793,
+      "endLine": 3794,
       "endColumn": 13,
       "suggestions": [
         {
@@ -226,8 +174,8 @@
           },
           "fix": {
             "range": [
-              297894,
-              297918
+              297980,
+              298004
             ],
             "text": ""
           },
@@ -239,10 +187,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'y' is assigned a value but never used.",
-      "line": 3818,
+      "line": 3819,
       "column": 10,
       "messageId": "unusedVar",
-      "endLine": 3818,
+      "endLine": 3819,
       "endColumn": 11,
       "suggestions": [
         {
@@ -252,8 +200,8 @@
           },
           "fix": {
             "range": [
-              298795,
-              298796
+              298881,
+              298882
             ],
             "text": ""
           },
@@ -265,10 +213,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'m' is assigned a value but never used.",
-      "line": 3818,
+      "line": 3819,
       "column": 12,
       "messageId": "unusedVar",
-      "endLine": 3818,
+      "endLine": 3819,
       "endColumn": 13,
       "suggestions": [
         {
@@ -278,8 +226,8 @@
           },
           "fix": {
             "range": [
-              298797,
-              298798
+              298883,
+              298884
             ],
             "text": ""
           },
@@ -291,10 +239,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'d' is assigned a value but never used.",
-      "line": 3818,
+      "line": 3819,
       "column": 14,
       "messageId": "unusedVar",
-      "endLine": 3818,
+      "endLine": 3819,
       "endColumn": 15,
       "suggestions": [
         {
@@ -304,8 +252,8 @@
           },
           "fix": {
             "range": [
-              298798,
-              298800
+              298884,
+              298886
             ],
             "text": ""
           },
@@ -317,10 +265,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'hasSS' is assigned a value but never used.",
-      "line": 4037,
+      "line": 4038,
       "column": 9,
       "messageId": "unusedVar",
-      "endLine": 4037,
+      "endLine": 4038,
       "endColumn": 14,
       "suggestions": [
         {
@@ -330,8 +278,8 @@
           },
           "fix": {
             "range": [
-              312706,
-              312743
+              312792,
+              312829
             ],
             "text": ""
           },
@@ -343,10 +291,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'allZhi' is assigned a value but never used.",
-      "line": 4038,
+      "line": 4039,
       "column": 9,
       "messageId": "unusedVar",
-      "endLine": 4038,
+      "endLine": 4039,
       "endColumn": 15,
       "suggestions": [
         {
@@ -356,8 +304,8 @@
           },
           "fix": {
             "range": [
-              312746,
-              312809
+              312832,
+              312895
             ],
             "text": ""
           },
@@ -369,10 +317,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'y' is assigned a value but never used.",
-      "line": 4091,
+      "line": 4092,
       "column": 10,
       "messageId": "unusedVar",
-      "endLine": 4091,
+      "endLine": 4092,
       "endColumn": 11,
       "suggestions": [
         {
@@ -382,8 +330,8 @@
           },
           "fix": {
             "range": [
-              315464,
-              315465
+              315550,
+              315551
             ],
             "text": ""
           },
@@ -395,10 +343,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'m' is assigned a value but never used.",
-      "line": 4091,
+      "line": 4092,
       "column": 12,
       "messageId": "unusedVar",
-      "endLine": 4091,
+      "endLine": 4092,
       "endColumn": 13,
       "suggestions": [
         {
@@ -408,8 +356,8 @@
           },
           "fix": {
             "range": [
-              315466,
-              315467
+              315552,
+              315553
             ],
             "text": ""
           },
@@ -421,10 +369,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'d' is assigned a value but never used.",
-      "line": 4091,
+      "line": 4092,
       "column": 14,
       "messageId": "unusedVar",
-      "endLine": 4091,
+      "endLine": 4092,
       "endColumn": 15,
       "suggestions": [
         {
@@ -434,8 +382,8 @@
           },
           "fix": {
             "range": [
-              315467,
-              315469
+              315553,
+              315555
             ],
             "text": ""
           },
@@ -447,10 +395,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'layout' is assigned a value but never used.",
-      "line": 4180,
+      "line": 4181,
       "column": 9,
       "messageId": "unusedVar",
-      "endLine": 4180,
+      "endLine": 4181,
       "endColumn": 15,
       "suggestions": [
         {
@@ -460,8 +408,8 @@
           },
           "fix": {
             "range": [
-              318019,
-              318064
+              318105,
+              318150
             ],
             "text": ""
           },
@@ -473,10 +421,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'y' is assigned a value but never used.",
-      "line": 4421,
+      "line": 4422,
       "column": 10,
       "messageId": "unusedVar",
-      "endLine": 4421,
+      "endLine": 4422,
       "endColumn": 11,
       "suggestions": [
         {
@@ -486,8 +434,8 @@
           },
           "fix": {
             "range": [
-              331318,
-              331319
+              331404,
+              331405
             ],
             "text": ""
           },
@@ -499,10 +447,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'m' is assigned a value but never used.",
-      "line": 4421,
+      "line": 4422,
       "column": 12,
       "messageId": "unusedVar",
-      "endLine": 4421,
+      "endLine": 4422,
       "endColumn": 13,
       "suggestions": [
         {
@@ -512,8 +460,8 @@
           },
           "fix": {
             "range": [
-              331320,
-              331321
+              331406,
+              331407
             ],
             "text": ""
           },
@@ -525,10 +473,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'d' is assigned a value but never used.",
-      "line": 4421,
+      "line": 4422,
       "column": 14,
       "messageId": "unusedVar",
-      "endLine": 4421,
+      "endLine": 4422,
       "endColumn": 15,
       "suggestions": [
         {
@@ -538,8 +486,8 @@
           },
           "fix": {
             "range": [
-              331321,
-              331323
+              331407,
+              331409
             ],
             "text": ""
           },
@@ -551,10 +499,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'jm' is assigned a value but never used.",
-      "line": 5133,
+      "line": 5134,
       "column": 13,
       "messageId": "unusedVar",
-      "endLine": 5133,
+      "endLine": 5134,
       "endColumn": 15,
       "suggestions": [
         {
@@ -564,8 +512,8 @@
           },
           "fix": {
             "range": [
-              369730,
-              369755
+              369816,
+              369841
             ],
             "text": ""
           },
@@ -577,10 +525,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'jd' is assigned a value but never used.",
-      "line": 5134,
+      "line": 5135,
       "column": 13,
       "messageId": "unusedVar",
-      "endLine": 5134,
+      "endLine": 5135,
       "endColumn": 15,
       "suggestions": [
         {
@@ -590,8 +538,8 @@
           },
           "fix": {
             "range": [
-              369762,
-              369789
+              369848,
+              369875
             ],
             "text": ""
           },
@@ -603,10 +551,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'jd2' is assigned a value but never used.",
-      "line": 5138,
+      "line": 5139,
       "column": 11,
       "messageId": "unusedVar",
-      "endLine": 5138,
+      "endLine": 5139,
       "endColumn": 14,
       "suggestions": [
         {
@@ -616,8 +564,8 @@
           },
           "fix": {
             "range": [
-              369949,
-              369979
+              370035,
+              370065
             ],
             "text": ""
           },
@@ -629,10 +577,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'zhis' is assigned a value but never used.",
-      "line": 5224,
+      "line": 5225,
       "column": 9,
       "messageId": "unusedVar",
-      "endLine": 5224,
+      "endLine": 5225,
       "endColumn": 13,
       "suggestions": [
         {
@@ -642,8 +590,8 @@
           },
           "fix": {
             "range": [
-              374956,
-              375045
+              375042,
+              375131
             ],
             "text": ""
           },
@@ -655,10 +603,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'yHidden' is assigned a value but never used.",
-      "line": 5399,
+      "line": 5400,
       "column": 9,
       "messageId": "unusedVar",
-      "endLine": 5399,
+      "endLine": 5400,
       "endColumn": 16,
       "suggestions": [
         {
@@ -668,8 +616,8 @@
           },
           "fix": {
             "range": [
-              386400,
-              386425
+              386486,
+              386511
             ],
             "text": ""
           },
@@ -681,10 +629,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'mHidden' is assigned a value but never used.",
-      "line": 5399,
+      "line": 5400,
       "column": 35,
       "messageId": "unusedVar",
-      "endLine": 5399,
+      "endLine": 5400,
       "endColumn": 42,
       "suggestions": [
         {
@@ -694,8 +642,8 @@
           },
           "fix": {
             "range": [
-              386424,
-              386450
+              386510,
+              386536
             ],
             "text": ""
           },
@@ -707,10 +655,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'minWx' is assigned a value but never used.",
-      "line": 5526,
+      "line": 5527,
       "column": 44,
       "messageId": "unusedVar",
-      "endLine": 5526,
+      "endLine": 5527,
       "endColumn": 49,
       "suggestions": [
         {
@@ -720,8 +668,8 @@
           },
           "fix": {
             "range": [
-              392506,
-              392541
+              392592,
+              392627
             ],
             "text": ""
           },
@@ -733,10 +681,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'tagColor' is assigned a value but never used.",
-      "line": 6918,
+      "line": 6919,
       "column": 9,
       "messageId": "unusedVar",
-      "endLine": 6918,
+      "endLine": 6919,
       "endColumn": 17,
       "suggestions": [
         {
@@ -746,8 +694,8 @@
           },
           "fix": {
             "range": [
-              473106,
-              473383
+              473192,
+              473469
             ],
             "text": ""
           },
@@ -759,10 +707,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'y' is assigned a value but never used.",
-      "line": 7248,
+      "line": 7249,
       "column": 10,
       "messageId": "unusedVar",
-      "endLine": 7248,
+      "endLine": 7249,
       "endColumn": 11,
       "suggestions": [
         {
@@ -772,8 +720,8 @@
           },
           "fix": {
             "range": [
-              503525,
-              503526
+              503611,
+              503612
             ],
             "text": ""
           },
@@ -785,10 +733,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'m' is assigned a value but never used.",
-      "line": 7248,
+      "line": 7249,
       "column": 12,
       "messageId": "unusedVar",
-      "endLine": 7248,
+      "endLine": 7249,
       "endColumn": 13,
       "suggestions": [
         {
@@ -798,8 +746,8 @@
           },
           "fix": {
             "range": [
-              503527,
-              503528
+              503613,
+              503614
             ],
             "text": ""
           },
@@ -811,10 +759,10 @@
       "ruleId": "no-unused-vars",
       "severity": 1,
       "message": "'d' is assigned a value but never used.",
-      "line": 7248,
+      "line": 7249,
       "column": 14,
       "messageId": "unusedVar",
-      "endLine": 7248,
+      "endLine": 7249,
       "endColumn": 15,
       "suggestions": [
         {
@@ -824,8 +772,8 @@
           },
           "fix": {
             "range": [
-              503528,
-              503530
+              503614,
+              503616
             ],
             "text": ""
           },
