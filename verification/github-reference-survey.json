@@ -3,7 +3,10 @@
   "queries": [
     "bazi stars:>100 sort:stars-desc",
     "紫微 stars:>100 sort:stars-desc",
-    "lunar calendar stars:>500 sort:stars-desc"
+    "lunar calendar stars:>500 sort:stars-desc",
+    "八字 stars:>1000 sort:stars-desc",
+    "命理 stars:>1000 sort:stars-desc",
+    "ziwei stars:>1000 sort:stars-desc"
   ],
   "scope": "Relevant repository search, not an exhaustive ranking. Stars record interest, not correctness.",
   "repositories": [
@@ -24,6 +27,15 @@
       "defaultBranch": "main",
       "pushedAt": "2026-11-05T16:03:53Z",
       "inspectedCommit": "d7df0a54c9f98f916a33ad4b025001a6b0235275"
+    },
+    {
+      "repository": "jinchenma94/bazi-skill",
+      "url": "https://github.com/jinchenma94/bazi-skill",
+      "stars": 3827,
+      "license": "MIT",
+      "defaultBranch": "main",
+      "pushedAt": "2026-08-17T17:53:04Z",
+      "inspectedCommit": "112a5d84cd1a001a0038cafca3be68d93e4c0cc9"
     },
     {
       "repository": "DestinyLinker/MingLi-Bench",

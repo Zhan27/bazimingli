@@ -18,6 +18,8 @@ Liuyao lines and Qimen palaces open detailed computed views; Hehun compares spec
 
 Use the same browser and origin to access saved records. The desktop launcher prefers `127.0.0.1:8765` and binds another port if occupied. A different port, a downloaded file, and the online site have separate browser storage. A blank record list at another origin does not mean the original records were deleted. Export a backup before changing your setup.
 
+The native desktop window keeps its profile under `%LOCALAPPDATA%\MingliPaipan\WebView`. Launch with `--private` for a temporary native session. This option requires pywebview and cannot be combined with `--browser`; unsupported private launches exit with code 5 before opening a regular browser.
+
 ## First chart
 
 1. Choose **八字排盘** (Bazi). Use **试用示例** for a synthetic example, or enter your birth information.

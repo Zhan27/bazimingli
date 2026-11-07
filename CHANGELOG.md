@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.44.0 — 2026-11-07
+- Keep `--private` launches in a temporary native window. Reject an incompatible `--browser` option or a missing native dependency with exit code 5 before opening a persistent browser session.
+- Preserve ordinary browser fallback when private mode was not requested.
+- Extend the GitHub survey with bazi-skill and record a five-input comparison against ten published calendar expectations.
+
 ## 5.43.0 — 2026-11-07
 - Add an explicit Ziwei annual reference year and preserve it in distinct history entries, replay and backups.
 - Show when legacy Ziwei records did not save an annual reference year.

@@ -1,0 +1,132 @@
+{
+  "checkedAt": "2026-11-07",
+  "source": "https://github.com/jinchenma94/bazi-skill/blob/112a5d84cd1a001a0038cafca3be68d93e4c0cc9/scripts/test_pai_pan.py",
+  "scope": "Small same-convention comparison against published test expectations. Not independent astronomical validation or a complete engine comparison.",
+  "options": {
+    "dayBoundary": "zi-chu",
+    "utcOffsetMinutes": 480,
+    "dstMinutes": 0
+  },
+  "cases": [
+    {
+      "id": "noon",
+      "date": "1990-05-15",
+      "time": "12:00",
+      "expected": {
+        "year": "庚午",
+        "month": "辛巳",
+        "day": "庚辰",
+        "hour": "壬午"
+      },
+      "fields": [
+        {
+          "field": "year",
+          "expected": "庚午",
+          "actual": "庚午",
+          "matches": true
+        },
+        {
+          "field": "month",
+          "expected": "辛巳",
+          "actual": "辛巳",
+          "matches": true
+        },
+        {
+          "field": "day",
+          "expected": "庚辰",
+          "actual": "庚辰",
+          "matches": true
+        },
+        {
+          "field": "hour",
+          "expected": "壬午",
+          "actual": "壬午",
+          "matches": true
+        }
+      ]
+    },
+    {
+      "id": "before-lichun",
+      "date": "1990-02-03",
+      "time": "10:00",
+      "expected": {
+        "year": "己巳"
+      },
+      "fields": [
+        {
+          "field": "year",
+          "expected": "己巳",
+          "actual": "己巳",
+          "matches": true
+        }
+      ]
+    },
+    {
+      "id": "late-zi",
+      "date": "1990-05-15",
+      "time": "23:30",
+      "expected": {
+        "day": "辛巳",
+        "hourBranch": "子"
+      },
+      "fields": [
+        {
+          "field": "day",
+          "expected": "辛巳",
+          "actual": "辛巳",
+          "matches": true
+        },
+        {
+          "field": "hourBranch",
+          "expected": "子",
+          "actual": "子",
+          "matches": true
+        }
+      ]
+    },
+    {
+      "id": "early-zi",
+      "date": "1990-05-15",
+      "time": "00:30",
+      "expected": {
+        "day": "庚辰",
+        "hourBranch": "子"
+      },
+      "fields": [
+        {
+          "field": "day",
+          "expected": "庚辰",
+          "actual": "庚辰",
+          "matches": true
+        },
+        {
+          "field": "hourBranch",
+          "expected": "子",
+          "actual": "子",
+          "matches": true
+        }
+      ]
+    },
+    {
+      "id": "yin-year",
+      "date": "1991-06-15",
+      "time": "12:00",
+      "expected": {
+        "year": "辛未"
+      },
+      "fields": [
+        {
+          "field": "year",
+          "expected": "辛未",
+          "actual": "辛未",
+          "matches": true
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "cases": 5,
+    "providedFields": 10,
+    "matchingFields": 10
+  }
+}
