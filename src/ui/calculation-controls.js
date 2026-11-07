@@ -75,7 +75,7 @@ function saveUnknownRecord(result,name,gender,schoolId,genderUnspecified=false){
     trueSun:!!result.options.trueSolar,dayBoundary:result.options.dayBoundary,utcOffsetMinutes:result.options.utcOffsetMinutes??480,dstMinutes:result.options.dstMinutes||0,school2:schoolId,wxMode:result.options.wxMode||'stems-main-qi'};
   const identity=birthRecordIdentity(rec);
   const old=recs.find(r=>birthRecordIdentity(r)===identity);
-  rec.id=old?.id??Date.now()+''+Math.floor(Math.random()*1000);
+  rec.id=old?.id??createRecordId(recs);
   if(old?.note!==undefined)rec.note=old.note;
   const all=[rec,...recs.filter(r=>r.id!==rec.id)].slice(0,50);localStorage.setItem(REC_KEY,JSON.stringify(all));renderRecords();
 }

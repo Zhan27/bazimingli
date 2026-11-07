@@ -5,6 +5,14 @@ const PAIR_REC_KEY='hh_records';
 const RECORD_KEYS=[REC_KEY,...Object.values(MOD_REC_KEYS),PAIR_REC_KEY];
 const BACKUP_MAX_BYTES=2*1024*1024;
 
+function createRecordId(records){
+  const ids=new Set(records.map(r=>r.id));
+  const base=Date.now()+'-'+Math.random().toString(36).slice(2,10);
+  let id=base,suffix=0;
+  while(ids.has(id))id=base+'-'+(++suffix);
+  return id;
+}
+
 function birthRecordIdentity(record){
   const unknown=!!record.unknowHour;
   const clock=unknown?null:record.time||[record.hourIdx,record.minute??0];
@@ -67,7 +75,7 @@ function cleanStoreList(key,list){
 }
 function savePairRecord(left,right,referenceYear,storage=localStorage){
   const l=cleanPairSide(left),r=cleanPairSide(right),rows=readStoredRecords(PAIR_REC_KEY,storage),signature=JSON.stringify([l,r,referenceYear]),old=rows.find(x=>JSON.stringify([x.left,x.right,x.referenceYear])===signature);
-  const record=cleanPairRecord({id:old?.id||Date.now()+'-'+Math.random().toString(36).slice(2,10),left:l,right:r,referenceYear,note:old?.note||'',ts:Date.now(),moduleVersion:HEHUN_RULE_VERSION,title:referenceYear+'年参照 · '+l.name+' × '+r.name});
+  const record=cleanPairRecord({id:old?.id||createRecordId(rows),left:l,right:r,referenceYear,note:old?.note||'',ts:Date.now(),moduleVersion:HEHUN_RULE_VERSION,title:referenceYear+'年参照 · '+l.name+' × '+r.name});
   storage.setItem(PAIR_REC_KEY,JSON.stringify([record,...rows.filter(x=>x.id!==record.id)].slice(0,50)));return record;
 }
 function cleanRecordList(list){

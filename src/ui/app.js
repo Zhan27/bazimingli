@@ -1112,7 +1112,7 @@ function saveRecord(zh,name){
   const rec={name,gender:zh.gender,dateStr,hourIdx:hourIndexAt(zh.inputDate||zh.date),bazi,lunarText,ts:Date.now(),time:zh.time||'',minute:zh.minute||0,place:zh.place||'',trueSun:!!zh.trueSun,unknowHour:!!zh.unknowHour,genderUnspecified:!!zh.genderUnspecified,dayBoundary:zh.temporal?.dayBoundary||'zi-chu',school2:lastSchool,utcOffsetMinutes:zh.temporal.utcOffsetMinutes,dstMinutes:zh.temporal.dstMinutes,wxMode:zh.wxStatistics.mode};
   const identity=birthRecordIdentity(rec);
   const idx=recs.findIndex(r=>birthRecordIdentity(r)===identity);
-  rec.id=idx>=0?recs[idx].id:Date.now()+''+Math.floor(Math.random()*1000);
+  rec.id=idx>=0?recs[idx].id:createRecordId(recs);
   if(idx>=0){if(recs[idx].note!==undefined)rec.note=recs[idx].note;recs[idx]=rec;}else recs.unshift(rec);
   if(recs.length>50) recs=recs.slice(0,50);
   localStorage.setItem(REC_KEY,JSON.stringify(recs));
@@ -1187,7 +1187,7 @@ function saveModRecord(mod,rec){
   const identityFor=r=>mod==='zw'?JSON.stringify([birthRecordIdentity(r),r.referenceYear??beijingNow().getFullYear()]):birthRecordIdentity(r);
   const identity=mod==='bz'||mod==='zw'?identityFor(rec):null;
   const idx=recs.findIndex(r=>identity===null?r.key===key:identityFor(r)===identity);
-  const id=idx>=0?recs[idx].id:(Date.now()+''+Math.floor(Math.random()*1000));
+  const id=idx>=0?recs[idx].id:createRecordId(recs);
   rec=Object.assign({},idx>=0?recs[idx]:{},rec,{id,key,ts:Date.now()});
   if(idx>=0) recs[idx]=rec; else recs.unshift(rec);
   if(recs.length>50) recs=recs.slice(0,50);
