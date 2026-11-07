@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.48.0 — 2026-11-07
+- Check new record IDs against existing records so repeated clock/random values cannot create duplicate IDs or overwrite distinct charts.
+- Apply the allocator to comprehensive, unknown-time, standalone module and paired records while reusing IDs and notes on matching-input replay.
+- Verify the repeated-entropy case through real history display, backup download and replay.
+
 ## 5.47.0 — 2026-11-07
 - Preserve the selected birthday, including a leap lunar month, when switching from Gregorian to lunar input.
 - Keep the existing reverse synchronization from edited lunar fields back to Gregorian input.

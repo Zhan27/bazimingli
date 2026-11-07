@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="application-version" content="5.47.0">
+<meta name="application-version" content="5.48.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="description" content="玄机命理排盘：八字四柱、紫微斗数、奇门遁甲、六爻卜筮在线排盘工具，支持 AI 深度解读与多流派分析。">
 <meta name="keywords" content="八字排盘,紫微斗数,奇门遁甲,六爻,合婚,真太阳时,命理排盘,AI命理解读">
@@ -11858,6 +11858,14 @@ const PAIR_REC_KEY='hh_records';
 const RECORD_KEYS=[REC_KEY,...Object.values(MOD_REC_KEYS),PAIR_REC_KEY];
 const BACKUP_MAX_BYTES=2*1024*1024;
 
+function createRecordId(records){
+  const ids=new Set(records.map(r=>r.id));
+  const base=Date.now()+'-'+Math.random().toString(36).slice(2,10);
+  let id=base,suffix=0;
+  while(ids.has(id))id=base+'-'+(++suffix);
+  return id;
+}
+
 function birthRecordIdentity(record){
   const unknown=!!record.unknowHour;
   const clock=unknown?null:record.time||[record.hourIdx,record.minute??0];
@@ -11920,7 +11928,7 @@ function cleanStoreList(key,list){
 }
 function savePairRecord(left,right,referenceYear,storage=localStorage){
   const l=cleanPairSide(left),r=cleanPairSide(right),rows=readStoredRecords(PAIR_REC_KEY,storage),signature=JSON.stringify([l,r,referenceYear]),old=rows.find(x=>JSON.stringify([x.left,x.right,x.referenceYear])===signature);
-  const record=cleanPairRecord({id:old?.id||Date.now()+'-'+Math.random().toString(36).slice(2,10),left:l,right:r,referenceYear,note:old?.note||'',ts:Date.now(),moduleVersion:HEHUN_RULE_VERSION,title:referenceYear+'年参照 · '+l.name+' × '+r.name});
+  const record=cleanPairRecord({id:old?.id||createRecordId(rows),left:l,right:r,referenceYear,note:old?.note||'',ts:Date.now(),moduleVersion:HEHUN_RULE_VERSION,title:referenceYear+'年参照 · '+l.name+' × '+r.name});
   storage.setItem(PAIR_REC_KEY,JSON.stringify([record,...rows.filter(x=>x.id!==record.id)].slice(0,50)));return record;
 }
 function cleanRecordList(list){
@@ -12401,7 +12409,7 @@ function saveUnknownRecord(result,name,gender,schoolId,genderUnspecified=false){
     trueSun:!!result.options.trueSolar,dayBoundary:result.options.dayBoundary,utcOffsetMinutes:result.options.utcOffsetMinutes??480,dstMinutes:result.options.dstMinutes||0,school2:schoolId,wxMode:result.options.wxMode||'stems-main-qi'};
   const identity=birthRecordIdentity(rec);
   const old=recs.find(r=>birthRecordIdentity(r)===identity);
-  rec.id=old?.id??Date.now()+''+Math.floor(Math.random()*1000);
+  rec.id=old?.id??createRecordId(recs);
   if(old?.note!==undefined)rec.note=old.note;
   const all=[rec,...recs.filter(r=>r.id!==rec.id)].slice(0,50);localStorage.setItem(REC_KEY,JSON.stringify(all));renderRecords();
 }
@@ -14199,7 +14207,7 @@ function saveRecord(zh,name){
   const rec={name,gender:zh.gender,dateStr,hourIdx:hourIndexAt(zh.inputDate||zh.date),bazi,lunarText,ts:Date.now(),time:zh.time||'',minute:zh.minute||0,place:zh.place||'',trueSun:!!zh.trueSun,unknowHour:!!zh.unknowHour,genderUnspecified:!!zh.genderUnspecified,dayBoundary:zh.temporal?.dayBoundary||'zi-chu',school2:lastSchool,utcOffsetMinutes:zh.temporal.utcOffsetMinutes,dstMinutes:zh.temporal.dstMinutes,wxMode:zh.wxStatistics.mode};
   const identity=birthRecordIdentity(rec);
   const idx=recs.findIndex(r=>birthRecordIdentity(r)===identity);
-  rec.id=idx>=0?recs[idx].id:Date.now()+''+Math.floor(Math.random()*1000);
+  rec.id=idx>=0?recs[idx].id:createRecordId(recs);
   if(idx>=0){if(recs[idx].note!==undefined)rec.note=recs[idx].note;recs[idx]=rec;}else recs.unshift(rec);
   if(recs.length>50) recs=recs.slice(0,50);
   localStorage.setItem(REC_KEY,JSON.stringify(recs));
@@ -14274,7 +14282,7 @@ function saveModRecord(mod,rec){
   const identityFor=r=>mod==='zw'?JSON.stringify([birthRecordIdentity(r),r.referenceYear??beijingNow().getFullYear()]):birthRecordIdentity(r);
   const identity=mod==='bz'||mod==='zw'?identityFor(rec):null;
   const idx=recs.findIndex(r=>identity===null?r.key===key:identityFor(r)===identity);
-  const id=idx>=0?recs[idx].id:(Date.now()+''+Math.floor(Math.random()*1000));
+  const id=idx>=0?recs[idx].id:createRecordId(recs);
   rec=Object.assign({},idx>=0?recs[idx]:{},rec,{id,key,ts:Date.now()});
   if(idx>=0) recs[idx]=rec; else recs.unshift(rec);
   if(recs.length>50) recs=recs.slice(0,50);
