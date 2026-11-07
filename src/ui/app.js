@@ -83,7 +83,7 @@ function initHours(){
 }
 
 function bzNow(){
-  const now=beijingNow();
+  const now=calculationNow('bz');
   document.getElementById('bz-date').value=fmtLocalDate(now);
   const h=now.getHours();
   let zhi=h===23||h<1?0:Math.floor((h+1)/2)%12;
@@ -623,6 +623,7 @@ function qmNow(){
   document.getElementById('qm-date').value=fmtLocalDate(n);
   const h=n.getHours();
   document.getElementById('qm-hour').value=h===23||h<1?0:Math.floor((h+1)/2)%12;
+  document.getElementById('qm-time').value=String(h).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
   qmCast();
 }
 // 24节气三元局数表(索引=TERM_NAMES: 0小寒1大寒2立春3雨水4惊蛰5春分6清明7谷雨8立夏9小满10芒种11夏至12小暑13大暑14立秋15处暑16白露17秋分18寒露19霜降20立冬21小雪22大雪23冬至)
@@ -638,6 +639,7 @@ function qmCast(){
   if(mode===0){
     const n=beijingNow();
     dateStr=fmtLocalDate(n);
+    document.getElementById('qm-date').value=dateStr;
     hourHH=n.getHours(); minute=n.getMinutes();
     hourIdx=(hourHH===23||hourHH===0)?0:Math.floor((hourHH+1)/2)%12;
     const tEl=document.getElementById('qm-time');
@@ -906,13 +908,17 @@ const ZW_CHAR={
   pojun:"破军坐命：开创进取，破坏后立，变动较大，敢闯敢拼"
 };
 function zhNow(){
-  const now=beijingNow();
+  const now=calculationNow('zh');
   document.getElementById('zh-solar').value=fmtLocalDate(now);
   const h=now.getHours();
   document.getElementById('zh-hour').value=h===23||h<1?0:Math.floor((h+1)/2)%12;
   document.getElementById('zh-cal').value='0';
   document.getElementById('zh-time').value=String(h).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('zh-minute').value=now.getMinutes();
+  document.getElementById('zh-unknow-hour').value='0';
+  document.getElementById('zh-unknow-hour').dispatchEvent(new Event('change'));
   zhToggleCal();
+  zhSyncFromSolar();
   zhCast();
 }
 function zhGetDate(){

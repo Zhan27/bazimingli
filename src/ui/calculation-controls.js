@@ -4,6 +4,10 @@ function readCalculationOptions(prefix='zh',schoolId=0){
   return {preciseTime:true,schoolId,dayBoundary:value('day-boundary',prefix==='bz'?(value('school','0')==='0'?'zi-chu':'zi-zheng'):'zi-chu'),
     utcOffsetMinutes:Number(value('utc-offset','480')),dstMinutes:Number(value('dst','0')),wxMode:value('wx-mode','stems-main-qi')};
 }
+function calculationNow(prefix){
+  const {utcOffsetMinutes,dstMinutes}=birthTimeOffsets(readCalculationOptions(prefix));
+  return civilFromMillis(Date.now()+(utcOffsetMinutes+dstMinutes)*60000);
+}
 function initializeCalculationControls(){
   const offsets=Array.from({length:105},(_,i)=>{const value=-720+i*15;return [value,utcOffsetLabel(value)];});
   document.querySelectorAll('[data-utc-offset]').forEach(el=>{

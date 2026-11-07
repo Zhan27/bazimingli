@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.46.0 — 2026-11-07
+- Fill comprehensive and standalone Bazi “now” inputs in the selected fixed offset and manual DST, aligning calculation to the current real minute, including date rollovers.
+- Treat the comprehensive “now” action as a known time and synchronize its minute and calendar fields.
+- Replace stale precise times in Qimen's “now” shortcut and refresh the displayed date when casting in current-time mode.
+
 ## 5.45.0 — 2026-11-07
 - Add an offline evaluator for already saved model responses with per-case contract results and comparable-request grouping.
 - Preserve missing latency/cost data, separate currency totals, and distinguish unverified Markdown, incompatible rules and invalid inputs.

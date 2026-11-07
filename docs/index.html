@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="application-version" content="5.45.0">
+<meta name="application-version" content="5.46.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="description" content="玄机命理排盘：八字四柱、紫微斗数、奇门遁甲、六爻卜筮在线排盘工具，支持 AI 深度解读与多流派分析。">
 <meta name="keywords" content="八字排盘,紫微斗数,奇门遁甲,六爻,合婚,真太阳时,命理排盘,AI命理解读">
@@ -12330,6 +12330,10 @@ function readCalculationOptions(prefix='zh',schoolId=0){
   return {preciseTime:true,schoolId,dayBoundary:value('day-boundary',prefix==='bz'?(value('school','0')==='0'?'zi-chu':'zi-zheng'):'zi-chu'),
     utcOffsetMinutes:Number(value('utc-offset','480')),dstMinutes:Number(value('dst','0')),wxMode:value('wx-mode','stems-main-qi')};
 }
+function calculationNow(prefix){
+  const {utcOffsetMinutes,dstMinutes}=birthTimeOffsets(readCalculationOptions(prefix));
+  return civilFromMillis(Date.now()+(utcOffsetMinutes+dstMinutes)*60000);
+}
 function initializeCalculationControls(){
   const offsets=Array.from({length:105},(_,i)=>{const value=-720+i*15;return [value,utcOffsetLabel(value)];});
   document.querySelectorAll('[data-utc-offset]').forEach(el=>{
@@ -13166,7 +13170,7 @@ function initHours(){
 }
 
 function bzNow(){
-  const now=beijingNow();
+  const now=calculationNow('bz');
   document.getElementById('bz-date').value=fmtLocalDate(now);
   const h=now.getHours();
   let zhi=h===23||h<1?0:Math.floor((h+1)/2)%12;
@@ -13706,6 +13710,7 @@ function qmNow(){
   document.getElementById('qm-date').value=fmtLocalDate(n);
   const h=n.getHours();
   document.getElementById('qm-hour').value=h===23||h<1?0:Math.floor((h+1)/2)%12;
+  document.getElementById('qm-time').value=String(h).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
   qmCast();
 }
 // 24节气三元局数表(索引=TERM_NAMES: 0小寒1大寒2立春3雨水4惊蛰5春分6清明7谷雨8立夏9小满10芒种11夏至12小暑13大暑14立秋15处暑16白露17秋分18寒露19霜降20立冬21小雪22大雪23冬至)
@@ -13721,6 +13726,7 @@ function qmCast(){
   if(mode===0){
     const n=beijingNow();
     dateStr=fmtLocalDate(n);
+    document.getElementById('qm-date').value=dateStr;
     hourHH=n.getHours(); minute=n.getMinutes();
     hourIdx=(hourHH===23||hourHH===0)?0:Math.floor((hourHH+1)/2)%12;
     const tEl=document.getElementById('qm-time');
@@ -13989,13 +13995,17 @@ const ZW_CHAR={
   pojun:"破军坐命：开创进取，破坏后立，变动较大，敢闯敢拼"
 };
 function zhNow(){
-  const now=beijingNow();
+  const now=calculationNow('zh');
   document.getElementById('zh-solar').value=fmtLocalDate(now);
   const h=now.getHours();
   document.getElementById('zh-hour').value=h===23||h<1?0:Math.floor((h+1)/2)%12;
   document.getElementById('zh-cal').value='0';
   document.getElementById('zh-time').value=String(h).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('zh-minute').value=now.getMinutes();
+  document.getElementById('zh-unknow-hour').value='0';
+  document.getElementById('zh-unknow-hour').dispatchEvent(new Event('change'));
   zhToggleCal();
+  zhSyncFromSolar();
   zhCast();
 }
 function zhGetDate(){

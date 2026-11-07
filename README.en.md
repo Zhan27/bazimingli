@@ -42,6 +42,8 @@ The native desktop window keeps its profile under `%LOCALAPPDATA%\MingliPaipan\W
 
 Enter the birth location's **standard UTC offset** and, separately, a manual DST adjustment of 0 or 60 minutes. For example, a New York birth during a period when standard UTC−5 and one hour of daylight saving both applied uses offset −300 minutes plus DST +60. Confirm the actual historical rule for the date; the application does not look it up. Countries with different historical transitions or non-hour DST need independently checked input preparation.
 
+The comprehensive and standalone Bazi “此刻” (now) buttons fill the current date and time in the selected standard offset plus manual DST. The resulting calculation refers to the current real minute. The comprehensive button also selects known time. Qimen's now/current-time controls continue to use UTC+8 clock fields. These controls have minute resolution.
+
 The city database currently covers mainland China, Hong Kong, Macao and Taiwan; it is not a worldwide city database. With true solar time enabled, an unsupported location requires an explicit longitude such as `-74.006°` (west negative, east positive), within −180° to +180°. Choose a specific city when a name is ambiguous. Approximate coordinates and equation-of-time calculations can matter near day/hour/solar-term boundaries.
 
 Choosing an unknown birth time displays candidate intervals and stable/changing pillars. Do not replace unknown information with the developer API's convenience defaults. Other traditional modules still have their own legacy input/time conventions; the main Bazi offset settings should not be assumed to apply to all modules. See [API conventions](docs/API.md).
