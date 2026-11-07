@@ -19,18 +19,19 @@ function zhFillLunarSel(){
 function zhRefreshLunarMonths(){
   const y=parseInt(document.getElementById('zh-ly').value);
   const mSel=document.getElementById('zh-lm');
-  const dSel=document.getElementById('zh-ld');
   const lSel=document.getElementById('zh-ll');
+  const previousMonth=Number(mSel.value)||1,previousLeap=lSel.value==='1';
   const leap=leapMonth(y);
   // 月
   mSel.innerHTML='';
-  const maxM=leap>0?12:12;
   for(let m=1;m<=12;m++){
     const o=document.createElement('option');o.value=m;o.textContent=lunarMonthName(m,false);mSel.appendChild(o);
   }
+  mSel.value=previousMonth;
   // 闰月选项
   lSel.innerHTML='<option value="0">否</option>';
   if(leap>0){ const o=document.createElement('option');o.value=1;o.textContent='是(闰'+lunarMonthName(leap,false)+')';lSel.appendChild(o); }
+  lSel.value=previousLeap&&leap===previousMonth?'1':'0';
   zhRefreshLunarDays();
 }
 function zhRefreshLunarDays(){

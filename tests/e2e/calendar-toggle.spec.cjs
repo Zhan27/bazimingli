@@ -33,3 +33,30 @@ test('switching back to Gregorian commits the selected lunar birthday',async({pa
   await page.evaluate(()=>zhCast());
   await expect.poll(()=>page.evaluate(()=>fmtLocalDate(lastZh.inputDate))).toBe('2023-03-25');
 });
+
+test('editing a lunar year retains the selected regular month and valid day',async({page})=>{
+  await page.locator('#zh-cal').selectOption('1');
+  await page.locator('#zh-ly').selectOption('2023');
+  await page.locator('#zh-lm').selectOption('6');
+  await page.locator('#zh-ld').selectOption('15');
+  await page.locator('#zh-ly').selectOption('2024');
+  await expect(page.locator('#zh-lm')).toHaveValue('6');
+  await expect(page.locator('#zh-ld')).toHaveValue('15');
+  await expect(page.locator('#zh-ll')).toHaveValue('0');
+});
+
+test('editing a leap-month birthday to a non-leap year keeps its month and clears the leap flag',async({page})=>{
+  await page.locator('#zh-cal').selectOption('1');
+  await page.locator('#zh-ly').selectOption('2023');
+  await page.locator('#zh-ll').selectOption('1');
+  await page.locator('#zh-ld').selectOption('4');
+  await expect(page.locator('#zh-lm')).toHaveValue('2');
+  await page.locator('#zh-ly').selectOption('2004');
+  await expect(page.locator('#zh-lm')).toHaveValue('2');
+  await expect(page.locator('#zh-ll')).toHaveValue('1');
+  await expect(page.locator('#zh-ld')).toHaveValue('4');
+  await page.locator('#zh-ly').selectOption('2024');
+  await expect(page.locator('#zh-lm')).toHaveValue('2');
+  await expect(page.locator('#zh-ld')).toHaveValue('4');
+  await expect(page.locator('#zh-ll')).toHaveValue('0');
+});
