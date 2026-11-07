@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.45.0 — 2026-11-07
+- Add an offline evaluator for already saved model responses with per-case contract results and comparable-request grouping.
+- Preserve missing latency/cost data, separate currency totals, and distinguish unverified Markdown, incompatible rules and invalid inputs.
+- Provide a bounded CLI with editable synthetic examples and overwrite protection, without calling model providers.
+
 ## 5.44.0 — 2026-11-07
 - Keep `--private` launches in a temporary native window. Reject an incompatible `--browser` option or a missing native dependency with exit code 5 before opening a persistent browser session.
 - Preserve ordinary browser fallback when private mode was not requested.

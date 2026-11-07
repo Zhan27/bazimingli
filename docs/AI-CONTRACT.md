@@ -24,6 +24,8 @@ Tests use synthetic charts, intentionally malformed replies, mocked HTTP/SSE str
 
 `node scripts/check-ai-fixtures.cjs` reruns the fixed `synthetic-contract-v1` fixtures and emits `verification/ai-contract-evaluation.json`, also produced by `npm test` and uploaded by verification CI. Positive cases are generated protocol examples, negative cases are declared fault injections. Counts report contract expectations and injected faults rejected; they are not model accuracy, cost, latency or experimental prediction results. Invalid/truncated JSON correctly reports incomplete coverage.
 
+5.45 adds a separate [offline response evaluator](AI-OFFLINE-EVALUATION.md) for operator-supplied saved replies. It retains per-case failures, groups comparable requests, and aggregates only reported latency/cost values. Markdown and incompatible rules remain outside the JSON contract pass-rate denominator. This does not run a paid cross-model experiment.
+
 
 ## 连续追问（5.30）
 

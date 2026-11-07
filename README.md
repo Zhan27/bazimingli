@@ -59,6 +59,7 @@ npm run verify
 | [测试资料来源](tests/fixtures/SOURCES.md) | 回归基准、参考数据与精度限制 |
 | [前端参考](docs/UI-REFERENCES.md) | 界面参考与许可证核对 |
 | [GitHub参考筛选](docs/OPEN-SOURCE-REFERENCES-5.43.md) | 高星项目的源码检查、许可与本仓库采用范围 |
+| [离线AI评测](docs/AI-OFFLINE-EVALUATION.md) | 已有回复的逐例检查、分组统计、延迟与费用缺项 |
 | [发布流程](docs/RELEASING.md) | 版本、构建与附件验证 |
 
 ## 许可
