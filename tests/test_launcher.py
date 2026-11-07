@@ -19,6 +19,20 @@ SPEC.loader.exec_module(app)
 
 
 class LauncherTests(unittest.TestCase):
+    def test_private_mode_rejects_browser_override_before_binding(self):
+        with patch.object(sys, 'argv', ['launcher.py', '--private', '--browser']), patch.object(app, 'serve_preferred') as serve, patch.object(app.webbrowser, 'open', return_value=False) as browser:
+            self.assertEqual(app.main(), 5)
+        serve.assert_not_called()
+        browser.assert_not_called()
+
+    def test_private_mode_never_falls_back_to_a_persistent_browser(self):
+        server = Mock(server_port=app.PREFERRED_PORTS[0])
+        with patch.object(sys, 'argv', ['launcher.py', '--private']), patch.object(app, 'serve_preferred', return_value=server), patch.dict(sys.modules, {'webview': None}), patch.object(app.webbrowser, 'open', return_value=False) as browser:
+            self.assertEqual(app.main(), 5)
+        browser.assert_not_called()
+        server.shutdown.assert_called_once()
+        server.server_close.assert_called_once()
+
     def test_native_window_uses_isolated_storage_and_explicit_private_mode(self):
         with tempfile.TemporaryDirectory(prefix='mingli-profile-') as folder:
             for private in (False, True):

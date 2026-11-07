@@ -127,6 +127,10 @@ def main() -> int:
             server.server_close()
 
     force_browser = "--browser" in sys.argv
+    private = '--private' in sys.argv
+    if private and force_browser:
+        print("[×] --private 需要原生窗口，请移除 --browser 后重试。", file=sys.stderr)
+        return 5
     try:
         httpd = serve_preferred()
     except OSError:
@@ -146,11 +150,13 @@ def main() -> int:
             try:
                 import webview
             except ImportError:
+                if private:
+                    print("[×] 私密模式需要 pywebview 原生窗口，请安装依赖或使用 Windows 桌面版。", file=sys.stderr)
+                    return 5
                 print("[!] 未安装 pywebview，降级为系统浏览器打开。")
             else:
                 webview.create_window(APP_TITLE, url, width=1180, height=880,
                                       min_size=(900, 640), text_select=True)
-                private = '--private' in sys.argv
                 storage_path = None
                 if not private:
                     storage_root = os.environ.get('LOCALAPPDATA') or os.path.expanduser('~/.local/share')
