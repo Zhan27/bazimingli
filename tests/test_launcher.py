@@ -33,6 +33,14 @@ class LauncherTests(unittest.TestCase):
         server.shutdown.assert_called_once()
         server.server_close.assert_called_once()
 
+    def test_regular_launch_can_still_use_browser_when_native_dependency_is_missing(self):
+        server = Mock(server_port=app.PREFERRED_PORTS[0])
+        with patch.object(sys, 'argv', ['launcher.py']), patch.object(app, 'serve_preferred', return_value=server), patch.dict(sys.modules, {'webview': None}), patch.object(app.webbrowser, 'open', return_value=False) as browser:
+            self.assertEqual(app.main(), 4)
+        browser.assert_called_once()
+        server.shutdown.assert_called_once()
+        server.server_close.assert_called_once()
+
     def test_native_window_uses_isolated_storage_and_explicit_private_mode(self):
         with tempfile.TemporaryDirectory(prefix='mingli-profile-') as folder:
             for private in (False, True):
