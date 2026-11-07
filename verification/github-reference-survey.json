@@ -1,0 +1,74 @@
+{
+  "checkedAt": "2026-11-07",
+  "queries": [
+    "bazi stars:>100 sort:stars-desc",
+    "紫微 stars:>100 sort:stars-desc",
+    "lunar calendar stars:>500 sort:stars-desc"
+  ],
+  "scope": "Relevant repository search, not an exhaustive ranking. Stars record interest, not correctness.",
+  "repositories": [
+    {
+      "repository": "Renhuai123/ziwei-doushu",
+      "url": "https://github.com/Renhuai123/ziwei-doushu",
+      "stars": 16546,
+      "license": "MIT",
+      "defaultBranch": "main",
+      "pushedAt": "2026-11-03T07:39:11Z",
+      "inspectedCommit": "a600484a49255039d0725f1ba9e11ca81a948f97"
+    },
+    {
+      "repository": "SylarLong/iztro",
+      "url": "https://github.com/SylarLong/iztro",
+      "stars": 4354,
+      "license": "MIT",
+      "defaultBranch": "main",
+      "pushedAt": "2026-11-05T16:03:53Z",
+      "inspectedCommit": "d7df0a54c9f98f916a33ad4b025001a6b0235275"
+    },
+    {
+      "repository": "DestinyLinker/MingLi-Bench",
+      "url": "https://github.com/DestinyLinker/MingLi-Bench",
+      "stars": 2565,
+      "license": "MIT",
+      "defaultBranch": "main",
+      "pushedAt": "2026-05-09T17:49:34Z",
+      "inspectedCommit": "b7433280fd86d7a7c27debbc47d0303c218f0bfd"
+    },
+    {
+      "repository": "6tail/lunar-javascript",
+      "url": "https://github.com/6tail/lunar-javascript",
+      "stars": 1739,
+      "license": "MIT",
+      "defaultBranch": "master",
+      "pushedAt": "2026-11-05T11:06:24Z",
+      "inspectedCommit": null
+    },
+    {
+      "repository": "china-testing/bazi",
+      "url": "https://github.com/china-testing/bazi",
+      "stars": 1558,
+      "license": "not declared in GitHub metadata",
+      "defaultBranch": "master",
+      "pushedAt": "2026-09-04T07:24:53Z",
+      "inspectedCommit": "33b18354d5407727640e545c3aaec0efb4bf5282"
+    },
+    {
+      "repository": "OPN48/cnlunar",
+      "url": "https://github.com/OPN48/cnlunar",
+      "stars": 863,
+      "license": "MIT",
+      "defaultBranch": "master",
+      "pushedAt": "2026-10-09T09:25:29Z",
+      "inspectedCommit": null
+    },
+    {
+      "repository": "6tail/tyme4ts",
+      "url": "https://github.com/6tail/tyme4ts",
+      "stars": 521,
+      "license": "MIT",
+      "defaultBranch": "master",
+      "pushedAt": "2026-11-05T10:45:33Z",
+      "inspectedCommit": "cee2493970d5571f96e272527a1a899d4dac1b9e"
+    }
+  ]
+}

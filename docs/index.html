@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="application-version" content="5.42.0">
+<meta name="application-version" content="5.43.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <meta name="description" content="玄机命理排盘：八字四柱、紫微斗数、奇门遁甲、六爻卜筮在线排盘工具，支持 AI 深度解读与多流派分析。">
 <meta name="keywords" content="八字排盘,紫微斗数,奇门遁甲,六爻,合婚,真太阳时,命理排盘,AI命理解读">
@@ -598,9 +598,11 @@ body[data-theme=xuanmo] .gz-explorer{--gz-he:#d8b276;--gz-chong:#e0a99b;--gz-san
 <div class="field"><label>公历日期</label><input type="date" id="zw-date" min="1900-01-31" max="2099-12-31"></div>
 <div class="field"><label>出生时辰</label><select id="zw-hour"></select></div>
 <div class="field"><label>风格</label><select id="zw-style"><option value="0" selected>三合派（完整安星）</option><option value="1">三合精简</option></select></div>
+<div class="field"><label for="zw-reference-year">流年参考年（太岁年）</label><input type="number" id="zw-reference-year" min="1900" max="2099" step="1" placeholder="留空用今年" aria-describedby="zw-reference-help"></div>
 <button class="btn btn-primary" onclick="zwCast()">排 盘</button>
 </div>
 <div class="tip">基于出生农历年月时定命身宫，依五行局安紫微主星，排十二宫与南北斗星曜。</div>
+<div class="tip" id="zw-reference-help">参考年直接指定目标太岁年（1900—2099），留空使用当前公历年份。本命星位不随参考年变化；流年以农历正月初一换年。</div>
 </div>
 <div class="result" id="zw-records-wrap" style="display:none">
 <div class="result-title">排盘历史 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">（点击记录可重新排盘）</span></div>
@@ -11880,7 +11882,7 @@ function cleanRecord(record){
   if(!r.id||!/^[-\w]{1,80}$/.test(r.id)) throw new Error('记录ID无效');
   if(!r.dateStr) throw new Error('记录缺少日期');
   parseCivilDate(r.dateStr);
-  for(const [field,min,max] of [['utcOffsetMinutes',-720,840],['dstMinutes',0,60],['hourIdx',0,11],['gender',0,1],['school',0,2],['school2',0,4],['style',0,1],['mode',0,2],['minute',0,59],['hourHH',0,23],['ts',0,Number.MAX_SAFE_INTEGER]]){
+  for(const [field,min,max] of [['utcOffsetMinutes',-720,840],['dstMinutes',0,60],['hourIdx',0,11],['gender',0,1],['school',0,2],['school2',0,4],['style',0,1],['mode',0,2],['minute',0,59],['hourHH',0,23],['referenceYear',1900,2099],['ts',0,Number.MAX_SAFE_INTEGER]]){
     if(record[field]===undefined) continue;
     if(!Number.isInteger(record[field])||record[field]<min||record[field]>max) throw new Error('记录字段无效：'+field);
     r[field]=record[field];
@@ -12839,7 +12841,7 @@ function showRecordManager(category='all'){
         const top=document.createElement('div'),label=document.createElement('label'),check=document.createElement('input');top.className='record-manager-row-heading';check.type='checkbox';check.checked=selected.has(key+'/'+r.id);check.setAttribute('aria-label','选择'+RECORD_LABELS[key]+'记录'+(r.name||r.dateStr));label.append(check,document.createTextNode(RECORD_LABELS[key]+' · '+(r.name||'未命名')+' · '+r.dateStr));check.onchange=()=>{if(check.checked)selected.set(key+'/'+r.id,{key,id:r.id});else selected.delete(key+'/'+r.id);updateSelection();};top.appendChild(label);
         const load=document.createElement('button');load.type='button';load.className='btn btn-ghost';load.textContent='重新排盘';load.onclick=()=>{const tab={ml_records:'zonghe',bz_records:'bazi',zw_records:'ziwei',qm_records:'qimen',ly_records:'liuyao',hh_records:'hehun'}[key];document.querySelector('.tab[data-tab="'+tab+'"]').click();close();if(key===PAIR_REC_KEY)hhRecordReload(r.id);else if(key===REC_KEY)recordReload(r.id);else modRecordReload(Object.keys(MOD_REC_KEYS).find(k=>MOD_REC_KEYS[k]===key),r.id);};top.appendChild(load);
         const clock=key===REC_KEY||key===MOD_REC_KEYS.bz?birthRecordClockLabel(r):r.time||HOUR_NAMES[r.hourIdx];
-        const detail=document.createElement('p');detail.textContent=[clock,r.place,r.bazi||r.title||r.pillars].filter(Boolean).join(' · ');
+        const detail=document.createElement('p');detail.textContent=[clock,r.place,r.bazi||r.title||r.pillars,key===MOD_REC_KEYS.zw?(r.referenceYear===undefined?'参考年未保存':r.referenceYear+'流年'):''].filter(Boolean).join(' · ');
         const note=document.createElement('textarea');note.maxLength=1000;note.rows=2;note.value=r.note||'';note.setAttribute('aria-label','备注 '+RECORD_LABELS[key]+' '+(r.name||r.dateStr));note.placeholder='备注（最多1000字，可能包含个人信息）';
         const save=document.createElement('button');save.type='button';save.className='btn btn-ghost';save.textContent='保存备注';save.onclick=()=>{try{updateRecordNote(key,r.id,note.value);refreshRecordViews();render();status('备注已保存。');}catch(e){status(e.message);}};
         row.append(top,detail,note,save);list.appendChild(row);
@@ -13417,12 +13419,14 @@ function zwCast(){
   if(!dateStr){alert('请选择日期');return;}
   const [y,m,d]=dateStr.split('-').map(Number);
   const date=parseCivilDate(dateStr);
-  const result=calculateZiwei({date,hourIdx,gender});
+  const yearText=(document.getElementById('zw-reference-year')?.value||'').trim();
+  const referenceYear=yearText?Number(yearText):undefined;
+  const result=calculateZiwei({date,hourIdx,gender,referenceYear});
   const {lunar,mgGan,mingGong,ju}=result;renderZW(result);
   // 保存紫微排盘历史
   try{
     const zwStyle=parseInt(document.getElementById('zw-style').value);
-    saveModRecord('zw',{gender,dateStr,hourIdx,style:(zwStyle>=0&&zwStyle<=1)?zwStyle:0,
+    saveModRecord('zw',{gender,dateStr,hourIdx,referenceYear:result.referenceYear,style:(zwStyle>=0&&zwStyle<=1)?zwStyle:0,
       title:'命宫'+GAN[mgGan]+ZHI[mingGong]+'·'+['水二','木三','金四','土五','火六'][ju-2]+'局',
       lunarText:lunar.year+'年'+(lunar.isLeap?'闰':'')+lunarMonthName(lunar.month,lunar.isLeap)+lunarDayName(lunar.day)});
   }catch(e){showChartRecordFailure();}
@@ -14254,8 +14258,9 @@ function saveModRecord(mod,rec){
   let recs=readStoredRecords(MOD_REC_KEYS[mod]);
   const detail=mod==='ly'?[rec.time||'',rec.mode,rec.nums||'',rec.ruleMode||'legacy',rec.dayBoundary||'zi-chu']:mod==='qm'?[rec.hourHH,rec.minute,rec.school,QIMEN_RULE_VERSION]:[];
   const key=mod+'|'+rec.dateStr+'|'+rec.hourIdx+(detail.length?'|'+JSON.stringify(detail):'');
-  const identity=mod==='bz'||mod==='zw'?birthRecordIdentity(rec):null;
-  const idx=recs.findIndex(r=>identity===null?r.key===key:birthRecordIdentity(r)===identity);
+  const identityFor=r=>mod==='zw'?JSON.stringify([birthRecordIdentity(r),r.referenceYear??beijingNow().getFullYear()]):birthRecordIdentity(r);
+  const identity=mod==='bz'||mod==='zw'?identityFor(rec):null;
+  const idx=recs.findIndex(r=>identity===null?r.key===key:identityFor(r)===identity);
   const id=idx>=0?recs[idx].id:(Date.now()+''+Math.floor(Math.random()*1000));
   rec=Object.assign({},idx>=0?recs[idx]:{},rec,{id,key,ts:Date.now()});
   if(idx>=0) recs[idx]=rec; else recs.unshift(rec);
@@ -14267,7 +14272,7 @@ function modRecMeta(mod,r){
   const gender=r.gender===1?'♂':r.gender===0?'♀':'';
   const h=HOUR_NAMES[r.hourIdx]||'';
   let extra='';
-  if(mod==='zw') extra='·'+(r.style===1?'三合精简':'三合派');
+  if(mod==='zw') extra='·'+(r.style===1?'三合精简':'三合派')+'·'+(r.referenceYear===undefined?'参考年未保存':r.referenceYear+'流年');
   if(mod==='bz') extra='·'+(r.school===0?'子时换日':'晚子时不换日')+((r.school2>=0&&r.school2<=4)?'·'+['综合','旺衰','盲派','格局','调候'][r.school2]:'');
   if(mod==='qm') extra='·'+(r.mode===0?'此刻':['旧版近似','拆补','拆补'][r.school===2?1:r.school]||'拆补')+(r.minute!==undefined?'·'+String(r.hourHH!==undefined?String(r.hourHH).padStart(2,'0')+'：':'')+String(r.minute).padStart(2,'0')+'分':'');
   if(mod==='ly') extra=r.nums?(r.mode===2?('·摇卦 '+r.nums):'·三数 '+r.nums):'·时间起卦';
@@ -14302,6 +14307,7 @@ function modRecordReload(mod,id){
     document.getElementById('zw-hour').value=r.hourIdx;
     document.getElementById('zw-gender').value=r.gender;
     if(r.style!==undefined) document.getElementById('zw-style').value=r.style;
+    document.getElementById('zw-reference-year').value=r.referenceYear??'';
     zwCast();
   }else if(mod==='bz'){
     document.getElementById('bz-name').value=r.name||'';
@@ -14327,24 +14333,23 @@ function modRecordReload(mod,id){
     if(r.school!==undefined) document.getElementById('qm-school').value=(r.school===2?1:r.school); // 茅山已弃用→拆补
     qmCast();
   }else if(mod==='ly'){
-    document.getElementById('ly-mode').value=r.mode;
+    const mode=r.mode??0;
+    document.getElementById('ly-mode').value=mode;
+    lyModeChange();
     document.getElementById('ly-date').value=r.dateStr;
     document.getElementById('ly-hour').value=r.hourIdx;
     document.getElementById('ly-time').value=r.time||'';
     document.getElementById('ly-rule-mode').value=r.ruleMode||'legacy';
     document.getElementById('ly-day-boundary').value=r.dayBoundary||'zi-chu';
-    if(r.nums) document.getElementById('ly-num').value=r.nums;
-    if(r.mode===2){
+    document.getElementById('ly-num').value=mode===1?(r.nums||''):'';
+    if(mode===2){
       // 恢复摇卦序列
-      const seq=String(r.nums||'').split('').map(Number).filter(n=>!isNaN(n));
-      lyYaoSeq=seq.length===6?seq:[];
-      updateYaoStatus();
-      const w=document.getElementById('ly-yao-wrap');
-      if(w) w.style.display='flex';
+      const nums=String(r.nums||'');
+      lyYaoSeq=/^[0-3]{6}$/.test(nums)?nums.split('').map(Number):[];
     }else{
       lyYaoSeq=[];
-      updateYaoStatus();
     }
+    updateYaoStatus();
     lyCast();
   }
   const el=document.getElementById(mod+'-result');

@@ -1,0 +1,63 @@
+const {test,expect}=require('@playwright/test');
+const fs=require('node:fs');
+
+for(const width of [1440,320])test('Ziwei annual selection and history preserve the natal chart at '+width+'px',async({page},testInfo)=>{
+  await page.setViewportSize({width,height:900});
+  await page.goto('/');
+  await page.locator('.tab[data-tab="ziwei"]').click();
+  await page.locator('#zw-date').fill('1988-08-08');
+  await page.locator('#zw-reference-year').fill('2024');
+  await page.locator('#panel-ziwei .btn-primary').click();
+  await expect(page.locator('#zw-result .info-bar')).toContainText('流年四化（2024 甲辰）：廉贞禄 破军权 武曲科 太阳忌');
+  const natal=await page.locator('#zw-result .info-bar > span').allTextContents();
+  await page.locator('#zw-reference-year').fill('2025');
+  await page.locator('#panel-ziwei .btn-primary').click();
+  await expect(page.locator('#zw-result .info-bar')).toContainText('流年四化（2025 乙巳）：天机禄 天梁权 紫微科 太阴忌');
+  expect((await page.locator('#zw-result .info-bar > span').allTextContents()).filter(x=>!x.startsWith('流年四化'))).toEqual(natal.filter(x=>!x.startsWith('流年四化')));
+  await expect(page.locator('#zw-records .rec-item')).toHaveCount(2);
+  await page.locator('#zw-records .rec-item').filter({hasText:'2024流年'}).click();
+  await expect(page.locator('#zw-reference-year')).toHaveValue('2024');
+  await expect(page.locator('#zw-result .info-bar')).toContainText('流年四化（2024 甲辰）');
+  await expect(page.locator('#zw-records .rec-item')).toHaveCount(2);
+  await page.locator('#record-manager-open').click();
+  await page.locator('#record-manager-category').selectOption('zw_records');
+  await expect(page.locator('#record-manager-list')).toContainText('2024流年');
+  await page.locator('#record-manager-select-visible').check();
+  const download=page.waitForEvent('download');
+  await page.locator('#record-manager-export').click();
+  const file=await download,dest=testInfo.outputPath('ziwei-years.json');
+  await file.saveAs(dest);
+  const backup=JSON.parse(fs.readFileSync(dest,'utf8'));
+  expect(backup.zw_records.map(r=>r.referenceYear).sort()).toEqual([2024,2025]);
+  await page.keyboard.press('Escape');
+  await page.evaluate(data=>{localStorage.setItem('zw_records','[]');restoreRecordBackup(data);renderModRecords('zw');},backup);
+  await page.locator('#zw-records .rec-item').filter({hasText:'2025流年'}).click();
+  await expect(page.locator('#zw-reference-year')).toHaveValue('2025');
+  await expect(page.locator('#zw-result .info-bar')).toContainText('流年四化（2025 乙巳）');
+  const previous=await page.locator('#zw-result').innerHTML(),dialogs=[];
+  page.on('dialog',async d=>{dialogs.push(d.message());await d.accept();});
+  await page.locator('#zw-reference-year').fill('2100');
+  await page.locator('#panel-ziwei .btn-primary').click();
+  expect(dialogs.join('')).toContain('参考年份');
+  expect(await page.locator('#zw-result').innerHTML()).toBe(previous);
+  await expect(page.locator('#zw-records .rec-item')).toHaveCount(2);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('old Ziwei records clear a stale annual selection and disclose the missing reference year',async({page})=>{
+  await page.goto('/');
+  await page.locator('.tab[data-tab="ziwei"]').click();
+  await page.evaluate(()=>{
+    localStorage.setItem('zw_records',JSON.stringify([{id:'legacy-zw',dateStr:'1988-08-08',hourIdx:6,gender:1,note:'原备注'}]));
+    renderModRecords('zw');
+  });
+  await expect(page.locator('#zw-records')).toContainText('参考年未保存');
+  await page.locator('#zw-reference-year').fill('2099');
+  await page.locator('#zw-records .rec-item').click();
+  await expect(page.locator('#zw-reference-year')).toHaveValue('');
+  const year=await page.evaluate(()=>beijingNow().getFullYear());
+  await expect(page.locator('#zw-result .info-bar')).toContainText('流年四化（'+year+' ');
+  const rows=await page.evaluate(()=>readStoredRecords('zw_records'));
+  expect(rows).toHaveLength(1);
+  expect(rows[0]).toMatchObject({id:'legacy-zw',note:'原备注',referenceYear:year});
+});

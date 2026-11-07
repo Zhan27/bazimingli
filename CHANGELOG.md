@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.43.0 — 2026-11-07
+- Add an explicit Ziwei annual reference year and preserve it in distinct history entries, replay and backups.
+- Show when legacy Ziwei records did not save an annual reference year.
+- Restore the matching Liuyao coin panel, number input and coin sequence when replaying history.
+- Record a fresh GitHub reference survey and the scope of ideas adopted from iztro and related projects.
+
 ## 5.42.0 — 2026-11-07
 - Show a record-space notice in the desktop window when the launcher has to use a different port.
 

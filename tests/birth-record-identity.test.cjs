@@ -41,3 +41,20 @@ test('standalone birth history distinguishes exact minutes and Ziwei gender',()=
   assert.equal(engine.json("readStoredRecords('bz_records')").length,2);
   assert.equal(engine.json("readStoredRecords('zw_records')").length,2);
 });
+
+test('Ziwei history separates reference years and keeps a legacy current-year record identity',()=>{
+  const engine=loadEngine({ui:true});
+  engine.run(`{
+    beijingNow=()=>parseCivilDate('2026-11-07');
+    const base={dateStr:'2024-02-09',hourIdx:5,gender:1};
+    saveModRecord('zw',base);
+    const original=readStoredRecords('zw_records')[0];
+    updateRecordNote('zw_records',original.id,'旧记录原备注');
+    saveModRecord('zw',{...base,referenceYear:2025});
+    saveModRecord('zw',{...base,referenceYear:2026});
+  }`);
+  const rows=engine.json("readStoredRecords('zw_records')");
+  assert.equal(rows.length,2);
+  assert.equal(rows.find(row=>row.referenceYear===2026).note,'旧记录原备注');
+  assert.equal(rows.find(row=>row.referenceYear===2025).note,undefined);
+});

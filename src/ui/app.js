@@ -336,12 +336,14 @@ function zwCast(){
   if(!dateStr){alert('请选择日期');return;}
   const [y,m,d]=dateStr.split('-').map(Number);
   const date=parseCivilDate(dateStr);
-  const result=calculateZiwei({date,hourIdx,gender});
+  const yearText=(document.getElementById('zw-reference-year')?.value||'').trim();
+  const referenceYear=yearText?Number(yearText):undefined;
+  const result=calculateZiwei({date,hourIdx,gender,referenceYear});
   const {lunar,mgGan,mingGong,ju}=result;renderZW(result);
   // 保存紫微排盘历史
   try{
     const zwStyle=parseInt(document.getElementById('zw-style').value);
-    saveModRecord('zw',{gender,dateStr,hourIdx,style:(zwStyle>=0&&zwStyle<=1)?zwStyle:0,
+    saveModRecord('zw',{gender,dateStr,hourIdx,referenceYear:result.referenceYear,style:(zwStyle>=0&&zwStyle<=1)?zwStyle:0,
       title:'命宫'+GAN[mgGan]+ZHI[mingGong]+'·'+['水二','木三','金四','土五','火六'][ju-2]+'局',
       lunarText:lunar.year+'年'+(lunar.isLeap?'闰':'')+lunarMonthName(lunar.month,lunar.isLeap)+lunarDayName(lunar.day)});
   }catch(e){showChartRecordFailure();}
@@ -1173,8 +1175,9 @@ function saveModRecord(mod,rec){
   let recs=readStoredRecords(MOD_REC_KEYS[mod]);
   const detail=mod==='ly'?[rec.time||'',rec.mode,rec.nums||'',rec.ruleMode||'legacy',rec.dayBoundary||'zi-chu']:mod==='qm'?[rec.hourHH,rec.minute,rec.school,QIMEN_RULE_VERSION]:[];
   const key=mod+'|'+rec.dateStr+'|'+rec.hourIdx+(detail.length?'|'+JSON.stringify(detail):'');
-  const identity=mod==='bz'||mod==='zw'?birthRecordIdentity(rec):null;
-  const idx=recs.findIndex(r=>identity===null?r.key===key:birthRecordIdentity(r)===identity);
+  const identityFor=r=>mod==='zw'?JSON.stringify([birthRecordIdentity(r),r.referenceYear??beijingNow().getFullYear()]):birthRecordIdentity(r);
+  const identity=mod==='bz'||mod==='zw'?identityFor(rec):null;
+  const idx=recs.findIndex(r=>identity===null?r.key===key:identityFor(r)===identity);
   const id=idx>=0?recs[idx].id:(Date.now()+''+Math.floor(Math.random()*1000));
   rec=Object.assign({},idx>=0?recs[idx]:{},rec,{id,key,ts:Date.now()});
   if(idx>=0) recs[idx]=rec; else recs.unshift(rec);
@@ -1186,7 +1189,7 @@ function modRecMeta(mod,r){
   const gender=r.gender===1?'♂':r.gender===0?'♀':'';
   const h=HOUR_NAMES[r.hourIdx]||'';
   let extra='';
-  if(mod==='zw') extra='·'+(r.style===1?'三合精简':'三合派');
+  if(mod==='zw') extra='·'+(r.style===1?'三合精简':'三合派')+'·'+(r.referenceYear===undefined?'参考年未保存':r.referenceYear+'流年');
   if(mod==='bz') extra='·'+(r.school===0?'子时换日':'晚子时不换日')+((r.school2>=0&&r.school2<=4)?'·'+['综合','旺衰','盲派','格局','调候'][r.school2]:'');
   if(mod==='qm') extra='·'+(r.mode===0?'此刻':['旧版近似','拆补','拆补'][r.school===2?1:r.school]||'拆补')+(r.minute!==undefined?'·'+String(r.hourHH!==undefined?String(r.hourHH).padStart(2,'0')+'：':'')+String(r.minute).padStart(2,'0')+'分':'');
   if(mod==='ly') extra=r.nums?(r.mode===2?('·摇卦 '+r.nums):'·三数 '+r.nums):'·时间起卦';
@@ -1221,6 +1224,7 @@ function modRecordReload(mod,id){
     document.getElementById('zw-hour').value=r.hourIdx;
     document.getElementById('zw-gender').value=r.gender;
     if(r.style!==undefined) document.getElementById('zw-style').value=r.style;
+    document.getElementById('zw-reference-year').value=r.referenceYear??'';
     zwCast();
   }else if(mod==='bz'){
     document.getElementById('bz-name').value=r.name||'';

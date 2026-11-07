@@ -25,6 +25,19 @@ test('v4 mingli_records backups migrate, both keys merge without duplicate IDs',
   restore({version:'v4',ml_records:[rec],mingli_records:[rec,{...rec,id:'54321'}]},store);
   assert.equal(JSON.parse(store.getItem('ml_records')).length,2);
 });
+
+test('Ziwei reference years survive backup round trips and invalid years fail before writing',()=>{
+  for(const referenceYear of [1900,2026,2099]){
+    const storage=memoryStorage();
+    restore({version:'v5',zw_records:[{...rec,referenceYear}]},storage);
+    assert.equal(JSON.parse(storage.getItem('zw_records'))[0].referenceYear,referenceYear);
+  }
+  for(const referenceYear of [1899,2100,2026.5,'2026',null]){
+    const storage=memoryStorage({zw_records:'[]'});
+    assert.throws(()=>restore({version:'v5',zw_records:[{...rec,referenceYear}]},storage),/referenceYear/);
+    assert.equal(storage.getItem('zw_records'),'[]');
+  }
+});
 test('local legacy key migrates once and cannot resurrect after clearing',()=>{
   const store=memoryStorage({mingli_records:JSON.stringify([rec])});e.context.storage=store;
   e.run('migrateLegacyRecords(storage)');assert.equal(store.getItem('mingli_records'),null);

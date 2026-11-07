@@ -29,7 +29,7 @@ function cleanRecord(record){
   if(!r.id||!/^[-\w]{1,80}$/.test(r.id)) throw new Error('记录ID无效');
   if(!r.dateStr) throw new Error('记录缺少日期');
   parseCivilDate(r.dateStr);
-  for(const [field,min,max] of [['utcOffsetMinutes',-720,840],['dstMinutes',0,60],['hourIdx',0,11],['gender',0,1],['school',0,2],['school2',0,4],['style',0,1],['mode',0,2],['minute',0,59],['hourHH',0,23],['ts',0,Number.MAX_SAFE_INTEGER]]){
+  for(const [field,min,max] of [['utcOffsetMinutes',-720,840],['dstMinutes',0,60],['hourIdx',0,11],['gender',0,1],['school',0,2],['school2',0,4],['style',0,1],['mode',0,2],['minute',0,59],['hourHH',0,23],['referenceYear',1900,2099],['ts',0,Number.MAX_SAFE_INTEGER]]){
     if(record[field]===undefined) continue;
     if(!Number.isInteger(record[field])||record[field]<min||record[field]>max) throw new Error('记录字段无效：'+field);
     r[field]=record[field];

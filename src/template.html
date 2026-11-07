@@ -440,9 +440,11 @@ header .sub{font-size:.78rem;color:var(--ink3);margin-top:6px;letter-spacing:.2e
 <div class="field"><label>公历日期</label><input type="date" id="zw-date" min="1900-01-31" max="2099-12-31"></div>
 <div class="field"><label>出生时辰</label><select id="zw-hour"></select></div>
 <div class="field"><label>风格</label><select id="zw-style"><option value="0" selected>三合派（完整安星）</option><option value="1">三合精简</option></select></div>
+<div class="field"><label for="zw-reference-year">流年参考年（太岁年）</label><input type="number" id="zw-reference-year" min="1900" max="2099" step="1" placeholder="留空用今年" aria-describedby="zw-reference-help"></div>
 <button class="btn btn-primary" onclick="zwCast()">排 盘</button>
 </div>
 <div class="tip">基于出生农历年月时定命身宫，依五行局安紫微主星，排十二宫与南北斗星曜。</div>
+<div class="tip" id="zw-reference-help">参考年直接指定目标太岁年（1900—2099），留空使用当前公历年份。本命星位不随参考年变化；流年以农历正月初一换年。</div>
 </div>
 <div class="result" id="zw-records-wrap" style="display:none">
 <div class="result-title">排盘历史 <span style="font-size:.7rem;color:var(--ink3);font-weight:400">（点击记录可重新排盘）</span></div>
