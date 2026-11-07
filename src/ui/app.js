@@ -1246,24 +1246,23 @@ function modRecordReload(mod,id){
     if(r.school!==undefined) document.getElementById('qm-school').value=(r.school===2?1:r.school); // 茅山已弃用→拆补
     qmCast();
   }else if(mod==='ly'){
-    document.getElementById('ly-mode').value=r.mode;
+    const mode=r.mode??0;
+    document.getElementById('ly-mode').value=mode;
+    lyModeChange();
     document.getElementById('ly-date').value=r.dateStr;
     document.getElementById('ly-hour').value=r.hourIdx;
     document.getElementById('ly-time').value=r.time||'';
     document.getElementById('ly-rule-mode').value=r.ruleMode||'legacy';
     document.getElementById('ly-day-boundary').value=r.dayBoundary||'zi-chu';
-    if(r.nums) document.getElementById('ly-num').value=r.nums;
-    if(r.mode===2){
+    document.getElementById('ly-num').value=mode===1?(r.nums||''):'';
+    if(mode===2){
       // 恢复摇卦序列
-      const seq=String(r.nums||'').split('').map(Number).filter(n=>!isNaN(n));
-      lyYaoSeq=seq.length===6?seq:[];
-      updateYaoStatus();
-      const w=document.getElementById('ly-yao-wrap');
-      if(w) w.style.display='flex';
+      const nums=String(r.nums||'');
+      lyYaoSeq=/^[0-3]{6}$/.test(nums)?nums.split('').map(Number):[];
     }else{
       lyYaoSeq=[];
-      updateYaoStatus();
     }
+    updateYaoStatus();
     lyCast();
   }
   const el=document.getElementById(mod+'-result');

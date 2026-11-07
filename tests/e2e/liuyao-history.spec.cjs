@@ -1,0 +1,40 @@
+const {test,expect}=require('@playwright/test');
+
+test('replaying Liuyao history restores the matching inputs and coin panel',async({page})=>{
+  await page.goto('/');
+  await page.locator('.tab[data-tab="liuyao"]').click();
+  await page.locator('#ly-date').fill('2024-02-10');
+  await page.locator('#ly-time').fill('12:00');
+  await page.evaluate(()=>lyCast());
+  const timeChart=await page.locator('#ly-result').innerText();
+  await page.locator('#ly-mode').selectOption('1');
+  await page.locator('#ly-date').fill('2024-02-12');
+  await page.locator('#ly-num').fill('3 8 6');
+  await page.evaluate(()=>lyCast());
+  const numberChart=await page.locator('#ly-result').innerText();
+  await page.locator('#ly-mode').selectOption('2');
+  await page.locator('#ly-date').fill('2024-02-11');
+  await page.evaluate(()=>{
+    lyYaoSeq=[0,1,2,3,1,2];
+    updateYaoStatus();
+    lyCast();
+  });
+  await expect(page.locator('#ly-yao-wrap')).toBeVisible();
+  await page.locator('#ly-records .rec-item').filter({hasText:'2024-02-10'}).click();
+  await expect(page.locator('#ly-mode')).toHaveValue('0');
+  await expect(page.locator('#ly-yao-wrap')).toBeHidden();
+  await expect(page.locator('#ly-num')).toHaveValue('');
+  await expect(page.locator('#ly-result')).toHaveText(timeChart,{useInnerText:true});
+  await page.locator('#ly-records .rec-item').filter({hasText:'2024-02-11'}).click();
+  await expect(page.locator('#ly-mode')).toHaveValue('2');
+  await expect(page.locator('#ly-yao-wrap')).toBeVisible();
+  await expect(page.locator('#ly-num')).toHaveValue('');
+  await expect(page.locator('#ly-yao-status')).toContainText('6/6');
+  expect(await page.evaluate(()=>lyYaoSeq)).toEqual([0,1,2,3,1,2]);
+  await page.locator('#ly-records .rec-item').filter({hasText:'2024-02-12'}).click();
+  await expect(page.locator('#ly-mode')).toHaveValue('1');
+  await expect(page.locator('#ly-yao-wrap')).toBeHidden();
+  await expect(page.locator('#ly-num')).toHaveValue('3 8 6');
+  await expect(page.locator('#ly-result')).toHaveText(numberChart,{useInnerText:true});
+  expect(await page.evaluate(()=>lyYaoSeq)).toEqual([]);
+});
