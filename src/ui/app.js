@@ -55,7 +55,10 @@ function zhToggleCal(){
   ['zh-lunar-field','zh-lm-field','zh-ld-field','zh-ll-field'].forEach(id=>{
     document.getElementById(id).style.display=isLunar?'':'none';
   });
-  if(isLunar) zhFillLunarSel();
+  if(isLunar){
+    if(document.getElementById('zh-solar').value) zhSyncFromSolar();
+    else if(!document.getElementById('zh-ly').options.length) zhFillLunarSel();
+  }
 }
 // 公历输入同步农历选择器
 function zhSyncFromSolar(){
